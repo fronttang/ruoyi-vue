@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.role.mapper.DetectUnitMapper">
+    
+    <resultMap type="DetectUnit" id="DetectUnitResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="shortName"    column="short_name"    />
+        <result property="controlledNumber"    column="controlled_number"    />
+        <result property="phone"    column="phone"    />
+        <result property="address"    column="address"    />
+        <result property="contact"    column="contact"    />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="logo"    column="logo"    />
+        <result property="businessLicense"    column="business_license"    />
+        <result property="qualification"    column="qualification"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectDetectUnitVo">
+        select id, name, short_name, controlled_number, phone, address, contact, contact_phone, logo, business_license, qualification, create_by, create_time, update_by, update_time from detect_unit
+    </sql>
+
+    <select id="selectDetectUnitList" parameterType="DetectUnit" resultMap="DetectUnitResult">
+        <include refid="selectDetectUnitVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="shortName != null  and shortName != ''"> and short_name like concat('%', #{shortName}, '%')</if>
+            <if test="controlledNumber != null  and controlledNumber != ''"> and controlled_number = #{controlledNumber}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="contact != null  and contact != ''"> and contact = #{contact}</if>
+            <if test="contactPhone != null  and contactPhone != ''"> and contact_phone = #{contactPhone}</if>
+            <if test="logo != null  and logo != ''"> and logo = #{logo}</if>
+            <if test="businessLicense != null  and businessLicense != ''"> and business_license = #{businessLicense}</if>
+            <if test="qualification != null  and qualification != ''"> and qualification = #{qualification}</if>
+        </where>
+    </select>
+    
+    <select id="selectDetectUnitById" parameterType="Long" resultMap="DetectUnitResult">
+        <include refid="selectDetectUnitVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectDetectUnitDict"  resultType="com.ruoyi.electrical.vo.DictVO">
+        select id, name from detect_unit
+    </select>
+
+    <insert id="insertDetectUnit" parameterType="DetectUnit">
+        insert into detect_unit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="shortName != null">short_name,</if>
+            <if test="controlledNumber != null">controlled_number,</if>
+            <if test="phone != null">phone,</if>
+            <if test="address != null">address,</if>
+            <if test="contact != null">contact,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="logo != null">logo,</if>
+            <if test="businessLicense != null">business_license,</if>
+            <if test="qualification != null">qualification,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="shortName != null">#{shortName},</if>
+            <if test="controlledNumber != null">#{controlledNumber},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="address != null">#{address},</if>
+            <if test="contact != null">#{contact},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="logo != null">#{logo},</if>
+            <if test="businessLicense != null">#{businessLicense},</if>
+            <if test="qualification != null">#{qualification},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDetectUnit" parameterType="DetectUnit">
+        update detect_unit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="shortName != null">short_name = #{shortName},</if>
+            <if test="controlledNumber != null">controlled_number = #{controlledNumber},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="contact != null">contact = #{contact},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="logo != null">logo = #{logo},</if>
+            <if test="businessLicense != null">business_license = #{businessLicense},</if>
+            <if test="qualification != null">qualification = #{qualification},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDetectUnitById" parameterType="Long">
+        delete from detect_unit where id = #{id}
+    </delete>
+
+    <delete id="deleteDetectUnitByIds" parameterType="String">
+        delete from detect_unit where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

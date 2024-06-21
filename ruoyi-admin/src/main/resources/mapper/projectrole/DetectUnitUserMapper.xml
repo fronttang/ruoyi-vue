@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.role.mapper.DetectUnitUserMapper">
+    
+    <resultMap type="DetectUnitUser" id="DetectUnitUserResult">
+        <result property="id"    column="user_id"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="detectName"    column="detect_name"    />
+        <result property="account"    column="user_name"    />
+        <result property="name"    column="nick_name"    />
+        <result property="password"    column="password"    />
+        <result property="status"    column="status"    />
+        <result property="type"    column="user_type"    />
+        <result property="recorder"    column="recorder"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="recorder"    column="recorder"    />
+        <result property="district"    column="district"    />
+        <result property="street"    column="street"    />
+        <result property="community"    column="community"    />
+        <result property="hamlet"    column="hamlet"    />
+    </resultMap>
+
+    <sql id="selectDetectUnitUserVo">
+        select s.user_id, s.detect_id, u.name as detect_name, s.user_type, s.user_name, s.nick_name, s.password, s.status, 
+        s.recorder, s.district, s.street, s.community, s.hamlet, s.create_by, s.create_time, s.update_by, s.update_time 
+        from sys_user s left join detect_unit u on s.detect_id = u.id
+    </sql>
+
+    <select id="selectDetectUnitUserList" parameterType="DetectUnitUser" resultMap="DetectUnitUserResult">
+        <include refid="selectDetectUnitUserVo"/>
+        <where>  
+        	<if test="type != null  and type != ''"> and s.user_type = #{type}</if>
+            <if test="detectName != null  and detectName != ''"> and s.detect_name = #{detectName}</if>
+            <if test="account != null  and account != ''"> and s.user_name = #{account}</if>
+            <if test="district != null  and district != ''"> and s.district = #{district}</if>
+            <if test="street != null  and street != ''"> and s.street = #{street}</if>
+            <if test="community != null  and community != ''"> and s.community = #{community}</if>
+            <if test="hamlet != null  and hamlet != ''"> and s.hamlet = #{hamlet}</if>
+        </where>
+    </select>
+    
+    <select id="selectDetectUnitUserById" parameterType="Long" resultMap="DetectUnitUserResult">
+        <include refid="selectDetectUnitUserVo"/>
+        where s.user_id = #{id}
+    </select>
+    
+    <select id="sysUserDictByType" resultType="com.ruoyi.electrical.vo.DictVO">
+       	select user_id as id, nick_name as name from sys_user where user_type = #{type} and detect_id = #{detectId}
+    </select>
+    
+    <select id="sysUserDict" resultType="com.ruoyi.electrical.vo.DictVO">
+       	select user_id as id, nick_name as name from sys_user
+    </select>
+
+    <insert id="insertDetectUnitUser" parameterType="DetectUnitUser" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="detectId != null">detect_id,</if>
+            <if test="detectName != null">detect_name,</if>
+            <if test="account != null and account != ''">user_name,</if>
+            <if test="name != null">nick_name,</if>
+            <if test="password != null">password,</if>
+            <if test="status != null">status,</if>
+            <if test="type != null">user_type,</if>
+            <if test="recorder != null">recorder,</if>
+            <if test="district != null">district,</if>
+            <if test="street != null">street,</if>
+            <if test="community != null">community,</if>
+            <if test="hamlet != null">hamlet,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="detectId != null">#{detectId},</if>
+            <if test="detectName != null">#{detectName},</if>
+            <if test="account != null and account != ''">#{account},</if>
+            <if test="name != null">#{name},</if>
+            <if test="password != null">#{password},</if>
+            <if test="status != null">#{status},</if>
+            <if test="type != null">#{type},</if>
+            <if test="recorder != null">#{recorder},</if>
+            <if test="district != null">#{district},</if>
+            <if test="street != null">#{street},</if>
+            <if test="community != null">#{community},</if>
+            <if test="hamlet != null">#{hamlet},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDetectUnitUser" parameterType="DetectUnitUser">
+        update sys_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="detectName != null">detect_name = #{detectName},</if>
+            <if test="account != null and account != ''">user_name = #{account},</if>
+            <if test="name != null">nick_name = #{name},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="recorder != null">recorder = #{recorder},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="street != null">street = #{street},</if>
+            <if test="community != null">community = #{community},</if>
+            <if test="hamlet != null">hamlet = #{hamlet},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where user_id = #{id}
+    </update>
+
+    <delete id="deleteDetectUnitUserById" parameterType="Long">
+        delete from sys_user where user_id = #{id}
+    </delete>
+
+    <delete id="deleteDetectUnitUserByIds" parameterType="String">
+        delete from sys_user where user_id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

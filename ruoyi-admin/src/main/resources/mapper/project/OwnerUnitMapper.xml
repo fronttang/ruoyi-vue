@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.OwnerUnitMapper">
+    
+    <resultMap type="OwnerUnit" id="OwnerUnitResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="type"    column="type"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="detectName"    column="detect_name"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="projectName"    column="project_name"    />
+        <result property="area"    column="area"    />
+        <result property="entrust"    column="entrust"    />
+        <result property="manager"    column="manager"    />
+        <result property="gridman"    column="gridman"    />
+        <result property="address"    column="address"    />
+        <result property="contact"    column="contact"    />
+        <result property="phone"    column="phone"    />
+        <result property="acreage"    column="acreage"    />
+        <result property="layers"    column="layers"    />
+        <result property="nature"    column="nature"    />
+        <result property="testStartDate"    column="test_start_date"    />
+        <result property="testEndDate"    column="test_end_date"    />
+        <result property="testDate"    column="test_date"    />
+        <result property="testContent"    column="test_content"    />
+        <result property="doorNumber"    column="door_number"    />
+        <result property="buildman"    column="buildman"    />
+        <result property="unitType"    column="unit_type"    />
+        <result property="incharge"    column="incharge"    />
+        <result property="venueType"    column="venue_type"    />
+        <result property="safetyIncharge"    column="safety_incharge"    />
+        <result property="safetyManager"    column="safety_manager"    />
+        <result property="staffs"    column="staffs"    />
+        <result property="licence"    column="licence"    />
+        <result property="safetyKeyUnit"    column="safety_key_unit"    />
+        <result property="stationType"    column="station_type"    />
+        <result property="detectModule"    column="detect_module"    />
+        <result property="operating"    column="operating"    />
+        <result property="propertyType"    column="property_type"    />
+        <result property="panoramaPic"    column="panorama_pic"    />
+        <result property="stationPic"    column="station_pic"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOwnerUnitVo">
+        select id, name, type, detect_id, detect_name, project_id, project_name, 
+        area, entrust, manager, gridman, address, contact, phone, acreage, layers, 
+        nature, test_start_date, test_end_date, test_date, test_content, door_number, 
+        buildman, unit_type, incharge, venue_type, safety_incharge, safety_manager, 
+        staffs, licence, safety_key_unit, station_type, detect_module, operating, 
+        property_type, panorama_pic, station_pic, 
+        create_by, create_time, update_by, update_time 
+        from owner_unit ou 
+    </sql>
+
+    <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
+        <include refid="selectOwnerUnitVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="detectId != null "> and detect_id = #{detectId}</if>
+            <if test="detectName != null  and detectName != ''"> and detect_name like concat('%', #{detectName}, '%')</if>
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
+            <if test="area != null "> and area = #{area}</if>
+            <if test="entrust != null  and entrust != ''"> and entrust = #{entrust}</if>
+            <if test="manager != null "> and manager = #{manager}</if>
+            <if test="gridman != null "> and gridman = #{gridman}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="contact != null  and contact != ''"> and contact = #{contact}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="acreage != null  and acreage != ''"> and acreage = #{acreage}</if>
+            <if test="layers != null "> and layers = #{layers}</if>
+            <if test="nature != null  and nature != ''"> and nature = #{nature}</if>
+            <if test="testStartDate != null "> and test_start_date = #{testStartDate}</if>
+            <if test="testEndDate != null "> and test_end_date = #{testEndDate}</if>
+            <if test="testDate != null "> and test_date = #{testDate}</if>
+            <if test="testContent != null  and testContent != ''"> and test_content = #{testContent}</if>
+            <if test="doorNumber != null "> and door_number = #{doorNumber}</if>
+            <if test="buildman != null  and buildman != ''"> and buildman = #{buildman}</if>
+            <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
+            <if test="incharge != null  and incharge != ''"> and incharge = #{incharge}</if>
+            <if test="venueType != null  and venueType != ''"> and venue_type = #{venueType}</if>
+            <if test="safetyIncharge != null  and safetyIncharge != ''"> and safety_incharge = #{safetyIncharge}</if>
+            <if test="safetyManager != null  and safetyManager != ''"> and safety_manager = #{safetyManager}</if>
+            <if test="staffs != null "> and staffs = #{staffs}</if>
+            <if test="licence != null  and licence != ''"> and licence = #{licence}</if>
+            <if test="safetyKeyUnit != null  and safetyKeyUnit != ''"> and safety_key_unit = #{safetyKeyUnit}</if>
+            <if test="stationType != null  and stationType != ''"> and station_type = #{stationType}</if>
+            <if test="detectModule != null  and detectModule != ''"> and detect_module = #{detectModule}</if>
+            <if test="operating != null  and operating != ''"> and operating = #{operating}</if>
+            <if test="propertyType != null  and propertyType != ''"> and property_type = #{propertyType}</if>
+            <if test="panoramaPic != null  and panoramaPic != ''"> and panorama_pic = #{panoramaPic}</if>
+            <if test="stationPic != null  and stationPic != ''"> and station_pic = #{stationPic}</if>
+        </where>
+    </select>
+    
+    <select id="selectOwnerUnitById" parameterType="Long" resultMap="OwnerUnitResult">
+        <include refid="selectOwnerUnitVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertOwnerUnit" parameterType="OwnerUnit">
+        insert into owner_unit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="type != null">type,</if>
+            <if test="detectId != null">detect_id,</if>
+            <if test="detectName != null">detect_name,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="projectName != null">project_name,</if>
+            <if test="area != null">area,</if>
+            <if test="entrust != null">entrust,</if>
+            <if test="manager != null">manager,</if>
+            <if test="gridman != null">gridman,</if>
+            <if test="address != null">address,</if>
+            <if test="contact != null">contact,</if>
+            <if test="phone != null">phone,</if>
+            <if test="acreage != null">acreage,</if>
+            <if test="layers != null">layers,</if>
+            <if test="nature != null">nature,</if>
+            <if test="testStartDate != null">test_start_date,</if>
+            <if test="testEndDate != null">test_end_date,</if>
+            <if test="testDate != null">test_date,</if>
+            <if test="testContent != null">test_content,</if>
+            <if test="doorNumber != null">door_number,</if>
+            <if test="buildman != null">buildman,</if>
+            <if test="unitType != null">unit_type,</if>
+            <if test="incharge != null">incharge,</if>
+            <if test="venueType != null">venue_type,</if>
+            <if test="safetyIncharge != null">safety_incharge,</if>
+            <if test="safetyManager != null">safety_manager,</if>
+            <if test="staffs != null">staffs,</if>
+            <if test="licence != null">licence,</if>
+            <if test="safetyKeyUnit != null">safety_key_unit,</if>
+            <if test="stationType != null">station_type,</if>
+            <if test="detectModule != null">detect_module,</if>
+            <if test="operating != null">operating,</if>
+            <if test="propertyType != null">property_type,</if>
+            <if test="panoramaPic != null">panorama_pic,</if>
+            <if test="stationPic != null">station_pic,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="type != null">#{type},</if>
+            <if test="detectId != null">#{detectId},</if>
+            <if test="detectName != null">#{detectName},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="projectName != null">#{projectName},</if>
+            <if test="area != null">#{area},</if>
+            <if test="entrust != null">#{entrust},</if>
+            <if test="manager != null">#{manager},</if>
+            <if test="gridman != null">#{gridman},</if>
+            <if test="address != null">#{address},</if>
+            <if test="contact != null">#{contact},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="acreage != null">#{acreage},</if>
+            <if test="layers != null">#{layers},</if>
+            <if test="nature != null">#{nature},</if>
+            <if test="testStartDate != null">#{testStartDate},</if>
+            <if test="testEndDate != null">#{testEndDate},</if>
+            <if test="testDate != null">#{testDate},</if>
+            <if test="testContent != null">#{testContent},</if>
+            <if test="doorNumber != null">#{doorNumber},</if>
+            <if test="buildman != null">#{buildman},</if>
+            <if test="unitType != null">#{unitType},</if>
+            <if test="incharge != null">#{incharge},</if>
+            <if test="venueType != null">#{venueType},</if>
+            <if test="safetyIncharge != null">#{safetyIncharge},</if>
+            <if test="safetyManager != null">#{safetyManager},</if>
+            <if test="staffs != null">#{staffs},</if>
+            <if test="licence != null">#{licence},</if>
+            <if test="safetyKeyUnit != null">#{safetyKeyUnit},</if>
+            <if test="stationType != null">#{stationType},</if>
+            <if test="detectModule != null">#{detectModule},</if>
+            <if test="operating != null">#{operating},</if>
+            <if test="propertyType != null">#{propertyType},</if>
+            <if test="panoramaPic != null">#{panoramaPic},</if>
+            <if test="stationPic != null">#{stationPic},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOwnerUnit" parameterType="OwnerUnit">
+        update owner_unit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="detectName != null">detect_name = #{detectName},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="entrust != null">entrust = #{entrust},</if>
+            <if test="manager != null">manager = #{manager},</if>
+            <if test="gridman != null">gridman = #{gridman},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="contact != null">contact = #{contact},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="acreage != null">acreage = #{acreage},</if>
+            <if test="layers != null">layers = #{layers},</if>
+            <if test="nature != null">nature = #{nature},</if>
+            <if test="testStartDate != null">test_start_date = #{testStartDate},</if>
+            <if test="testEndDate != null">test_end_date = #{testEndDate},</if>
+            <if test="testDate != null">test_date = #{testDate},</if>
+            <if test="testContent != null">test_content = #{testContent},</if>
+            <if test="doorNumber != null">door_number = #{doorNumber},</if>
+            <if test="buildman != null">buildman = #{buildman},</if>
+            <if test="unitType != null">unit_type = #{unitType},</if>
+            <if test="incharge != null">incharge = #{incharge},</if>
+            <if test="venueType != null">venue_type = #{venueType},</if>
+            <if test="safetyIncharge != null">safety_incharge = #{safetyIncharge},</if>
+            <if test="safetyManager != null">safety_manager = #{safetyManager},</if>
+            <if test="staffs != null">staffs = #{staffs},</if>
+            <if test="licence != null">licence = #{licence},</if>
+            <if test="safetyKeyUnit != null">safety_key_unit = #{safetyKeyUnit},</if>
+            <if test="stationType != null">station_type = #{stationType},</if>
+            <if test="detectModule != null">detect_module = #{detectModule},</if>
+            <if test="operating != null">operating = #{operating},</if>
+            <if test="propertyType != null">property_type = #{propertyType},</if>
+            <if test="panoramaPic != null">panorama_pic = #{panoramaPic},</if>
+            <if test="stationPic != null">station_pic = #{stationPic},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOwnerUnitById" parameterType="Long">
+        delete from owner_unit where id = #{id}
+    </delete>
+
+    <delete id="deleteOwnerUnitByIds" parameterType="String">
+        delete from owner_unit where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

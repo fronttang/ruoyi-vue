@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.DetectDeviceMapper">
+    
+    <resultMap type="DetectDevice" id="DetectDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="detectName"    column="detect_name"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="type"    column="type"    />
+        <result property="name"    column="name"    />
+        <result property="calibrationDate"    column="calibration_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="isExpired"    column="is_expired"    />
+    </resultMap>
+
+    <sql id="selectDetectDeviceVo">
+        select d.id, d.detect_id, u.name as detect_name, d.device_id, d.type, d.name, d.calibration_date, d.create_by, d.create_time, d.update_by, d.update_time, d.is_expired 
+        from detect_device d left join detect_unit u on d.detect_id = u.id
+    </sql>
+
+    <select id="selectDetectDeviceList" parameterType="DetectDevice" resultMap="DetectDeviceResult">
+        <include refid="selectDetectDeviceVo"/>
+        <where>  
+            <if test="detectId != null "> and d.detect_id = #{detectId}</if>
+            <if test="deviceId != null  and deviceId != ''"> and d.device_id = #{deviceId}</if>
+            <if test="type != null  and type != ''"> and d.type = #{type}</if>
+            <if test="name != null  and name != ''"> and d.name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectDetectDeviceById" parameterType="Long" resultMap="DetectDeviceResult">
+        <include refid="selectDetectDeviceVo"/>
+        where d.id = #{id}
+    </select>
+
+    <insert id="insertDetectDevice" parameterType="DetectDevice">
+        insert into detect_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="detectId != null">detect_id,</if>
+            <if test="detectName != null">detect_name,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="type != null">type,</if>
+            <if test="name != null">name,</if>
+            <if test="calibrationDate != null">calibration_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isExpired != null">is_expired,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="detectId != null">#{detectId},</if>
+            <if test="detectName != null">#{detectName},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="name != null">#{name},</if>
+            <if test="calibrationDate != null">#{calibrationDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isExpired != null">#{isExpired},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDetectDevice" parameterType="DetectDevice">
+        update detect_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="detectName != null">detect_name = #{detectName},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="calibrationDate != null">calibration_date = #{calibrationDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isExpired != null">is_expired = #{isExpired},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDetectDeviceById" parameterType="Long">
+        delete from detect_device where id = #{id}
+    </delete>
+
+    <delete id="deleteDetectDeviceByIds" parameterType="String">
+        delete from detect_device where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

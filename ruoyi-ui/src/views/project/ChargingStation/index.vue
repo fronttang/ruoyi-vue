@@ -64,12 +64,21 @@
     <el-table v-loading="loading" :data="OwnerUnitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="名称" align="center" prop="name" />
+      <el-table-column label="场站名称" align="center" prop="name" />
+      <el-table-column label="轮次" align="center" prop="rounds" />
       <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat"/>
       <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" />
-      <el-table-column label="管理员" align="center" prop="manager" :formatter="managerFormat" />
-      <el-table-column label="网格员" align="center" prop="gridman" :formatter="gridmanFormat" />
       <el-table-column label="检测地址" align="center" prop="address" />
+      <el-table-column label="全景图" align="center" prop="panoramaPic" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.panoramaPic" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="点位图" align="center" prop="stationPic" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.stationPic" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -98,15 +107,13 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改工业园电检对话框 -->
+    <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="检测单位" label-width="100px" prop="detectId">
-              <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable
-                @change="handleDetectUnitChange"
-              >
+              <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable>
                 <el-option
                   v-for="item in detectUnitDict"
                   :key="item.id"
@@ -119,8 +126,34 @@
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="名称" label-width="100px" prop="name">
-                <el-input v-model="form.name" placeholder="请输入名称" />
+              <el-form-item label="场站名称" label-width="100px" prop="name">
+                <el-input v-model="form.name" placeholder="请输入场站名称" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="充电站类型" label-width="100px" prop="stationType">
+                <el-select v-model="form.stationType" placeholder="请选择充电站类型" filterable>
+                  <el-option
+                    v-for="dict in dict.type.charging_station_type"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="dict.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+              <el-form-item label="检测模块" label-width="100px"  prop="detectModule">
+                <el-select v-model="form.detectModule" placeholder="请选择检测模块" multiple filterable>
+                  <el-option
+                    v-for="dict in dict.type.detect_module"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="dict.value"
+                  ></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -137,54 +170,23 @@
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="12">
-              <el-form-item label="项目名称" label-width="100px" prop="projectName">
-                <el-input v-model="form.projectName" placeholder="请输入项目名称" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="委托单位" label-width="100px" prop="entrust">
-                <el-input v-model="form.entrust" placeholder="请输入委托单位" />
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="12">
-              <el-form-item label="管理员" label-width="100px" prop="manager">
-                <el-select v-model="form.manager" placeholder="请选择管理员" filterable>
-                  <el-option
-                    v-for="item in ownerUnitUserDict"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="网格员" label-width="100px" prop="gridman">
-                <el-select v-model="form.gridman" placeholder="请选择网格员" filterable>
-                  <el-option
-                    v-for="item in gridmanDict"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
             <el-col :span="24">
-              <el-form-item label="检测地址" label-width="100px" prop="address">
+              <el-form-item label="地址" label-width="100px" prop="address">
                 <el-input v-model="form.address" placeholder="请输入检测地址" />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
+            <el-col :span="24">
+              <el-form-item label="运营单位" label-width="100px"  prop="operating">
+                <el-input v-model="form.operating" placeholder="请输入运营单位" />
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
             <el-col :span="12">
-              <el-form-item label="联系人" label-width="100px" prop="contact">
-                <el-input v-model="form.contact" placeholder="请输入联系人" />
+              <el-form-item label="负责人" label-width="100px" prop="contact">
+                <el-input v-model="form.contact" placeholder="请输入负责人" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -194,59 +196,38 @@
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="12">
-              <el-form-item label="建筑面积" label-width="100px" prop="acreage">
-                <el-input v-model="form.acreage" placeholder="请输入建筑面积" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="建筑层数" label-width="100px" prop="layers">
-                <el-input-number controls-position="right" v-model="form.layers" />
+            <el-col :span="24">
+              <el-form-item label="委托单位" label-width="100px" prop="entrust">
+                <el-input v-model="form.entrust" placeholder="请输入委托单位" />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24">
-              <el-form-item label="检测起止日期" label-width="100px" prop="testDate">
-                <el-date-picker clearable
-                  v-model="form.testDate"
-                  type="daterange"
-                  range-separator="-"
-                  value-format="yyyy-MM-dd"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  size="small">
-                </el-date-picker>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="24">
-              <el-form-item label="建筑使用性质" label-width="100px" prop="nature">
-                <el-select v-model="form.nature" placeholder="请选择建筑使用性质" filterable>
+              <el-form-item label="物业类型" label-width="100px"  prop="propertyType">
+                <el-select v-model="form.propertyType" placeholder="请选择物业类型" filterable>
                   <el-option
-                    v-for="dict in dict.type.building_nature"
+                    v-for="dict in dict.type.property_type"
                     :key="dict.value"
                     :label="dict.label"
                     :value="dict.value"
                   ></el-option>
                 </el-select>
+                <el-input v-model="form.propertyName" placeholder="物业类型选其他时输入"  />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
-              <el-form-item label="检测内容" label-width="100px" prop="testContent">
-                <el-select v-model="form.testContent" placeholder="请选择检测内容" multiple filterable>
-                  <el-option
-                    v-for="dict in dict.type.detect_content"
-                    :key="dict.value"
-                    :label="dict.label"
-                    :value="dict.value"
-                  ></el-option>
-                </el-select>
+            <el-col :span="12">
+              <el-form-item label="全景图" label-width="100px" prop="panoramaPic">
+                <image-upload v-model="form.panoramaPic" limit=1 />
               </el-form-item>
-          </el-col>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="点位图" label-width="100px" prop="stationPic">
+                <image-upload v-model="form.stationPic" limit=1 />
+              </el-form-item>
+            </el-col>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -265,7 +246,7 @@ import { getDetectUnitUserDictByType, getDetectUnitUserDict } from "@/api/projec
 
 export default {
   name: "OwnerUnit",
-  dicts: ['detect_content', 'building_nature'],
+  dicts: ['detect_content', 'building_nature', 'charging_station_type', 'property_type', 'detect_module'],
   data() {
     return {
       // 遮罩层
@@ -280,7 +261,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 工业园电检表格数据
+      // 充电场站检测表格数据
       OwnerUnitList: [],
       // 弹出层标题
       title: "",
@@ -291,7 +272,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        type: '2',
+        type: '4',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -345,7 +326,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询工业园电检列表 */
+    /** 查询充电场站检测列表 */
     getList() {
       this.loading = true;
       detectUnitDict().then(response => {
@@ -353,9 +334,6 @@ export default {
       });
       getProjectAreaDict().then(response => {
         this.allProjectArea = response.data;
-      });
-      getDetectUnitUserDict().then(response => {
-        this.allUser = response.data;
       });
       listOwnerUnit(this.queryParams).then(response => {
         this.OwnerUnitList = response.rows;
@@ -373,7 +351,7 @@ export default {
       this.form = {
         id: null,
         name: null,
-        type: '2',
+        type: '4',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -403,9 +381,11 @@ export default {
         licence: null,
         safetyKeyUnit: null,
         stationType: null,
+        rounds: null,
         detectModule: null,
         operating: null,
         propertyType: null,
+        propertyName: null,
         panoramaPic: null,
         stationPic: null,
         createBy: null,
@@ -420,12 +400,6 @@ export default {
     },
     detectFormat(row){
       return this.selectDictLabel(this.detectUnitDict, row.detectId);
-    },
-    managerFormat(row){
-      return this.selectDictLabel(this.allUser, row.manager);
-    },
-    gridmanFormat(row){
-      return this.selectDictLabel(this.allUser, row.gridman);
     },
     areaFormat(row) {
       return this.selectDictLabel(this.allProjectArea, row.area);
@@ -472,7 +446,7 @@ export default {
         this.projectAreaDict = response.data;
       });
       this.open = true;
-      this.title = "添加工业园电检";
+      this.title = "添加充电场站";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -486,28 +460,15 @@ export default {
       const id = row.id || this.ids
       getOwnerUnit(id).then(response => {
         this.form = response.data;
-        this.form.testDate = [this.form.testStartDate, this.form.testEndDate];
-        this.form.testContent = this.form.testContent.split(',')
-        this.handleDetectUnitChange(this.form.detectId);
+        this.form.detectModule = this.form.detectModule.split(',')
         this.open = true;
-        this.title = "修改工业园电检";
-      });
-    },
-    handleDetectUnitChange(value) {
-      getDetectUnitUserDictByType('05', value).then(response => {
-        this.ownerUnitUserDict = response.data;
-      });
-      getDetectUnitUserDictByType('04', value).then(response => {
-        this.gridmanDict = response.data;
+        this.title = "修改充电场站";
       });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
-        this.form.testStartDate = this.form.testDate[0];
-        this.form.testEndDate = this.form.testDate[1];
-        this.form.testDate = this.form.testDate.join(",");
-        this.form.testContent = this.form.testContent.join(",");
+        this.form.detectModule = this.form.detectModule.join(",");
         if (valid) {
           if (this.form.id != null) {
             updateOwnerUnit(this.form).then(response => {
@@ -516,6 +477,7 @@ export default {
               this.getList();
             });
           } else {
+            this.form.rounds = "1";
             addOwnerUnit(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
@@ -528,7 +490,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除工业园电检编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除充电场站检测编号为"' + ids + '"的数据项？').then(function() {
         return delOwnerUnit(ids);
       }).then(() => {
         this.getList();

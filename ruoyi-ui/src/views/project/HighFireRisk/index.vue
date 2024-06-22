@@ -18,38 +18,6 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['project:OwnerUnit:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['project:OwnerUnit:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['project:OwnerUnit:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
           type="warning"
           plain
           icon="el-icon-download"
@@ -64,30 +32,17 @@
     <el-table v-loading="loading" :data="OwnerUnitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="类型" align="center" prop="highRiskType">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.high_risk_type" :value="scope.row.highRiskType"/>
+        </template>
+      </el-table-column>
       <el-table-column label="名称" align="center" prop="name" />
       <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat"/>
       <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" />
       <el-table-column label="管理员" align="center" prop="manager" :formatter="managerFormat" />
       <el-table-column label="网格员" align="center" prop="gridman" :formatter="gridmanFormat" />
       <el-table-column label="检测地址" align="center" prop="address" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['project:OwnerUnit:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['project:OwnerUnit:remove']"
-          >删除</el-button>
-        </template>
-      </el-table-column>
     </el-table>
 
     <pagination
@@ -98,7 +53,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改工业园电检对话框 -->
+    <!-- 添加或修改城中村电检对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
@@ -280,7 +235,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 工业园电检表格数据
+      // 城中村电检表格数据
       OwnerUnitList: [],
       // 弹出层标题
       title: "",
@@ -291,7 +246,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        type: '2',
+        type: '3',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -345,7 +300,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询工业园电检列表 */
+    /** 查询城中村电检列表 */
     getList() {
       this.loading = true;
       detectUnitDict().then(response => {
@@ -373,7 +328,7 @@ export default {
       this.form = {
         id: null,
         name: null,
-        type: '2',
+        type: '3',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -472,7 +427,7 @@ export default {
         this.projectAreaDict = response.data;
       });
       this.open = true;
-      this.title = "添加工业园电检";
+      this.title = "添加城中村电检";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -490,7 +445,7 @@ export default {
         this.form.testContent = this.form.testContent.split(',')
         this.handleDetectUnitChange(this.form.detectId);
         this.open = true;
-        this.title = "修改工业园电检";
+        this.title = "修改城中村电检";
       });
     },
     handleDetectUnitChange(value) {
@@ -528,7 +483,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除工业园电检编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除城中村电检编号为"' + ids + '"的数据项？').then(function() {
         return delOwnerUnit(ids);
       }).then(() => {
         this.getList();

@@ -98,12 +98,12 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改城中村电检对话框 -->
+    <!-- 添加或修改公共场所对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="24">
-            <el-form-item label="检测单位" label-width="100px" prop="detectId">
+            <el-form-item label="检测单位" label-width="130px" prop="detectId">
               <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable
                 @change="handleDetectUnitChange"
               >
@@ -119,12 +119,12 @@
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="名称" label-width="100px" prop="name">
+              <el-form-item label="名称" label-width="130px" prop="name">
                 <el-input v-model="form.name" placeholder="请输入名称" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="区域" label-width="100px" prop="area">
+              <el-form-item label="区域" label-width="130px" prop="area">
                 <el-select v-model="form.area" placeholder="请选择区域" filterable>
                   <el-option
                     v-for="item in projectAreaDict"
@@ -138,19 +138,19 @@
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="项目名称" label-width="100px" prop="projectName">
-                <el-input v-model="form.projectName" placeholder="请输入项目名称" />
+              <el-form-item label="场所类型" label-width="130px" prop="venueType">
+                <el-input v-model="form.venueType" placeholder="请输入场所类型" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="委托单位" label-width="100px" prop="entrust">
-                <el-input v-model="form.entrust" placeholder="请输入委托单位" />
+              <el-form-item label="经营范围" label-width="130px" prop="businessScope">
+                <el-input v-model="form.businessScope" placeholder="请输入经营范围" />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="管理员" label-width="100px" prop="manager">
+              <el-form-item label="管理员" label-width="130px" prop="manager">
                 <el-select v-model="form.manager" placeholder="请选择管理员" filterable>
                   <el-option
                     v-for="item in ownerUnitUserDict"
@@ -162,7 +162,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="网格员" label-width="100px" prop="gridman">
+              <el-form-item label="网格员" label-width="130px" prop="gridman">
                 <el-select v-model="form.gridman" placeholder="请选择网格员" filterable>
                   <el-option
                     v-for="item in gridmanDict"
@@ -176,56 +176,71 @@
         </el-row>
         <el-row>
             <el-col :span="24">
-              <el-form-item label="检测地址" label-width="100px" prop="address">
-                <el-input v-model="form.address" placeholder="请输入检测地址" />
+              <el-form-item label="场所地址" label-width="130px" prop="address">
+                <el-input v-model="form.address" placeholder="请输入场所地址" />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="联系人" label-width="100px" prop="contact">
-                <el-input v-model="form.contact" placeholder="请输入联系人" />
+              <el-form-item label="员工人数（人）" label-width="130px" prop="staffs">
+                <el-input-number controls-position="right" v-model="form.staffs" placeholder="请输入员工人数" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="联系电话" label-width="100px" prop="phone">
-                <el-input v-model="form.phone" placeholder="请输入联系电话" />
+              <el-form-item label="使用面积（M²）" label-width="130px" prop="acreage">
+                <el-input v-model="form.acreage" placeholder="请输入使用面积" />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="建筑面积" label-width="100px" prop="acreage">
-                <el-input v-model="form.acreage" placeholder="请输入建筑面积" />
+              <el-form-item label="有无证照" label-width="130px" prop="licence">
+                <el-radio-group v-model="form.licence">
+                  <el-radio label="1">有</el-radio>
+                  <el-radio label="0">无</el-radio>
+                </el-radio-group>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="建筑层数" label-width="100px" prop="layers">
-                <el-input-number controls-position="right" v-model="form.layers" />
+              <el-form-item label="消防安全重点单位" label-width="130px" prop="safetyKeyUnit">
+                <el-radio-group v-model="form.safetyKeyUnit">
+                  <el-radio label="1">是</el-radio>
+                  <el-radio label="0">否</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+              <el-form-item label="消防安全负责人" label-width="130px" prop="safetyIncharge">
+                <el-input v-model="form.safetyIncharge" placeholder="请输入消防安全负责人" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系电话" label-width="130px" prop="safetyInchargePhone">
+                <el-input v-model="form.safetyInchargePhone" placeholder="请输入联系电话" />
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+              <el-form-item label="消防安全管理人" label-width="130px" prop="safetyManager">
+                <el-input v-model="form.safetyManager" placeholder="请输入消防安全管理人" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系电话" label-width="130px" prop="safetyManagerPhone">
+                <el-input v-model="form.safetyManagerPhone" placeholder="请输入联系电话" />
               </el-form-item>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24">
-              <el-form-item label="检测起止日期" label-width="100px" prop="testDate">
-                <el-date-picker clearable
-                  v-model="form.testDate"
-                  type="daterange"
-                  range-separator="-"
-                  value-format="yyyy-MM-dd"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  size="small">
-                </el-date-picker>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="24">
-              <el-form-item label="建筑使用性质" label-width="100px" prop="nature">
-                <el-select v-model="form.nature" placeholder="请选择建筑使用性质" filterable>
+              <el-form-item label="单位类型" label-width="130px" prop="unitType">
+                <el-select v-model="form.unitType" placeholder="请选择单位类型" filterable>
                   <el-option
-                    v-for="dict in dict.type.building_nature"
+                    v-for="dict in dict.type.public_places_unit_type"
                     :key="dict.value"
                     :label="dict.label"
                     :value="dict.value"
@@ -233,20 +248,6 @@
                 </el-select>
               </el-form-item>
             </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-              <el-form-item label="检测内容" label-width="100px" prop="testContent">
-                <el-select v-model="form.testContent" placeholder="请选择检测内容" multiple filterable collapse-tags>
-                  <el-option
-                    v-for="dict in dict.type.detect_content"
-                    :key="dict.value"
-                    :label="dict.label"
-                    :value="dict.value"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-          </el-col>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -265,7 +266,7 @@ import { getDetectUnitUserDictByType, getDetectUnitUserDict } from "@/api/projec
 
 export default {
   name: "OwnerUnit",
-  dicts: ['detect_content', 'building_nature'],
+  dicts: ['detect_content', 'building_nature', 'public_places_unit_type'],
   data() {
     return {
       // 遮罩层
@@ -280,7 +281,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 城中村电检表格数据
+      // 公共场所表格数据
       OwnerUnitList: [],
       // 弹出层标题
       title: "",
@@ -291,7 +292,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        type: '1',
+        type: '3',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -326,6 +327,7 @@ export default {
         propertyType: null,
         panoramaPic: null,
         stationPic: null,
+        highRiskType: '5',
       },
       // 表单参数
       form: {},
@@ -345,7 +347,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询城中村电检列表 */
+    /** 查询公共场所列表 */
     getList() {
       this.loading = true;
       detectUnitDict().then(response => {
@@ -373,7 +375,7 @@ export default {
       this.form = {
         id: null,
         name: null,
-        type: '1',
+        type: '3',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -397,17 +399,21 @@ export default {
         unitType: null,
         incharge: null,
         venueType: null,
+        businessScope: null,
         safetyIncharge: null,
+        safetyInchargePhone: null,
         safetyManager: null,
+        safetyManagerPhone: null,
         staffs: null,
-        licence: null,
-        safetyKeyUnit: null,
+        licence: '1',
+        safetyKeyUnit: '0',
         stationType: null,
         detectModule: null,
         operating: null,
         propertyType: null,
         panoramaPic: null,
         stationPic: null,
+        highRiskType: '5',
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -472,7 +478,7 @@ export default {
         this.projectAreaDict = response.data;
       });
       this.open = true;
-      this.title = "添加城中村电检";
+      this.title = "添加公共场所";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -486,11 +492,9 @@ export default {
       const id = row.id || this.ids
       getOwnerUnit(id).then(response => {
         this.form = response.data;
-        this.form.testDate = [this.form.testStartDate, this.form.testEndDate];
-        this.form.testContent = this.form.testContent.split(',')
         this.handleDetectUnitChange(this.form.detectId);
         this.open = true;
-        this.title = "修改城中村电检";
+        this.title = "修改公共场所";
       });
     },
     handleDetectUnitChange(value) {
@@ -504,10 +508,6 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
-        this.form.testStartDate = this.form.testDate[0];
-        this.form.testEndDate = this.form.testDate[1];
-        this.form.testDate = this.form.testDate.join(",");
-        this.form.testContent = this.form.testContent.join(",");
         if (valid) {
           if (this.form.id != null) {
             updateOwnerUnit(this.form).then(response => {
@@ -528,7 +528,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除城中村电检编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除公共场所编号为"' + ids + '"的数据项？').then(function() {
         return delOwnerUnit(ids);
       }).then(() => {
         this.getList();

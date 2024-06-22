@@ -98,7 +98,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改工业园电检对话框 -->
+    <!-- 添加或修改城中村电检对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
@@ -280,7 +280,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 工业园电检表格数据
+      // 城中村电检表格数据
       OwnerUnitList: [],
       // 弹出层标题
       title: "",
@@ -291,7 +291,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        type: '2',
+        type: '1',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -345,7 +345,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询工业园电检列表 */
+    /** 查询城中村电检列表 */
     getList() {
       this.loading = true;
       detectUnitDict().then(response => {
@@ -373,7 +373,7 @@ export default {
       this.form = {
         id: null,
         name: null,
-        type: '2',
+        type: '1',
         detectId: null,
         detectName: null,
         projectId: null,
@@ -472,7 +472,7 @@ export default {
         this.projectAreaDict = response.data;
       });
       this.open = true;
-      this.title = "添加工业园电检";
+      this.title = "添加城中村电检";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -490,7 +490,7 @@ export default {
         this.form.testContent = this.form.testContent.split(',')
         this.handleDetectUnitChange(this.form.detectId);
         this.open = true;
-        this.title = "修改工业园电检";
+        this.title = "修改城中村电检";
       });
     },
     handleDetectUnitChange(value) {
@@ -528,7 +528,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除工业园电检编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除城中村电检编号为"' + ids + '"的数据项？').then(function() {
         return delOwnerUnit(ids);
       }).then(() => {
         this.getList();

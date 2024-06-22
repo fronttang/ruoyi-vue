@@ -8,10 +8,10 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 城中村电检对象 owner_unit
+ * 业主单元对象 owner_unit
  * 
  * @author fronttang
- * @date 2024-06-21
+ * @date 2024-06-22
  */
 public class OwnerUnit extends BaseEntity
 {
@@ -64,8 +64,8 @@ public class OwnerUnit extends BaseEntity
     @Excel(name = "检测地址")
     private String address;
 
-    /** 联系人 */
-    @Excel(name = "联系人")
+    /** 联系人/负责人/业主 */
+    @Excel(name = "联系人/负责人/业主")
     private String contact;
 
     /** 联系电话 */
@@ -95,8 +95,7 @@ public class OwnerUnit extends BaseEntity
     private Date testEndDate;
 
     /** 检测起止日期 */
-    //@JsonFormat(pattern = "yyyy-MM-dd")
-    //@Excel(name = "检测起止日期", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "检测起止日期")
     private String testDate;
 
     /** 检测内容 */
@@ -123,13 +122,29 @@ public class OwnerUnit extends BaseEntity
     @Excel(name = "场所类型")
     private String venueType;
 
+    /** 经营范围 */
+    @Excel(name = "经营范围")
+    private String businessScope;
+
     /** 消防安全负责人 */
     @Excel(name = "消防安全负责人")
     private String safetyIncharge;
 
+    /** 消防安全负责人电话 */
+    @Excel(name = "消防安全负责人电话")
+    private String safetyInchargePhone;
+
     /** 消防安全管理人 */
     @Excel(name = "消防安全管理人")
     private String safetyManager;
+
+    /** 消防安全管理人电话 */
+    @Excel(name = "消防安全管理人电话")
+    private String safetyManagerPhone;
+
+    /** 高风险类型 */
+    @Excel(name = "高风险类型")
+    private String highRiskType;
 
     /** 员工人数 */
     @Excel(name = "员工人数")
@@ -147,6 +162,10 @@ public class OwnerUnit extends BaseEntity
     @Excel(name = "充电站类型")
     private String stationType;
 
+    /** 轮次 */
+    @Excel(name = "轮次")
+    private Long rounds;
+
     /** 检测模块 */
     @Excel(name = "检测模块")
     private String detectModule;
@@ -158,6 +177,10 @@ public class OwnerUnit extends BaseEntity
     /** 物业类型 */
     @Excel(name = "物业类型")
     private String propertyType;
+
+    /** 物业类型名称(物业类型为其他时输入) */
+    @Excel(name = "物业类型名称(物业类型为其他时输入)")
+    private String propertyName;
 
     /** 全景图 */
     @Excel(name = "全景图")
@@ -401,6 +424,15 @@ public class OwnerUnit extends BaseEntity
     {
         return venueType;
     }
+    public void setBusinessScope(String businessScope) 
+    {
+        this.businessScope = businessScope;
+    }
+
+    public String getBusinessScope() 
+    {
+        return businessScope;
+    }
     public void setSafetyIncharge(String safetyIncharge) 
     {
         this.safetyIncharge = safetyIncharge;
@@ -410,6 +442,15 @@ public class OwnerUnit extends BaseEntity
     {
         return safetyIncharge;
     }
+    public void setSafetyInchargePhone(String safetyInchargePhone) 
+    {
+        this.safetyInchargePhone = safetyInchargePhone;
+    }
+
+    public String getSafetyInchargePhone() 
+    {
+        return safetyInchargePhone;
+    }
     public void setSafetyManager(String safetyManager) 
     {
         this.safetyManager = safetyManager;
@@ -418,6 +459,24 @@ public class OwnerUnit extends BaseEntity
     public String getSafetyManager() 
     {
         return safetyManager;
+    }
+    public void setSafetyManagerPhone(String safetyManagerPhone) 
+    {
+        this.safetyManagerPhone = safetyManagerPhone;
+    }
+
+    public String getSafetyManagerPhone() 
+    {
+        return safetyManagerPhone;
+    }
+    public void setHighRiskType(String highRiskType) 
+    {
+        this.highRiskType = highRiskType;
+    }
+
+    public String getHighRiskType() 
+    {
+        return highRiskType;
     }
     public void setStaffs(Long staffs) 
     {
@@ -455,6 +514,15 @@ public class OwnerUnit extends BaseEntity
     {
         return stationType;
     }
+    public void setRounds(Long rounds) 
+    {
+        this.rounds = rounds;
+    }
+
+    public Long getRounds() 
+    {
+        return rounds;
+    }
     public void setDetectModule(String detectModule) 
     {
         this.detectModule = detectModule;
@@ -481,6 +549,15 @@ public class OwnerUnit extends BaseEntity
     public String getPropertyType() 
     {
         return propertyType;
+    }
+    public void setPropertyName(String propertyName) 
+    {
+        this.propertyName = propertyName;
+    }
+
+    public String getPropertyName() 
+    {
+        return propertyName;
     }
     public void setPanoramaPic(String panoramaPic) 
     {
@@ -530,15 +607,21 @@ public class OwnerUnit extends BaseEntity
             .append("unitType", getUnitType())
             .append("incharge", getIncharge())
             .append("venueType", getVenueType())
+            .append("businessScope", getBusinessScope())
             .append("safetyIncharge", getSafetyIncharge())
+            .append("safetyInchargePhone", getSafetyInchargePhone())
             .append("safetyManager", getSafetyManager())
+            .append("safetyManagerPhone", getSafetyManagerPhone())
+            .append("highRiskType", getHighRiskType())
             .append("staffs", getStaffs())
             .append("licence", getLicence())
             .append("safetyKeyUnit", getSafetyKeyUnit())
             .append("stationType", getStationType())
+            .append("rounds", getRounds())
             .append("detectModule", getDetectModule())
             .append("operating", getOperating())
             .append("propertyType", getPropertyType())
+            .append("propertyName", getPropertyName())
             .append("panoramaPic", getPanoramaPic())
             .append("stationPic", getStationPic())
             .append("createBy", getCreateBy())

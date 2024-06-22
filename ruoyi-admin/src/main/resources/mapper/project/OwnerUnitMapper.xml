@@ -31,15 +31,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="unitType"    column="unit_type"    />
         <result property="incharge"    column="incharge"    />
         <result property="venueType"    column="venue_type"    />
+        <result property="businessScope"    column="business_scope"    />
         <result property="safetyIncharge"    column="safety_incharge"    />
+        <result property="safetyInchargePhone"    column="safety_incharge_phone"    />
         <result property="safetyManager"    column="safety_manager"    />
+        <result property="safetyManagerPhone"    column="safety_manager_phone"    />
+        <result property="highRiskType"    column="high_risk_type"    />
         <result property="staffs"    column="staffs"    />
         <result property="licence"    column="licence"    />
         <result property="safetyKeyUnit"    column="safety_key_unit"    />
         <result property="stationType"    column="station_type"    />
+        <result property="rounds"    column="rounds"    />
         <result property="detectModule"    column="detect_module"    />
         <result property="operating"    column="operating"    />
         <result property="propertyType"    column="property_type"    />
+        <result property="propertyName"    column="property_name"    />
         <result property="panoramaPic"    column="panorama_pic"    />
         <result property="stationPic"    column="station_pic"    />
         <result property="createBy"    column="create_by"    />
@@ -49,14 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, name, type, detect_id, detect_name, project_id, project_name, 
-        area, entrust, manager, gridman, address, contact, phone, acreage, layers, 
-        nature, test_start_date, test_end_date, test_date, test_content, door_number, 
-        buildman, unit_type, incharge, venue_type, safety_incharge, safety_manager, 
-        staffs, licence, safety_key_unit, station_type, detect_module, operating, 
-        property_type, panorama_pic, station_pic, 
-        create_by, create_time, update_by, update_time 
-        from owner_unit ou 
+        select id, name, type, detect_id, detect_name, project_id, project_name, area, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
@@ -80,22 +79,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="nature != null  and nature != ''"> and nature = #{nature}</if>
             <if test="testStartDate != null "> and test_start_date = #{testStartDate}</if>
             <if test="testEndDate != null "> and test_end_date = #{testEndDate}</if>
-            <if test="testDate != null "> and test_date = #{testDate}</if>
+            <if test="testDate != null  and testDate != ''"> and test_date = #{testDate}</if>
             <if test="testContent != null  and testContent != ''"> and test_content = #{testContent}</if>
             <if test="doorNumber != null "> and door_number = #{doorNumber}</if>
             <if test="buildman != null  and buildman != ''"> and buildman = #{buildman}</if>
             <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
             <if test="incharge != null  and incharge != ''"> and incharge = #{incharge}</if>
             <if test="venueType != null  and venueType != ''"> and venue_type = #{venueType}</if>
+            <if test="businessScope != null  and businessScope != ''"> and business_scope = #{businessScope}</if>
             <if test="safetyIncharge != null  and safetyIncharge != ''"> and safety_incharge = #{safetyIncharge}</if>
+            <if test="safetyInchargePhone != null  and safetyInchargePhone != ''"> and safety_incharge_phone = #{safetyInchargePhone}</if>
             <if test="safetyManager != null  and safetyManager != ''"> and safety_manager = #{safetyManager}</if>
+            <if test="safetyManagerPhone != null  and safetyManagerPhone != ''"> and safety_manager_phone = #{safetyManagerPhone}</if>
+            <if test="highRiskType != null  and highRiskType != ''"> and high_risk_type = #{highRiskType}</if>
             <if test="staffs != null "> and staffs = #{staffs}</if>
             <if test="licence != null  and licence != ''"> and licence = #{licence}</if>
             <if test="safetyKeyUnit != null  and safetyKeyUnit != ''"> and safety_key_unit = #{safetyKeyUnit}</if>
             <if test="stationType != null  and stationType != ''"> and station_type = #{stationType}</if>
+            <if test="rounds != null "> and rounds = #{rounds}</if>
             <if test="detectModule != null  and detectModule != ''"> and detect_module = #{detectModule}</if>
             <if test="operating != null  and operating != ''"> and operating = #{operating}</if>
             <if test="propertyType != null  and propertyType != ''"> and property_type = #{propertyType}</if>
+            <if test="propertyName != null  and propertyName != ''"> and property_name like concat('%', #{propertyName}, '%')</if>
             <if test="panoramaPic != null  and panoramaPic != ''"> and panorama_pic = #{panoramaPic}</if>
             <if test="stationPic != null  and stationPic != ''"> and station_pic = #{stationPic}</if>
         </where>
@@ -135,15 +140,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitType != null">unit_type,</if>
             <if test="incharge != null">incharge,</if>
             <if test="venueType != null">venue_type,</if>
+            <if test="businessScope != null">business_scope,</if>
             <if test="safetyIncharge != null">safety_incharge,</if>
+            <if test="safetyInchargePhone != null">safety_incharge_phone,</if>
             <if test="safetyManager != null">safety_manager,</if>
+            <if test="safetyManagerPhone != null">safety_manager_phone,</if>
+            <if test="highRiskType != null">high_risk_type,</if>
             <if test="staffs != null">staffs,</if>
             <if test="licence != null">licence,</if>
             <if test="safetyKeyUnit != null">safety_key_unit,</if>
             <if test="stationType != null">station_type,</if>
+            <if test="rounds != null">rounds,</if>
             <if test="detectModule != null">detect_module,</if>
             <if test="operating != null">operating,</if>
             <if test="propertyType != null">property_type,</if>
+            <if test="propertyName != null">property_name,</if>
             <if test="panoramaPic != null">panorama_pic,</if>
             <if test="stationPic != null">station_pic,</if>
             <if test="createBy != null">create_by,</if>
@@ -178,15 +189,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitType != null">#{unitType},</if>
             <if test="incharge != null">#{incharge},</if>
             <if test="venueType != null">#{venueType},</if>
+            <if test="businessScope != null">#{businessScope},</if>
             <if test="safetyIncharge != null">#{safetyIncharge},</if>
+            <if test="safetyInchargePhone != null">#{safetyInchargePhone},</if>
             <if test="safetyManager != null">#{safetyManager},</if>
+            <if test="safetyManagerPhone != null">#{safetyManagerPhone},</if>
+            <if test="highRiskType != null">#{highRiskType},</if>
             <if test="staffs != null">#{staffs},</if>
             <if test="licence != null">#{licence},</if>
             <if test="safetyKeyUnit != null">#{safetyKeyUnit},</if>
             <if test="stationType != null">#{stationType},</if>
+            <if test="rounds != null">#{rounds},</if>
             <if test="detectModule != null">#{detectModule},</if>
             <if test="operating != null">#{operating},</if>
             <if test="propertyType != null">#{propertyType},</if>
+            <if test="propertyName != null">#{propertyName},</if>
             <if test="panoramaPic != null">#{panoramaPic},</if>
             <if test="stationPic != null">#{stationPic},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -224,15 +241,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitType != null">unit_type = #{unitType},</if>
             <if test="incharge != null">incharge = #{incharge},</if>
             <if test="venueType != null">venue_type = #{venueType},</if>
+            <if test="businessScope != null">business_scope = #{businessScope},</if>
             <if test="safetyIncharge != null">safety_incharge = #{safetyIncharge},</if>
+            <if test="safetyInchargePhone != null">safety_incharge_phone = #{safetyInchargePhone},</if>
             <if test="safetyManager != null">safety_manager = #{safetyManager},</if>
+            <if test="safetyManagerPhone != null">safety_manager_phone = #{safetyManagerPhone},</if>
+            <if test="highRiskType != null">high_risk_type = #{highRiskType},</if>
             <if test="staffs != null">staffs = #{staffs},</if>
             <if test="licence != null">licence = #{licence},</if>
             <if test="safetyKeyUnit != null">safety_key_unit = #{safetyKeyUnit},</if>
             <if test="stationType != null">station_type = #{stationType},</if>
+            <if test="rounds != null">rounds = #{rounds},</if>
             <if test="detectModule != null">detect_module = #{detectModule},</if>
             <if test="operating != null">operating = #{operating},</if>
             <if test="propertyType != null">property_type = #{propertyType},</if>
+            <if test="propertyName != null">property_name = #{propertyName},</if>
             <if test="panoramaPic != null">panorama_pic = #{panoramaPic},</if>
             <if test="stationPic != null">station_pic = #{stationPic},</if>
             <if test="createBy != null">create_by = #{createBy},</if>

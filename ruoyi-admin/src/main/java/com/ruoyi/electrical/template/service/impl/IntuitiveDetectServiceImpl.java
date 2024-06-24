@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.electrical.template.mapper.IntuitiveDetectMapper;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
+import com.ruoyi.electrical.vo.DictVO;
 
 /**
  * 直观检测标题Service业务层处理
@@ -93,4 +94,9 @@ public class IntuitiveDetectServiceImpl implements IIntuitiveDetectService
     {
         return intuitiveDetectMapper.deleteIntuitiveDetectById(id);
     }
+
+	@Override
+	public List<DictVO> selectIntuitiveDetectDict(Long templateId) {
+		return intuitiveDetectMapper.selectIntuitiveDetectDict(templateId);
+	}
 }

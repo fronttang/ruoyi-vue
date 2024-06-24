@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.template.mapper.IntuitiveDetectDataMapper">
+    
+    <resultMap type="IntuitiveDetectData" id="IntuitiveDetectDataResult">
+        <result property="id"    column="id"    />
+        <result property="templateId"    column="template_id"    />
+        <result property="detectTitle"    column="detect_title"    />
+        <result property="type"    column="type"    />
+        <result property="detectModule"    column="detect_module"    />
+        <result property="firstCode"    column="first_code"    />
+        <result property="firstContent"    column="first_content"    />
+        <result property="secondaryCode"    column="secondary_code"    />
+        <result property="secondaryContent"    column="secondary_content"    />
+        <result property="weights"    column="weights"    />
+        <result property="output"    column="output"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectIntuitiveDetectDataVo">
+        select id, template_id, detect_title, type, detect_module, first_code, first_content, secondary_code, secondary_content, weights, output, create_by, create_time, update_by, update_time from intuitive_detect_data
+    </sql>
+
+    <select id="selectIntuitiveDetectDataList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
+        <include refid="selectIntuitiveDetectDataVo"/>
+        <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
+            <if test="detectTitle != null "> and detect_title = #{detectTitle}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="detectModule != null  and detectModule != ''"> and detect_module = #{detectModule}</if>
+            <if test="firstCode != null  and firstCode != ''"> and first_code = #{firstCode}</if>
+            <if test="firstContent != null  and firstContent != ''"> and first_content = #{firstContent}</if>
+            <if test="secondaryCode != null  and secondaryCode != ''"> and secondary_code = #{secondaryCode}</if>
+            <if test="secondaryContent != null  and secondaryContent != ''"> and secondary_content = #{secondaryContent}</if>
+            <if test="weights != null "> and weights = #{weights}</if>
+            <if test="output != null  and output != ''"> and output = #{output}</if>
+        </where>
+    </select>
+    
+    <select id="selectIntuitiveDetectDataById" parameterType="Long" resultMap="IntuitiveDetectDataResult">
+        <include refid="selectIntuitiveDetectDataVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertIntuitiveDetectData" parameterType="IntuitiveDetectData" useGeneratedKeys="true" keyProperty="id">
+        insert into intuitive_detect_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
+            <if test="detectTitle != null">detect_title,</if>
+            <if test="type != null">type,</if>
+            <if test="detectModule != null">detect_module,</if>
+            <if test="firstCode != null">first_code,</if>
+            <if test="firstContent != null">first_content,</if>
+            <if test="secondaryCode != null">secondary_code,</if>
+            <if test="secondaryContent != null">secondary_content,</if>
+            <if test="weights != null">weights,</if>
+            <if test="output != null">output,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
+            <if test="detectTitle != null">#{detectTitle},</if>
+            <if test="type != null">#{type},</if>
+            <if test="detectModule != null">#{detectModule},</if>
+            <if test="firstCode != null">#{firstCode},</if>
+            <if test="firstContent != null">#{firstContent},</if>
+            <if test="secondaryCode != null">#{secondaryCode},</if>
+            <if test="secondaryContent != null">#{secondaryContent},</if>
+            <if test="weights != null">#{weights},</if>
+            <if test="output != null">#{output},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateIntuitiveDetectData" parameterType="IntuitiveDetectData">
+        update intuitive_detect_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="detectTitle != null">detect_title = #{detectTitle},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="detectModule != null">detect_module = #{detectModule},</if>
+            <if test="firstCode != null">first_code = #{firstCode},</if>
+            <if test="firstContent != null">first_content = #{firstContent},</if>
+            <if test="secondaryCode != null">secondary_code = #{secondaryCode},</if>
+            <if test="secondaryContent != null">secondary_content = #{secondaryContent},</if>
+            <if test="weights != null">weights = #{weights},</if>
+            <if test="output != null">output = #{output},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteIntuitiveDetectDataById" parameterType="Long">
+        delete from intuitive_detect_data where id = #{id}
+    </delete>
+
+    <delete id="deleteIntuitiveDetectDataByIds" parameterType="String">
+        delete from intuitive_detect_data where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

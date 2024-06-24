@@ -101,4 +101,12 @@ public class IntuitiveDetectController extends BaseController
     {
         return toAjax(intuitiveDetectService.deleteIntuitiveDetectByIds(ids));
     }
+    
+    @Log(title = "直观检测标题字典", businessType = BusinessType.OTHER)
+	@GetMapping("/dict/{templateId}")
+    public AjaxResult dict(@PathVariable Long templateId)
+    {
+        return success(intuitiveDetectService.selectIntuitiveDetectDict(templateId));
+    }
+
 }

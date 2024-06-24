@@ -17,6 +17,8 @@ public class IntuitiveDetect extends BaseEntity
 
     /** ID */
     private Long id;
+    
+    private Long templateId;
 
     /** 名称 */
     @Excel(name = "名称")
@@ -29,8 +31,16 @@ public class IntuitiveDetect extends BaseEntity
     /** 代号 */
     @Excel(name = "代号")
     private String code;
+    
+    public Long getTemplateId() {
+		return templateId;
+	}
 
-    public void setId(Long id) 
+	public void setTemplateId(Long templateId) {
+		this.templateId = templateId;
+	}
+
+	public void setId(Long id) 
     {
         this.id = id;
     }
@@ -67,17 +77,11 @@ public class IntuitiveDetect extends BaseEntity
         return code;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("name", getName())
-            .append("type", getType())
-            .append("code", getCode())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .toString();
-    }
+	@Override
+	public String toString() {
+		return "IntuitiveDetect [id=" + id + ", templateId=" + templateId + ", name=" + name + ", type=" + type
+				+ ", code=" + code + "]";
+	}
+
+   
 }

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.template.mapper.IntuitiveDetectDangerMapper">
+    
+    <resultMap type="IntuitiveDetectDanger" id="IntuitiveDetectDangerResult">
+        <result property="id"    column="id"    />
+        <result property="templateId"    column="template_id"    />
+        <result property="dataId"    column="data_id"    />
+        <result property="level"    column="level"    />
+        <result property="description"    column="description"    />
+        <result property="suggestions"    column="suggestions"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectIntuitiveDetectDangerVo">
+        select id, data_id, template_id, level, description, suggestions, create_by, create_time, update_by, update_time from intuitive_detect_danger
+    </sql>
+
+    <select id="selectIntuitiveDetectDangerList" parameterType="IntuitiveDetectDanger" resultMap="IntuitiveDetectDangerResult">
+        <include refid="selectIntuitiveDetectDangerVo"/>
+        <where>  
+            <if test="dataId != null "> and data_id = #{dataId}</if>
+            <if test="templateId != null  and templateId != ''"> and template_id = #{templateId}</if>
+            <if test="level != null  and level != ''"> and level = #{level}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="suggestions != null  and suggestions != ''"> and suggestions = #{suggestions}</if>
+        </where>
+    </select>
+    
+    <select id="selectIntuitiveDetectDangerById" parameterType="Long" resultMap="IntuitiveDetectDangerResult">
+        <include refid="selectIntuitiveDetectDangerVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectIntuitiveDetectDangersByDataId" parameterType="Long" resultMap="IntuitiveDetectDangerResult">
+        <include refid="selectIntuitiveDetectDangerVo"/>
+        where data_id = #{dataId}
+    </select>
+
+    <insert id="insertIntuitiveDetectDanger" parameterType="IntuitiveDetectDanger" useGeneratedKeys="true" keyProperty="id">
+        insert into intuitive_detect_danger
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dataId != null">data_id,</if>
+            <if test="level != null">level,</if>
+            <if test="templateId != null">template_id,</if>
+            <if test="description != null">description,</if>
+            <if test="suggestions != null">suggestions,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dataId != null">#{dataId},</if>
+            <if test="level != null">#{level},</if>
+            <if test="templateId != null">#{templateId},</if>
+            <if test="description != null">#{description},</if>
+            <if test="suggestions != null">#{suggestions},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateIntuitiveDetectDanger" parameterType="IntuitiveDetectDanger">
+        update intuitive_detect_danger
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dataId != null">data_id = #{dataId},</if>
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="suggestions != null">suggestions = #{suggestions},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteIntuitiveDetectDangerById" parameterType="Long">
+        delete from intuitive_detect_danger where id = #{id}
+    </delete>
+
+    <delete id="deleteIntuitiveDetectDangerByIds" parameterType="String">
+        delete from intuitive_detect_danger where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteIntuitiveDetectDangerByDataId" parameterType="Long">
+        delete from intuitive_detect_danger where data_id = #{id}
+    </delete>
+
+    <delete id="deleteIntuitiveDetectDangerByDataIds" parameterType="String">
+        delete from intuitive_detect_danger where data_id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

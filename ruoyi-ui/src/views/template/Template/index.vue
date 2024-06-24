@@ -1,18 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择类型" clearable>
-          <el-option
-            v-for="dict in dict.type.detect_device_type"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="检测单位" prop="detectId">
-        <el-select v-model="queryParams.detectId" placeholder="请选择检测单位" clearable>
+      <el-form-item label="检测单位" prop="detectId" clearable filterable>
+        <el-select v-model="queryParams.detectId" placeholder="请选择检测单位" clearable filterable>
           <el-option
             v-for="item in detectUnitDict"
             :key="item.id"
@@ -35,7 +25,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['project:DetectDevice:add']"
+          v-hasPermi="['template:Template:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -46,7 +36,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['project:DetectDevice:edit']"
+          v-hasPermi="['template:Template:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -57,7 +47,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['project:DetectDevice:remove']"
+          v-hasPermi="['template:Template:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -67,31 +57,29 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['project:DetectDevice:export']"
+          v-hasPermi="['template:Template:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="DetectDeviceList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="TemplateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" />
-      <el-table-column label="仪器编号" align="center" prop="deviceId" />
-      <el-table-column label="类型" align="center" prop="type">
+      <el-table-column label="检测单位" align="center" prop="detectName" >
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.detect_device_type" :value="scope.row.type"/>
+          <span>{{ formatDetectName(scope.row.detectId) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="仪器名称" align="center" prop="name" />
-      <el-table-column label="校准日期" align="center" prop="calibrationDate" width="180">
+      <el-table-column label="模板名称" align="center" prop="name" />
+      <el-table-column label="模板类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.calibrationDate, '{y}-{m}-{d}') }}</span>
+          <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -101,14 +89,40 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['project:DetectDevice:edit']"
           >修改</el-button>
+          <span v-if="scope.row.type === 'urban_village' || scope.row.type === 'industrial_area'">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUrbanVillageIntuitiveDatect(scope.row)"
+            >直观标题</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUrbanVillageIntuitiveDatectData(scope.row)"
+            >直观内容</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUrbanVillageDatectDevice(scope.row)"
+            >仪器模板</el-button>
+          </span>
+          <span v-if="scope.row.type === 'charging_station'">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleChargingStationIntuitiveDatectData(scope.row)"
+            >检测项</el-button>
+          </span>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['project:DetectDevice:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -122,48 +136,31 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改检测仪器对话框 -->
+    <!-- 添加或修改模板列表对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="检测单位" prop="detectId">
-          <el-select v-model="form.detectId" placeholder="请选择检测单位">
-            <el-option
-              v-for="item in detectUnitDict"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
+      <el-form-item label="检测单位" prop="detectId">
+        <el-select v-model="form.detectId" placeholder="请选择检测单位">
+          <el-option
+            v-for="item in detectUnitDict"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+        <el-form-item label="模板名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入模板名称" />
         </el-form-item>
-        <el-form-item label="类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择类型">
+        <el-form-item label="模板类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择模板类型">
             <el-option
-              v-for="dict in dict.type.detect_device_type"
+              v-for="dict in dict.type.project_type"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
             ></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="仪器编号" prop="deviceId">
-          <el-input v-model="form.deviceId" placeholder="请输入仪器编号" />
-        </el-form-item>
-        <el-form-item label="仪器名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入仪器名称" />
-        </el-form-item>
-        <el-form-item label="校准日期" prop="calibrationDate">
-          <el-date-picker clearable
-            v-model="form.calibrationDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择校准日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="是否过期" prop="isExpired">
-          <el-radio-group v-model="form.isExpired">
-            <el-radio label="0">未过期</el-radio>
-            <el-radio label="1">已过期</el-radio>
-          </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -175,12 +172,12 @@
 </template>
 
 <script>
-import { listDetectDevice, getDetectDevice, delDetectDevice, addDetectDevice, updateDetectDevice } from "@/api/project/DetectDevice";
+import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/template/Template";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 
 export default {
-  name: "DetectDevice",
-  dicts: ['detect_device_type'],
+  name: "Template",
+  dicts: ['project_type'],
   data() {
     return {
       // 遮罩层
@@ -195,8 +192,10 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 检测仪器表格数据
-      DetectDeviceList: [],
+      // 模板列表表格数据
+      TemplateList: [],
+      // 检测单位字典选项
+      detectUnitDict: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -206,34 +205,32 @@ export default {
         pageNum: 1,
         pageSize: 10,
         detectId: null,
-        deviceId: null,
-        type: null,
+        detectName: null,
         name: null,
+        type: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         detectId: [
-          { required: true, message: "检测单位不能为空", trigger: "change" }
+          { required: true, message: "检测单位不能为空", trigger: "blur" }
         ],
-      },
-      // 检测单位字典选项
-      detectUnitDict: [],
+      }
     };
   },
   created() {
     this.getList();
   },
   methods: {
-    /** 查询检测仪器列表 */
+    /** 查询模板列表列表 */
     getList() {
       this.loading = true;
       detectUnitDict().then(response => {
         this.detectUnitDict = response.data;
       });
-      listDetectDevice(this.queryParams).then(response => {
-        this.DetectDeviceList = response.rows;
+      listTemplate(this.queryParams).then(response => {
+        this.TemplateList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -249,17 +246,54 @@ export default {
         id: null,
         detectId: null,
         detectName: null,
-        deviceId: null,
-        type: null,
         name: null,
-        calibrationDate: null,
+        type: null,
         createBy: null,
         createTime: null,
         updateBy: null,
-        updateTime: null,
-        isExpired: '0'
+        updateTime: null
       };
       this.resetForm("form");
+    },
+    formatDetectName(detectId) {
+      return this.selectDictLabel(this.detectUnitDict, detectId);
+    },
+    selectDictLabel(datas, value) {
+      if (value === undefined) {
+        return "";
+      }
+      var actions = [];
+      Object.keys(datas).some((key) => {
+        if (datas[key].id == value) {
+          actions.push(datas[key].name);
+          return true;
+        }
+      })
+      if (actions.length === 0) {
+        actions.push(value);
+      }
+      return actions.join('');
+    },
+    /** 打开直观标题 */
+    handleUrbanVillageIntuitiveDatect(row){
+      const templateId = row.id || this.ids[0];
+      const params = {};
+      this.$tab.openPage("直观检测标题", '/template/UrbanVillage/IntuitiveDetect/index/' + templateId, params);
+    },
+    /** 打开直观内容 */
+    handleUrbanVillageIntuitiveDatectData(row){
+      const templateId = row.id || this.ids[0];
+      const params = {};
+      this.$tab.openPage("直观检测表内容", '/template/UrbanVillage/IntuitiveDetectData/index/' + templateId, params);
+    },
+    /** 打开仪器模板 */
+    handleUrbanVillageDatectDevice(row){
+
+    },
+    handleChargingStationIntuitiveDatectData(row) {
+      const templateId = row.id || this.ids[0];
+      const params = {};
+      this.$tab.openPage("直观检测项", '/template/ChargingStation/index/' + templateId, params);
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -280,23 +314,17 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
       this.open = true;
-      this.title = "添加检测仪器";
+      this.title = "添加模板列表";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
       const id = row.id || this.ids
-      getDetectDevice(id).then(response => {
+      getTemplate(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改检测仪器";
+        this.title = "修改模板列表";
       });
     },
     /** 提交按钮 */
@@ -304,13 +332,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateDetectDevice(this.form).then(response => {
+            updateTemplate(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addDetectDevice(this.form).then(response => {
+            addTemplate(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -322,8 +350,8 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除检测仪器编号为"' + ids + '"的数据项？').then(function() {
-        return delDetectDevice(ids);
+      this.$modal.confirm('是否确认删除模板列表编号为"' + ids + '"的数据项？').then(function() {
+        return delTemplate(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
@@ -331,9 +359,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('project/DetectDevice/export', {
+      this.download('template/Template/export', {
         ...this.queryParams
-      }, `DetectDevice_${new Date().getTime()}.xlsx`)
+      }, `Template_${new Date().getTime()}.xlsx`)
     }
   }
 };

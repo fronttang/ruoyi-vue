@@ -2,60 +2,60 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.electrical.template.mapper.IntuitiveDetectMapper">
+<mapper namespace="com.ruoyi.electrical.template.mapper.DetectTemplateMapper">
     
-    <resultMap type="IntuitiveDetect" id="IntuitiveDetectResult">
+    <resultMap type="DetectTemplate" id="DetectTemplateResult">
         <result property="id"    column="id"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="detectName"    column="detect_name"    />
         <result property="name"    column="name"    />
         <result property="type"    column="type"    />
-        <result property="code"    column="code"    />
-        <result property="templateId"    column="template_id"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <sql id="selectIntuitiveDetectVo">
-        select id, name, type, code, template_id, create_by, create_time, update_by, update_time from intuitive_detect
+    <sql id="selectDetectTemplateVo">
+        select id, detect_id, detect_name, name, type, create_by, create_time, update_by, update_time from detect_template
     </sql>
 
-    <select id="selectIntuitiveDetectList" parameterType="IntuitiveDetect" resultMap="IntuitiveDetectResult">
-        <include refid="selectIntuitiveDetectVo"/>
+    <select id="selectDetectTemplateList" parameterType="DetectTemplate" resultMap="DetectTemplateResult">
+        <include refid="selectDetectTemplateVo"/>
         <where>  
+            <if test="detectId != null "> and detect_id = #{detectId}</if>
+            <if test="detectName != null  and detectName != ''"> and detect_name like concat('%', #{detectName}, '%')</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="type != null  and type != ''"> and type = #{type}</if>
-            <if test="templateId != null  and templateId != ''"> and template_id = #{templateId}</if>
-            <if test="code != null  and code != ''"> and code like concat('%', #{code}, '%')</if>
         </where>
     </select>
     
-    <select id="selectIntuitiveDetectById" parameterType="Long" resultMap="IntuitiveDetectResult">
-        <include refid="selectIntuitiveDetectVo"/>
+    <select id="selectDetectTemplateById" parameterType="Long" resultMap="DetectTemplateResult">
+        <include refid="selectDetectTemplateVo"/>
         where id = #{id}
     </select>
     
-    <select id="selectIntuitiveDetectDict" parameterType="Long" resultType="com.ruoyi.electrical.vo.DictVO">
-        select id, CONCAT(code, '(', name, ')') as name from intuitive_detect where template_id = #{templateId}
+    <select id="selectDetectTemplateDict"  resultType="com.ruoyi.electrical.vo.DictVO">
+        select id, name from detect_template
     </select>
 
-    <insert id="insertIntuitiveDetect" parameterType="IntuitiveDetect" useGeneratedKeys="true" keyProperty="id">
-        insert into intuitive_detect
+    <insert id="insertDetectTemplate" parameterType="DetectTemplate" useGeneratedKeys="true" keyProperty="id">
+        insert into detect_template
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="detectId != null">detect_id,</if>
+            <if test="detectName != null">detect_name,</if>
             <if test="name != null">name,</if>
             <if test="type != null">type,</if>
-            <if test="code != null">code,</if>
-            <if test="templateId != null">template_id,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="detectId != null">#{detectId},</if>
+            <if test="detectName != null">#{detectName},</if>
             <if test="name != null">#{name},</if>
             <if test="type != null">#{type},</if>
-            <if test="code != null">#{code},</if>
-            <if test="templateId != null">#{templateId},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -63,13 +63,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateIntuitiveDetect" parameterType="IntuitiveDetect">
-        update intuitive_detect
+    <update id="updateDetectTemplate" parameterType="DetectTemplate">
+        update detect_template
         <trim prefix="SET" suffixOverrides=",">
+            <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="detectName != null">detect_name = #{detectName},</if>
             <if test="name != null">name = #{name},</if>
             <if test="type != null">type = #{type},</if>
-            <if test="code != null">code = #{code},</if>
-            <if test="templateId != null">template_id = #{templateId},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
@@ -78,12 +78,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteIntuitiveDetectById" parameterType="Long">
-        delete from intuitive_detect where id = #{id}
+    <delete id="deleteDetectTemplateById" parameterType="Long">
+        delete from detect_template where id = #{id}
     </delete>
 
-    <delete id="deleteIntuitiveDetectByIds" parameterType="String">
-        delete from intuitive_detect where id in 
+    <delete id="deleteDetectTemplateByIds" parameterType="String">
+        delete from detect_template where id in 
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

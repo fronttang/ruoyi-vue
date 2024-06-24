@@ -42,3 +42,11 @@ export function delIntuitiveDetect(id) {
     method: 'delete'
   })
 }
+
+// 查询直观检测标题字典
+export function getIntuitiveDetectDict(templateId) {
+  return request({
+    url: '/template/IntuitiveDetect/dict/' + templateId,
+    method: 'get'
+  })
+}

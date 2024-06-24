@@ -182,7 +182,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="建筑层数" label-width="110px" prop="layers">
-                <el-input-number controls-position="right" v-model="form.layers" />
+                <el-input-number controls-position="right" v-model="form.layers" :min="0" />
               </el-form-item>
             </el-col>
         </el-row>
@@ -196,7 +196,7 @@
         <el-row>
             <el-col :span="24">
               <el-form-item label="租户（套间）数" label-width="110px" prop="doorNumber">
-                <el-input-number controls-position="right" v-model="form.doorNumber" placeholder="请输入检测地址" />
+                <el-input-number controls-position="right" v-model="form.doorNumber" placeholder="请输入租户（套间）数" :min="0" />
               </el-form-item>
             </el-col>
         </el-row>

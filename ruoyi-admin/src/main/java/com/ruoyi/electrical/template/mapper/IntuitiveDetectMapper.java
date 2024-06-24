@@ -2,6 +2,7 @@ package com.ruoyi.electrical.template.mapper;
 
 import java.util.List;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
+import com.ruoyi.electrical.vo.DictVO;
 
 /**
  * 直观检测标题Mapper接口
@@ -58,4 +59,10 @@ public interface IntuitiveDetectMapper
      * @return 结果
      */
     public int deleteIntuitiveDetectByIds(Long[] ids);
+
+    /**
+     * 直观检测标题字典
+     * @return
+     */
+	public List<DictVO> selectIntuitiveDetectDict(Long templateId);
 }

@@ -156,7 +156,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="建筑层数" label-width="100px" prop="layers">
-                <el-input-number controls-position="right" v-model="form.layers" />
+                <el-input-number controls-position="right" v-model="form.layers" :min="0" />
               </el-form-item>
             </el-col>
         </el-row>

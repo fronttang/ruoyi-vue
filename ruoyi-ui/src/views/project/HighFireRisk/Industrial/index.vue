@@ -184,7 +184,7 @@
         <el-row>
             <el-col :span="12">
               <el-form-item label="员工人数（人）" label-width="130px" prop="staffs">
-                <el-input-number controls-position="right" v-model="form.staffs" placeholder="请输入员工人数" />
+                <el-input-number controls-position="right" v-model="form.staffs" placeholder="请输入员工人数" :min="0" />
               </el-form-item>
             </el-col>
             <el-col :span="12">

@@ -2,6 +2,7 @@ package com.ruoyi.electrical.template.service;
 
 import java.util.List;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
+import com.ruoyi.electrical.vo.DictVO;
 
 /**
  * 直观检测标题Service接口
@@ -58,4 +59,6 @@ public interface IIntuitiveDetectService
      * @return 结果
      */
     public int deleteIntuitiveDetectById(Long id);
+
+	public List<DictVO> selectIntuitiveDetectDict(Long templateId);
 }

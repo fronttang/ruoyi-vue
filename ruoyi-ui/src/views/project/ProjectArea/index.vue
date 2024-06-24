@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="项目" prop="projectId">
-        <el-select v-model="queryParams.projectId" placeholder="请选择项目">
+        <el-select v-model="queryParams.projectId" placeholder="请选择项目" filterable clearable>
           <el-option
             v-for="item in projectDict"
             :key="item.id"
@@ -119,7 +119,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="项目名称" prop="projectId">
-          <el-select v-model="form.projectId" placeholder="请选择项目">
+          <el-select v-model="form.projectId" placeholder="请选择项目" filterable>
             <el-option
               v-for="item in projectDict"
               :key="item.id"
@@ -129,7 +129,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="区县" prop="district">
-          <el-select v-model="form.district" placeholder="请选择区县">
+          <el-select v-model="form.district" placeholder="请选择区县" filterable>
             <el-option
               v-for="dict in dict.type.district"
               :key="dict.value"
@@ -139,7 +139,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="街道" prop="street">
-          <el-select v-model="form.street" placeholder="请选择街道">
+          <el-select v-model="form.street" placeholder="请选择街道" filterable>
             <el-option
               v-for="dict in dict.type.street"
               :key="dict.value"
@@ -149,7 +149,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="社区" prop="community">
-          <el-select v-model="form.community" placeholder="请选择社区">
+          <el-select v-model="form.community" placeholder="请选择社区" filterable>
             <el-option
               v-for="dict in dict.type.community"
               :key="dict.value"
@@ -159,7 +159,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="村" prop="hamlet">
-          <el-select v-model="form.hamlet" placeholder="请选择村">
+          <el-select v-model="form.hamlet" placeholder="请选择村" filterable>
             <el-option
               v-for="dict in dict.type.hamlet"
               :key="dict.value"

@@ -1,6 +1,16 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="模板" prop="templateId">
+        <el-select v-model="queryParams.templateId" disabled >
+          <el-option
+            v-for="item in TemplateDict"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="名称" prop="name">
         <el-input
           v-model="queryParams.name"
@@ -147,6 +157,7 @@
 
 <script>
 import { listIntuitiveDetect, getIntuitiveDetect, delIntuitiveDetect, addIntuitiveDetect, updateIntuitiveDetect } from "@/api/template/IntuitiveDetect";
+import { getTemplateDict } from "@/api/template/Template";
 
 export default {
   name: "IntuitiveDetect",
@@ -167,6 +178,7 @@ export default {
       total: 0,
       // 直观检测标题表格数据
       IntuitiveDetectList: [],
+      TemplateDict: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -178,12 +190,14 @@ export default {
         name: null,
         type: null,
         code: null,
+        templateId: parseInt(this.$route.params.templateId)
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-      }
+      },
+      templateId: null
     };
   },
   created() {
@@ -193,6 +207,9 @@ export default {
     /** 查询直观检测标题列表 */
     getList() {
       this.loading = true;
+      getTemplateDict().then(response => {
+        this.TemplateDict = response.data;
+      });
       listIntuitiveDetect(this.queryParams).then(response => {
         this.IntuitiveDetectList = response.rows;
         this.total = response.total;
@@ -211,6 +228,7 @@ export default {
         name: null,
         type: null,
         code: null,
+        templateId: this.$route.params.templateId,
         createBy: null,
         createTime: null,
         updateBy: null,

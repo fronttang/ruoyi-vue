@@ -161,6 +161,48 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
+  },
+  {
+    path: '/template/UrbanVillage/IntuitiveDetect',
+    component: Layout,
+    hidden: true,
+    permissions: ['template:Template:edit'],
+    children: [
+      {
+        path: 'index/:templateId(\\d+)',
+        component: () => import('@/views/template/UrbanVillage/IntuitiveDetect'),
+        name: 'IntuitiveDetect',
+        meta: { title: '直观检测表标题', activeMenu: '/template/Template' }
+      }
+    ]
+  },
+  {
+    path: '/template/UrbanVillage/IntuitiveDetectData',
+    component: Layout,
+    hidden: true,
+    permissions: ['template:Template:edit'],
+    children: [
+      {
+        path: 'index/:templateId(\\d+)',
+        component: () => import('@/views/template/UrbanVillage/IntuitiveDetectData'),
+        name: 'IntuitiveDetectData',
+        meta: { title: '直观检测表内容', activeMenu: '/template/Template' }
+      }
+    ]
+  },
+  {
+    path: '/template/ChargingStation',
+    component: Layout,
+    hidden: true,
+    permissions: ['template:Template:edit'],
+    children: [
+      {
+        path: 'index/:templateId(\\d+)',
+        component: () => import('@/views/template/ChargingStation'),
+        name: 'IntuitiveDetectData',
+        meta: { title: '直观检测表内容', activeMenu: '/template/Template' }
+      }
+    ]
   }
 ]
 

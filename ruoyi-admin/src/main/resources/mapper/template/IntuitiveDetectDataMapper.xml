@@ -9,13 +9,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="templateId"    column="template_id"    />
         <result property="detectTitle"    column="detect_title"    />
         <result property="type"    column="type"    />
+        <result property="unitType"    column="unit_type"    />
+        <result property="moduleType"    column="module_type"    />
         <result property="detectModule"    column="detect_module"    />
+        <result property="parentId"    column="parent_id"    />
         <result property="firstCode"    column="first_code"    />
         <result property="firstContent"    column="first_content"    />
         <result property="secondaryCode"    column="secondary_code"    />
         <result property="secondaryContent"    column="secondary_content"    />
         <result property="weights"    column="weights"    />
         <result property="output"    column="output"    />
+        <result property="maxScore"    column="max_score"    />
+        <result property="view"    column="view"    />
+        <result property="viewParentId"    column="view_parent_id"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -23,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectIntuitiveDetectDataVo">
-        select id, template_id, detect_title, type, detect_module, first_code, first_content, secondary_code, secondary_content, weights, output, create_by, create_time, update_by, update_time from intuitive_detect_data
+        select id, template_id, detect_title, type, unit_type, module_type, detect_module, parent_id, first_code, first_content, secondary_code, secondary_content, weights, output, max_score, view, view_parent_id, create_by, create_time, update_by, update_time from intuitive_detect_data
     </sql>
 
     <select id="selectIntuitiveDetectDataList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
@@ -32,13 +38,72 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="templateId != null "> and template_id = #{templateId}</if>
             <if test="detectTitle != null "> and detect_title = #{detectTitle}</if>
             <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
+            <if test="moduleType != null  and moduleType != ''"> and module_type = #{moduleType}</if>
             <if test="detectModule != null  and detectModule != ''"> and detect_module = #{detectModule}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
             <if test="firstCode != null  and firstCode != ''"> and first_code = #{firstCode}</if>
             <if test="firstContent != null  and firstContent != ''"> and first_content = #{firstContent}</if>
             <if test="secondaryCode != null  and secondaryCode != ''"> and secondary_code = #{secondaryCode}</if>
             <if test="secondaryContent != null  and secondaryContent != ''"> and secondary_content = #{secondaryContent}</if>
             <if test="weights != null "> and weights = #{weights}</if>
             <if test="output != null  and output != ''"> and output = #{output}</if>
+            <if test="maxScore != null "> and max_score = #{maxScore}</if>
+            <if test="view != null  and view != ''"> and view = #{view}</if>
+            <if test="viewParentId != null  and viewParentId != ''"> and view_parent_id = #{viewParentId}</if>
+        </where>
+    </select>
+    
+    <select id="selectIntuitiveDetectDataViewList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
+        select a.id, b.template_id, b.detect_title, b.type, b.unit_type, b.module_type, b.detect_module, b.parent_id, a.first_code, a.first_content, 
+        b.secondary_code, b.secondary_content, b.weights, b.output, b.max_score, b.view, a.view_parent_id, b.create_by, b.create_time, b.update_by, b.update_time 
+        from intuitive_detect_data a left join intuitive_detect_data b on a.view_parent_id = b.id
+        <where>  
+            <if test="templateId != null "> and b.template_id = #{templateId}</if>
+            <if test="detectTitle != null "> and b.detect_title = #{detectTitle}</if>
+            <if test="type != null  and type != ''"> and b.type = #{type}</if>
+            <if test="unitType != null  and unitType != ''"> and b.unit_type = #{unitType}</if>
+            <if test="moduleType != null  and moduleType != ''"> and b.module_type = #{moduleType}</if>
+            <if test="detectModule != null  and detectModule != ''"> and b.detect_module = #{detectModule}</if>
+            <if test="parentId != null "> and b.parent_id = #{parentId}</if>
+            <if test="firstCode != null  and firstCode != ''"> and b.first_code = #{firstCode}</if>
+            <if test="firstContent != null  and firstContent != ''"> and b.first_content = #{firstContent}</if>
+            <if test="secondaryCode != null  and secondaryCode != ''"> and b.secondary_code = #{secondaryCode}</if>
+            <if test="secondaryContent != null  and secondaryContent != ''"> and b.secondary_content = #{secondaryContent}</if>
+            <if test="weights != null "> and b.weights = #{weights}</if>
+            <if test="output != null  and output != ''"> and b.output = #{output}</if>
+            <if test="maxScore != null "> and b.max_score = #{maxScore}</if>
+            <if test="view != null  and view != ''"> and a.view = #{view}</if>
+            <if test="viewParentId != null  and viewParentId != ''"> and a.view_parent_id = #{viewParentId} and a.view = '2' </if>
+            <if test="viewParentId == null  or viewParentId == ''"> and a.view_parent_id is not null and a.view = '2' </if>
+        </where>
+    </select>
+    
+    <select id="selectIntuitiveDetectDataViewById" parameterType="Long" resultMap="IntuitiveDetectDataResult">
+        select a.id, b.template_id, b.detect_title, b.type, b.unit_type, b.module_type, b.detect_module, b.parent_id, a.first_code, a.first_content, 
+        b.secondary_code, b.secondary_content, b.weights, b.output, b.max_score, b.view, a.view_parent_id, b.create_by, b.create_time, b.update_by, b.update_time 
+        from intuitive_detect_data a left join intuitive_detect_data b on a.view_parent_id = b.id where a.id = #{id}
+    </select>
+    
+    <select id="selectIntuitiveDetectDataDict" parameterType="IntuitiveDetectData" resultType="com.ruoyi.electrical.vo.DictVO">
+        select id,first_content as name from intuitive_detect_data
+        <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
+            <if test="detectTitle != null "> and detect_title = #{detectTitle}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
+            <if test="moduleType != null  and moduleType != ''"> and module_type = #{moduleType}</if>
+            <if test="detectModule != null  and detectModule != ''"> and detect_module = #{detectModule}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="firstCode != null  and firstCode != ''"> and first_code = #{firstCode}</if>
+            <if test="firstContent != null  and firstContent != ''"> and first_content = #{firstContent}</if>
+            <if test="secondaryCode != null  and secondaryCode != ''"> and secondary_code = #{secondaryCode}</if>
+            <if test="secondaryContent != null  and secondaryContent != ''"> and secondary_content = #{secondaryContent}</if>
+            <if test="weights != null "> and weights = #{weights}</if>
+            <if test="output != null  and output != ''"> and output = #{output}</if>
+            <if test="maxScore != null "> and max_score = #{maxScore}</if>
+            <if test="view != null  and view != ''"> and view = #{view}</if>
+            <if test="viewParentId != null  and viewParentId != ''"> and view_parent_id = #{viewParentId}</if>
         </where>
     </select>
     
@@ -53,13 +118,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="templateId != null">template_id,</if>
             <if test="detectTitle != null">detect_title,</if>
             <if test="type != null">type,</if>
+            <if test="unitType != null">unit_type,</if>
+            <if test="moduleType != null">module_type,</if>
             <if test="detectModule != null">detect_module,</if>
+            <if test="parentId != null">parent_id,</if>
             <if test="firstCode != null">first_code,</if>
             <if test="firstContent != null">first_content,</if>
             <if test="secondaryCode != null">secondary_code,</if>
             <if test="secondaryContent != null">secondary_content,</if>
             <if test="weights != null">weights,</if>
             <if test="output != null">output,</if>
+            <if test="maxScore != null">max_score,</if>
+            <if test="view != null">view,</if>
+            <if test="viewParentId != null">view_parent_id,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -69,13 +140,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="templateId != null">#{templateId},</if>
             <if test="detectTitle != null">#{detectTitle},</if>
             <if test="type != null">#{type},</if>
+            <if test="unitType != null">#{unitType},</if>
+            <if test="moduleType != null">#{moduleType},</if>
             <if test="detectModule != null">#{detectModule},</if>
+            <if test="parentId != null">#{parentId},</if>
             <if test="firstCode != null">#{firstCode},</if>
             <if test="firstContent != null">#{firstContent},</if>
             <if test="secondaryCode != null">#{secondaryCode},</if>
             <if test="secondaryContent != null">#{secondaryContent},</if>
             <if test="weights != null">#{weights},</if>
             <if test="output != null">#{output},</if>
+            <if test="maxScore != null">#{maxScore},</if>
+            <if test="view != null">#{view},</if>
+            <if test="viewParentId != null">#{viewParentId},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -89,19 +166,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="templateId != null">template_id = #{templateId},</if>
             <if test="detectTitle != null">detect_title = #{detectTitle},</if>
             <if test="type != null">type = #{type},</if>
+            <if test="unitType != null">unit_type = #{unitType},</if>
+            <if test="moduleType != null">module_type = #{moduleType},</if>
             <if test="detectModule != null">detect_module = #{detectModule},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
             <if test="firstCode != null">first_code = #{firstCode},</if>
             <if test="firstContent != null">first_content = #{firstContent},</if>
             <if test="secondaryCode != null">secondary_code = #{secondaryCode},</if>
             <if test="secondaryContent != null">secondary_content = #{secondaryContent},</if>
             <if test="weights != null">weights = #{weights},</if>
             <if test="output != null">output = #{output},</if>
+            <if test="maxScore != null">max_score = #{maxScore},</if>
+            <if test="view != null">view = #{view},</if>
+            <if test="viewParentId != null">view_parent_id = #{viewParentId},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </trim>
         where id = #{id}
+    </update>
+    
+    <update id="deleteIntuitiveDetectDataViewByIds" parameterType="String">
+        update intuitive_detect_data set view_parent_id = null where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </update>
 
     <delete id="deleteIntuitiveDetectDataById" parameterType="Long">

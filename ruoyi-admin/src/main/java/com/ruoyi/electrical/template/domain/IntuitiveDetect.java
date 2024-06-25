@@ -17,11 +17,13 @@ public class IntuitiveDetect extends BaseEntity
 
     /** ID */
     private Long id;
-    
+
+    /** 模板ID */
+    @Excel(name = "模板ID")
     private Long templateId;
 
-    /** 名称 */
-    @Excel(name = "名称")
+    /** 检测表名称 */
+    @Excel(name = "检测表名称")
     private String name;
 
     /** 类型 */
@@ -31,16 +33,12 @@ public class IntuitiveDetect extends BaseEntity
     /** 代号 */
     @Excel(name = "代号")
     private String code;
-    
-    public Long getTemplateId() {
-		return templateId;
-	}
 
-	public void setTemplateId(Long templateId) {
-		this.templateId = templateId;
-	}
+    /** 业主单元类型 */
+    @Excel(name = "业主单元类型")
+    private String unitType;
 
-	public void setId(Long id) 
+    public void setId(Long id) 
     {
         this.id = id;
     }
@@ -48,6 +46,15 @@ public class IntuitiveDetect extends BaseEntity
     public Long getId() 
     {
         return id;
+    }
+    public void setTemplateId(Long templateId) 
+    {
+        this.templateId = templateId;
+    }
+
+    public Long getTemplateId() 
+    {
+        return templateId;
     }
     public void setName(String name) 
     {
@@ -76,12 +83,28 @@ public class IntuitiveDetect extends BaseEntity
     {
         return code;
     }
+    public void setUnitType(String unitType) 
+    {
+        this.unitType = unitType;
+    }
 
-	@Override
-	public String toString() {
-		return "IntuitiveDetect [id=" + id + ", templateId=" + templateId + ", name=" + name + ", type=" + type
-				+ ", code=" + code + "]";
-	}
+    public String getUnitType() 
+    {
+        return unitType;
+    }
 
-   
-}
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+            .append("id", getId())
+            .append("templateId", getTemplateId())
+            .append("name", getName())
+            .append("type", getType())
+            .append("code", getCode())
+            .append("unitType", getUnitType())
+            .append("createBy", getCreateBy())
+            .append("createTime", getCreateTime())
+            .append("updateBy", getUpdateBy())
+            .append("updateTime", getUpdateTime())
+            .toString();
+    }}

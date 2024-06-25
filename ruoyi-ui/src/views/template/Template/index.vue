@@ -66,7 +66,7 @@
     <el-table v-loading="loading" :data="TemplateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" >
+      <el-table-column label="检测单位" align="center" prop="detectId"  :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <span>{{ formatDetectName(scope.row.detectId) }}</span>
         </template>
@@ -117,6 +117,20 @@
               icon="el-icon-edit"
               @click="handleChargingStationIntuitiveDatectData(scope.row)"
             >检测项</el-button>
+          </span>
+          <span v-if="scope.row.type === 'high_fire_risk'">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleHighFireRiskScore(scope.row)"
+            >记分模块</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleHighFireRiskView(scope.row)"
+            >展示模块</el-button>
           </span>
           <el-button
             size="mini"
@@ -294,6 +308,16 @@ export default {
       const templateId = row.id || this.ids[0];
       const params = {};
       this.$tab.openPage("直观检测项", '/template/ChargingStation/index/' + templateId, params);
+    },
+    handleHighFireRiskScore(row){
+      const templateId = row.id || this.ids[0];
+      const params = {};
+      this.$tab.openPage("直观检测计分模块", '/template/HighFireRisk/score/index/' + templateId, params);
+    },
+    handleHighFireRiskView(row){
+      const templateId = row.id || this.ids[0];
+      const params = {};
+      this.$tab.openPage("展示检测表", '/template/HighFireRisk/view/index/' + templateId, params);
     },
     /** 搜索按钮操作 */
     handleQuery() {

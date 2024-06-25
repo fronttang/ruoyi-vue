@@ -61,4 +61,6 @@ public interface IIntuitiveDetectService
     public int deleteIntuitiveDetectById(Long id);
 
 	public List<DictVO> selectIntuitiveDetectDict(Long templateId);
+
+	public List<DictVO> selectIntuitiveDetectListDict(IntuitiveDetect intuitiveDetect);
 }

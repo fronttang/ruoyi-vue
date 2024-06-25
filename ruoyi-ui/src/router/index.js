@@ -203,6 +203,46 @@ export const dynamicRoutes = [
         meta: { title: '直观检测表内容', activeMenu: '/template/Template' }
       }
     ]
+  },
+  {
+    path: '/template/HighFireRisk/score',
+    component: Layout,
+    hidden: true,
+    permissions: ['template:Template:edit'],
+    children: [
+      {
+        path: 'index/:templateId(\\d+)',
+        component: () => import('@/views/template/HighFireRisk/score'),
+        name: 'HighFireRiskScore',
+        meta: { title: '直观检测计分模块', activeMenu: '/template/Template' }
+      }
+    ]
+  },
+  {
+    path: '/template/HighFireRisk/view',
+    component: Layout,
+    hidden: true,
+    permissions: ['template:Template:edit'],
+    children: [
+      {
+        path: 'index/:templateId(\\d+)',
+        component: () => import('@/views/template/HighFireRisk/view'),
+        name: 'HighFireRiskView',
+        meta: { title: '展示检测表', activeMenu: '/template/Template' }
+      },
+      {
+        path: 'firstlevel/:templateId(\\d+)/:unitType(\\d+)/:detectId(\\d+)',
+        component: () => import('@/views/template/HighFireRisk/view/firstlevel'),
+        name: 'HighFireRiskViewFirstLevel',
+        meta: { title: '一级展示模块', activeMenu: '/template/Template' }
+      },
+      {
+        path: 'secondlevel/:templateId(\\d+)/:unitType(\\d+)/:detectId(\\d+)/:parentId(\\d+)',
+        component: () => import('@/views/template/HighFireRisk/view/secondlevel'),
+        name: 'HighFireRiskViewSecondLevel',
+        meta: { title: '二级展示模块', activeMenu: '/template/Template' }
+      }
+    ]
   }
 ]
 

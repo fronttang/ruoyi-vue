@@ -50,3 +50,12 @@ export function getIntuitiveDetectDict(templateId) {
     method: 'get'
   })
 }
+
+// 查询直观检测标题列表
+export function listIntuitiveDetectDict(query) {
+  return request({
+    url: '/template/IntuitiveDetect/dict',
+    method: 'get',
+    params: query
+  })
+}

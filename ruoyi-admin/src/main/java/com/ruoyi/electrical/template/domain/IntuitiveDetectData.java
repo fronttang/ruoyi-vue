@@ -33,9 +33,21 @@ public class IntuitiveDetectData extends BaseEntity
     @Excel(name = "类型")
     private String type;
 
+    /** 业主单元类型 */
+    @Excel(name = "业主单元类型")
+    private String unitType;
+
+    /** 模块类型（一级，二级） */
+    @Excel(name = "模块类型", readConverterExp = "一级，二级")
+    private String moduleType;
+
     /** 检测板块 */
     @Excel(name = "检测板块")
     private String detectModule;
+
+    /** 上级模块ID */
+    @Excel(name = "上级模块ID")
+    private Long parentId;
 
     /** 一级编号 */
     @Excel(name = "一级编号")
@@ -60,6 +72,18 @@ public class IntuitiveDetectData extends BaseEntity
     /** 输出格式 */
     @Excel(name = "输出格式")
     private String output;
+
+    /** 最高扣分数 */
+    @Excel(name = "最高扣分数")
+    private Long maxScore;
+
+    /** 1展示，2计分 */
+    @Excel(name = "1展示，2计分")
+    private String view;
+    
+    /** 展示模块上级 */
+    @Excel(name = "展示模块上级")
+    private Long viewParentId;
     
     private List<IntuitiveDetectDanger> dangers;
     
@@ -107,6 +131,24 @@ public class IntuitiveDetectData extends BaseEntity
     {
         return type;
     }
+    public void setUnitType(String unitType) 
+    {
+        this.unitType = unitType;
+    }
+
+    public String getUnitType() 
+    {
+        return unitType;
+    }
+    public void setModuleType(String moduleType) 
+    {
+        this.moduleType = moduleType;
+    }
+
+    public String getModuleType() 
+    {
+        return moduleType;
+    }
     public void setDetectModule(String detectModule) 
     {
         this.detectModule = detectModule;
@@ -115,6 +157,15 @@ public class IntuitiveDetectData extends BaseEntity
     public String getDetectModule() 
     {
         return detectModule;
+    }
+    public void setParentId(Long parentId) 
+    {
+        this.parentId = parentId;
+    }
+
+    public Long getParentId() 
+    {
+        return parentId;
     }
     public void setFirstCode(String firstCode) 
     {
@@ -170,21 +221,52 @@ public class IntuitiveDetectData extends BaseEntity
     {
         return output;
     }
+    public void setMaxScore(Long maxScore) 
+    {
+        this.maxScore = maxScore;
+    }
 
-    @Override
+    public Long getMaxScore() 
+    {
+        return maxScore;
+    }
+    public void setView(String view) 
+    {
+        this.view = view;
+    }
+
+    public String getView() 
+    {
+        return view;
+    }
+    
+    public Long getViewParentId() {
+		return viewParentId;
+	}
+
+	public void setViewParentId(Long viewParentId) {
+		this.viewParentId = viewParentId;
+	}
+
+	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
             .append("templateId", getTemplateId())
             .append("detectTitle", getDetectTitle())
             .append("type", getType())
+            .append("unitType", getUnitType())
+            .append("moduleType", getModuleType())
             .append("detectModule", getDetectModule())
+            .append("parentId", getParentId())
             .append("firstCode", getFirstCode())
             .append("firstContent", getFirstContent())
             .append("secondaryCode", getSecondaryCode())
             .append("secondaryContent", getSecondaryContent())
             .append("weights", getWeights())
             .append("output", getOutput())
+            .append("maxScore", getMaxScore())
+            .append("view", getView())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

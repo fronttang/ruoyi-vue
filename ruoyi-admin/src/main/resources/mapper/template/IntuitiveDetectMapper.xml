@@ -6,10 +6,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="IntuitiveDetect" id="IntuitiveDetectResult">
         <result property="id"    column="id"    />
+        <result property="templateId"    column="template_id"    />
         <result property="name"    column="name"    />
         <result property="type"    column="type"    />
         <result property="code"    column="code"    />
-        <result property="templateId"    column="template_id"    />
+        <result property="unitType"    column="unit_type"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -17,16 +18,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectIntuitiveDetectVo">
-        select id, name, type, code, template_id, create_by, create_time, update_by, update_time from intuitive_detect
+        select id, template_id, name, type, code, unit_type, create_by, create_time, update_by, update_time from intuitive_detect
     </sql>
 
     <select id="selectIntuitiveDetectList" parameterType="IntuitiveDetect" resultMap="IntuitiveDetectResult">
         <include refid="selectIntuitiveDetectVo"/>
         <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="type != null  and type != ''"> and type = #{type}</if>
-            <if test="templateId != null  and templateId != ''"> and template_id = #{templateId}</if>
             <if test="code != null  and code != ''"> and code like concat('%', #{code}, '%')</if>
+            <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
         </where>
     </select>
     
@@ -38,24 +40,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectIntuitiveDetectDict" parameterType="Long" resultType="com.ruoyi.electrical.vo.DictVO">
         select id, CONCAT(code, '(', name, ')') as name from intuitive_detect where template_id = #{templateId}
     </select>
+    
+    <select id="selectIntuitiveDetectListDict" parameterType="IntuitiveDetect" resultType="com.ruoyi.electrical.vo.DictVO">
+        select id, CONCAT(code, '(', name, ')') as name from intuitive_detect 
+        <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="code != null  and code != ''"> and code like concat('%', #{code}, '%')</if>
+            <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
+        </where>
+    </select>
 
     <insert id="insertIntuitiveDetect" parameterType="IntuitiveDetect" useGeneratedKeys="true" keyProperty="id">
         insert into intuitive_detect
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
             <if test="name != null">name,</if>
             <if test="type != null">type,</if>
             <if test="code != null">code,</if>
-            <if test="templateId != null">template_id,</if>
+            <if test="unitType != null">unit_type,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
             <if test="name != null">#{name},</if>
             <if test="type != null">#{type},</if>
             <if test="code != null">#{code},</if>
-            <if test="templateId != null">#{templateId},</if>
+            <if test="unitType != null">#{unitType},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -66,10 +81,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateIntuitiveDetect" parameterType="IntuitiveDetect">
         update intuitive_detect
         <trim prefix="SET" suffixOverrides=",">
+            <if test="templateId != null">template_id = #{templateId},</if>
             <if test="name != null">name = #{name},</if>
             <if test="type != null">type = #{type},</if>
             <if test="code != null">code = #{code},</if>
-            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="unitType != null">unit_type = #{unitType},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

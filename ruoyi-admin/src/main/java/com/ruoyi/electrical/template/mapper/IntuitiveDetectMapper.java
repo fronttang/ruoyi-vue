@@ -65,4 +65,6 @@ public interface IntuitiveDetectMapper
      * @return
      */
 	public List<DictVO> selectIntuitiveDetectDict(Long templateId);
+
+	public List<DictVO> selectIntuitiveDetectListDict(IntuitiveDetect intuitiveDetect);
 }

@@ -18,6 +18,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
+import com.ruoyi.electrical.vo.DictVO;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -107,6 +108,13 @@ public class IntuitiveDetectController extends BaseController
     public AjaxResult dict(@PathVariable Long templateId)
     {
         return success(intuitiveDetectService.selectIntuitiveDetectDict(templateId));
+    }
+    
+    @GetMapping("/dict")
+    public AjaxResult dict(IntuitiveDetect intuitiveDetect)
+    {
+        List<DictVO> list = intuitiveDetectService.selectIntuitiveDetectListDict(intuitiveDetect);
+        return success(list);
     }
 
 }

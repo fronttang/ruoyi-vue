@@ -99,4 +99,9 @@ public class IntuitiveDetectServiceImpl implements IIntuitiveDetectService
 	public List<DictVO> selectIntuitiveDetectDict(Long templateId) {
 		return intuitiveDetectMapper.selectIntuitiveDetectDict(templateId);
 	}
+
+	@Override
+	public List<DictVO> selectIntuitiveDetectListDict(IntuitiveDetect intuitiveDetect) {
+		return intuitiveDetectMapper.selectIntuitiveDetectListDict(intuitiveDetect);
+	}
 }

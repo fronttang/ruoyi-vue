@@ -9,7 +9,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 检测内容隐患对象 intuitive_detect_danger
  * 
  * @author fronttang
- * @date 2024-06-23
+ * @date 2024-06-24
  */
 public class IntuitiveDetectDanger extends BaseEntity
 {
@@ -17,7 +17,9 @@ public class IntuitiveDetectDanger extends BaseEntity
 
     /** ID */
     private Long id;
-    
+
+    /** 模板ID */
+    @Excel(name = "模板ID")
     private Long templateId;
 
     /** 内容ID */
@@ -35,16 +37,16 @@ public class IntuitiveDetectDanger extends BaseEntity
     /** 整改建议 */
     @Excel(name = "整改建议")
     private String suggestions;
-    
-    public Long getTemplateId() {
-		return templateId;
-	}
 
-	public void setTemplateId(Long templateId) {
-		this.templateId = templateId;
-	}
+    /** 累计方式 */
+    @Excel(name = "累计方式")
+    private String accMethod;
 
-	public void setId(Long id) 
+    /** 扣分数 */
+    @Excel(name = "扣分数")
+    private Long score;
+
+    public void setId(Long id) 
     {
         this.id = id;
     }
@@ -52,6 +54,15 @@ public class IntuitiveDetectDanger extends BaseEntity
     public Long getId() 
     {
         return id;
+    }
+    public void setTemplateId(Long templateId) 
+    {
+        this.templateId = templateId;
+    }
+
+    public Long getTemplateId() 
+    {
+        return templateId;
     }
     public void setDataId(Long dataId) 
     {
@@ -89,11 +100,40 @@ public class IntuitiveDetectDanger extends BaseEntity
     {
         return suggestions;
     }
+    public void setAccMethod(String accMethod) 
+    {
+        this.accMethod = accMethod;
+    }
 
-	@Override
-	public String toString() {
-		return "IntuitiveDetectDanger [id=" + id + ", templateId=" + templateId + ", dataId=" + dataId + ", level="
-				+ level + ", description=" + description + ", suggestions=" + suggestions + "]";
-	}
+    public String getAccMethod() 
+    {
+        return accMethod;
+    }
+    public void setScore(Long score) 
+    {
+        this.score = score;
+    }
 
+    public Long getScore() 
+    {
+        return score;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+            .append("id", getId())
+            .append("templateId", getTemplateId())
+            .append("dataId", getDataId())
+            .append("level", getLevel())
+            .append("description", getDescription())
+            .append("suggestions", getSuggestions())
+            .append("accMethod", getAccMethod())
+            .append("score", getScore())
+            .append("createBy", getCreateBy())
+            .append("createTime", getCreateTime())
+            .append("updateBy", getUpdateBy())
+            .append("updateTime", getUpdateTime())
+            .toString();
+    }
 }

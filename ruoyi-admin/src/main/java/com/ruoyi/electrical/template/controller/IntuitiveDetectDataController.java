@@ -65,6 +65,15 @@ public class IntuitiveDetectDataController extends BaseController
         List<IntuitiveDetectData> list = intuitiveDetectDataService.selectIntuitiveDetectDataList(intuitiveDetectData);
         return getDataTable(list);
     }
+    
+    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:list')")
+    @GetMapping("/list/view")
+    public TableDataInfo listViewData(IntuitiveDetectData intuitiveDetectData)
+    {
+        startPage();
+        List<IntuitiveDetectData> list = intuitiveDetectDataService.selectIntuitiveDetectDataViewList(intuitiveDetectData);
+        return getDataTable(list);
+    }
 
     /**
      * 导出直观检测表内容列表
@@ -92,6 +101,13 @@ public class IntuitiveDetectDataController extends BaseController
     	result.put("data", intuitiveDetectData);
     	result.put("dangers", dangers);
         return result;
+    }
+    
+    @GetMapping(value = "/view/{id}")
+    public AjaxResult getViewInfo(@PathVariable("id") Long id)
+    {
+    	IntuitiveDetectData intuitiveDetectData = intuitiveDetectDataService.selectIntuitiveDetectDataViewById(id);
+        return success(intuitiveDetectData);
     }
 
     /**
@@ -125,5 +141,18 @@ public class IntuitiveDetectDataController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(intuitiveDetectDataService.deleteIntuitiveDetectDataByIds(ids));
+    }
+    
+    @DeleteMapping("/view/{ids}")
+    public AjaxResult removeView(@PathVariable Long[] ids)
+    {
+        return toAjax(intuitiveDetectDataService.deleteIntuitiveDetectDataViewByIds(ids));
+    }
+    
+    @Log(title = "直观检测表内容字典", businessType = BusinessType.OTHER)
+	@GetMapping("/dict")
+    public AjaxResult dict(IntuitiveDetectData intuitiveDetectData)
+    {
+        return success(intuitiveDetectDataService.selectIntuitiveDetectDataDict(intuitiveDetectData));
     }
 }

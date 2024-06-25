@@ -11,6 +11,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="level"    column="level"    />
         <result property="description"    column="description"    />
         <result property="suggestions"    column="suggestions"    />
+        <result property="accMethod"    column="acc_method"    />
+        <result property="score"    column="score"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -18,17 +20,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectIntuitiveDetectDangerVo">
-        select id, data_id, template_id, level, description, suggestions, create_by, create_time, update_by, update_time from intuitive_detect_danger
+        select id, template_id, data_id, level, description, suggestions, acc_method, score, create_by, create_time, update_by, update_time from intuitive_detect_danger
     </sql>
 
     <select id="selectIntuitiveDetectDangerList" parameterType="IntuitiveDetectDanger" resultMap="IntuitiveDetectDangerResult">
         <include refid="selectIntuitiveDetectDangerVo"/>
         <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
             <if test="dataId != null "> and data_id = #{dataId}</if>
-            <if test="templateId != null  and templateId != ''"> and template_id = #{templateId}</if>
             <if test="level != null  and level != ''"> and level = #{level}</if>
             <if test="description != null  and description != ''"> and description = #{description}</if>
             <if test="suggestions != null  and suggestions != ''"> and suggestions = #{suggestions}</if>
+            <if test="accMethod != null  and accMethod != ''"> and acc_method = #{accMethod}</if>
+            <if test="score != null "> and score = #{score}</if>
         </where>
     </select>
     
@@ -45,22 +49,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertIntuitiveDetectDanger" parameterType="IntuitiveDetectDanger" useGeneratedKeys="true" keyProperty="id">
         insert into intuitive_detect_danger
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
             <if test="dataId != null">data_id,</if>
             <if test="level != null">level,</if>
-            <if test="templateId != null">template_id,</if>
             <if test="description != null">description,</if>
             <if test="suggestions != null">suggestions,</if>
+            <if test="accMethod != null">acc_method,</if>
+            <if test="score != null">score,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
             <if test="dataId != null">#{dataId},</if>
             <if test="level != null">#{level},</if>
-            <if test="templateId != null">#{templateId},</if>
             <if test="description != null">#{description},</if>
             <if test="suggestions != null">#{suggestions},</if>
+            <if test="accMethod != null">#{accMethod},</if>
+            <if test="score != null">#{score},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -71,11 +79,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateIntuitiveDetectDanger" parameterType="IntuitiveDetectDanger">
         update intuitive_detect_danger
         <trim prefix="SET" suffixOverrides=",">
-            <if test="dataId != null">data_id = #{dataId},</if>
             <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="dataId != null">data_id = #{dataId},</if>
             <if test="level != null">level = #{level},</if>
             <if test="description != null">description = #{description},</if>
             <if test="suggestions != null">suggestions = #{suggestions},</if>
+            <if test="accMethod != null">acc_method = #{accMethod},</if>
+            <if test="score != null">score = #{score},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

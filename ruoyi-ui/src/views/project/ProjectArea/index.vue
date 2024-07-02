@@ -1,13 +1,43 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="项目" prop="projectId">
-        <el-select v-model="queryParams.projectId" placeholder="请选择项目" filterable clearable>
+      <el-form-item label="一级区域" prop="district">
+        <el-select v-model="queryParams.district" placeholder="请选择一级区域" clearable filterable>
           <el-option
-            v-for="item in projectDict"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
+            v-for="dict in districtOptions"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="二级区域" prop="street">
+        <el-select v-model="queryParams.street" placeholder="请选择二级区域" clearable filterable>
+          <el-option
+            v-for="dict in streetOptions"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="三级区域" prop="community">
+        <el-select v-model="queryParams.community" placeholder="请选择三级区域" clearable filterable>
+          <el-option
+            v-for="dict in communityOptions"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="四级区域" prop="hamlet">
+        <el-select v-model="queryParams.hamlet" placeholder="请选择四级区域" clearable filterable>
+          <el-option
+            v-for="dict in hamletOptions"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -66,25 +96,30 @@
     <el-table v-loading="loading" :data="ProjectAreaList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="项目名称" align="center" prop="projectName" />
-      <el-table-column label="区县" align="center" prop="district">
+      <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
+      <el-table-column label="一级区域" align="center" prop="district" >
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.district" :value="scope.row.district"/>
+          <dict-tag :options="districtOptions" :value="scope.row.district"/>
         </template>
       </el-table-column>
-      <el-table-column label="街道" align="center" prop="street">
+      <el-table-column label="二级区域" align="center" prop="street">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.street" :value="scope.row.street"/>
+          <dict-tag :options="streetOptions" :value="scope.row.street"/>
         </template>
       </el-table-column>
-      <el-table-column label="社区" align="center" prop="community">
+      <el-table-column label="三级区域" align="center" prop="community">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.community" :value="scope.row.community"/>
+          <dict-tag :options="communityOptions" :value="scope.row.community"/>
         </template>
       </el-table-column>
-      <el-table-column label="村" align="center" prop="hamlet">
+      <el-table-column label="四级区域" align="center" prop="hamlet">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.hamlet" :value="scope.row.hamlet"/>
+          <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -118,50 +153,40 @@
     <!-- 添加或修改项目区域对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="项目名称" prop="projectId">
-          <el-select v-model="form.projectId" placeholder="请选择项目" filterable>
+        <el-form-item label="一级区域" prop="district">
+          <el-select v-model="form.district" placeholder="请选择一级区域" clearable filterable>
             <el-option
-              v-for="item in projectDict"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="区县" prop="district">
-          <el-select v-model="form.district" placeholder="请选择区县" filterable>
-            <el-option
-              v-for="dict in dict.type.district"
+              v-for="dict in districtOptions"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="街道" prop="street">
-          <el-select v-model="form.street" placeholder="请选择街道" filterable>
+        <el-form-item label="二级区域" prop="street">
+          <el-select v-model="form.street" placeholder="请选择二级区域" clearable filterable>
             <el-option
-              v-for="dict in dict.type.street"
+              v-for="dict in streetOptions"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="社区" prop="community">
-          <el-select v-model="form.community" placeholder="请选择社区" filterable>
+        <el-form-item label="三级区域" prop="community">
+          <el-select v-model="form.community" placeholder="请选择三级区域" clearable filterable>
             <el-option
-              v-for="dict in dict.type.community"
+              v-for="dict in communityOptions"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="村" prop="hamlet">
-          <el-select v-model="form.hamlet" placeholder="请选择村" filterable>
+        <el-form-item label="四级区域" prop="hamlet">
+          <el-select v-model="form.hamlet" placeholder="请选择四级区域" clearable filterable>
             <el-option
-              v-for="dict in dict.type.hamlet"
+              v-for="dict in hamletOptions"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
@@ -180,6 +205,8 @@
 <script>
 import { listProjectArea, getProjectArea, delProjectArea, addProjectArea, updateProjectArea } from "@/api/project/ProjectArea";
 import { getProjectDict } from "@/api/project/project";
+import { listProjectAreaDict } from "@/api/project/AreaDict";
+import DictMeta from '@/utils/dict/DictMeta'
 
 export default {
   name: "ProjectArea",
@@ -204,18 +231,30 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      districtOptions: [],
+      streetOptions: [],
+      communityOptions: [],
+      hamletOptions: [],
+      dictQuery: {
+        dictType: null,
+        projectId: this.$store.state.settings.projectId,
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        projectId: null,
+        district: null,
+        street: null,
+        community: null,
+        hamlet: null,
+        projectId: this.$store.state.settings.projectId,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        projectId: [
-          { required: true, message: "项目ID不能为空", trigger: "change" }
+        district: [
+          { required: true, message: "一级区域不能为空", trigger: "change" }
         ],
       },
       projectDict: [],
@@ -228,9 +267,32 @@ export default {
     /** 查询项目区域列表 */
     getList() {
       this.loading = true;
-      getProjectDict().then(response => {
-        this.projectDict = response.data;
+
+      this.dictQuery.dictType = "district";
+      listProjectAreaDict(this.dictQuery).then(response => {
+        this.districtList = response.data;
+        const dictMeta = DictMeta.parse("districtOptions");
+        this.districtOptions = dictMeta.responseConverter(response.data, dictMeta);
       });
+
+      this.dictQuery.dictType = "street";
+      listProjectAreaDict(this.dictQuery).then(response => {
+        const dictMeta = DictMeta.parse("streetOptions");
+        this.streetOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
+      this.dictQuery.dictType = "community";
+      listProjectAreaDict(this.dictQuery).then(response => {
+        const dictMeta = DictMeta.parse("communityOptions");
+        this.communityOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
+      this.dictQuery.dictType = "hamlet";
+      listProjectAreaDict(this.dictQuery).then(response => {
+        const dictMeta = DictMeta.parse("hamletOptions");
+        this.hamletOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
       listProjectArea(this.queryParams).then(response => {
         this.ProjectAreaList = response.rows;
         this.total = response.total;
@@ -246,7 +308,7 @@ export default {
     reset() {
       this.form = {
         id: null,
-        projectId: null,
+        projectId: this.$store.state.settings.projectId,
         projectName: null,
         district: null,
         street: null,
@@ -275,21 +337,18 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
+    districtFormat(row){
+      return this.selectDictLabel(this.districtList, row.district);
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      getProjectDict().then(response => {
-        this.projectDict = response.data;
-      });
       this.open = true;
       this.title = "添加项目区域";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      getProjectDict().then(response => {
-        this.projectDict = response.data;
-      });
       const id = row.id || this.ids
       getProjectArea(id).then(response => {
         this.form = response.data;

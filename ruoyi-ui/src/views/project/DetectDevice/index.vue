@@ -76,7 +76,7 @@
     <el-table v-loading="loading" :data="DetectDeviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" />
+      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
       <el-table-column label="仪器编号" align="center" prop="deviceId" />
       <el-table-column label="类型" align="center" prop="type">
         <template slot-scope="scope">
@@ -91,7 +91,7 @@
       </el-table-column>
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -135,8 +135,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择类型">
+        <el-form-item label="仪器类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择仪器类型">
             <el-option
               v-for="dict in dict.type.detect_device_type"
               :key="dict.value"
@@ -215,7 +215,10 @@ export default {
       // 表单校验
       rules: {
         detectId: [
-          { required: true, message: "检测单位不能为空", trigger: "change" }
+          { required: true, message: "请选择检测单位", trigger: "change" }
+        ],
+        type: [
+          { required: true, message: "请选择仪器类型", trigger: "change" }
         ],
       },
       // 检测单位字典选项

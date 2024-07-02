@@ -65,11 +65,16 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="名称" align="center" prop="name" />
-      <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat"/>
-      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" />
+      <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat" :show-overflow-tooltip="true"/>
+      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat"  :show-overflow-tooltip="true" />
       <el-table-column label="管理员" align="center" prop="manager" :formatter="managerFormat" />
       <el-table-column label="网格员" align="center" prop="gridman" :formatter="gridmanFormat" />
-      <el-table-column label="检测地址" align="center" prop="address" />
+      <el-table-column label="检测地址" align="center" prop="address"  :show-overflow-tooltip="true" />
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -101,22 +106,6 @@
     <!-- 添加或修改出租屋对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="检测单位" label-width="110px" prop="detectId">
-              <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable
-                @change="handleDetectUnitChange"
-              >
-                <el-option
-                  v-for="item in detectUnitDict"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-row>
             <el-col :span="12">
               <el-form-item label="名称" label-width="110px" prop="name">
@@ -213,8 +202,9 @@
 <script>
 import { listOwnerUnit, getOwnerUnit, delOwnerUnit, addOwnerUnit, updateOwnerUnit } from "@/api/project/OwnerUnit";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
+import { getProject } from "@/api/project/project";
 import { getProjectAreaDict, getProjectAreaDictByProjectId } from "@/api/project/ProjectArea";
-import { getDetectUnitUserDictByType, getDetectUnitUserDict } from "@/api/projectrole/detectUnitUser";
+import { getDetectUnitUserDictByTypeAndProjectId, getDetectUnitUserDict } from "@/api/projectrole/detectUnitUser";
 
 export default {
   name: "OwnerUnit",
@@ -239,6 +229,9 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      projectInfo: {
+
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -247,7 +240,7 @@ export default {
         type: '3',
         detectId: null,
         detectName: null,
-        projectId: null,
+        projectId: this.$store.state.settings.projectId,
         projectName: null,
         area: null,
         entrust: null,
@@ -285,14 +278,18 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        name: [
+          { required: true, message: "请输入名称", trigger: "blur" }
+        ],
+        area: [
+          { required: true, message: "请选择区域", trigger: "change" }
+        ],
       },
       // 检测单位字典选项
       detectUnitDict: [],
       projectAreaDict: [],
       ownerUnitUserDict: [],
-      gridmanDict: [],
-      allUser: [],
-      allProjectArea: []
+      gridmanDict: []
     };
   },
   created() {
@@ -305,12 +302,24 @@ export default {
       detectUnitDict().then(response => {
         this.detectUnitDict = response.data;
       });
-      getProjectAreaDict().then(response => {
-        this.allProjectArea = response.data;
+
+      getProject(this.queryParams.projectId).then(response => {
+        this.projectInfo = response.data;
+        this.form.projectName = this.projectInfo.name;
       });
-      getDetectUnitUserDict().then(response => {
-        this.allUser = response.data;
+
+      getProjectAreaDictByProjectId(this.queryParams.projectId).then(response => {
+        this.projectAreaDict = response.data;
       });
+
+      getDetectUnitUserDictByTypeAndProjectId('05', this.queryParams.projectId).then(response => {
+        this.ownerUnitUserDict = response.data;
+      });
+
+      getDetectUnitUserDictByTypeAndProjectId('04', this.queryParams.projectId).then(response => {
+        this.gridmanDict = response.data;
+      });
+
       listOwnerUnit(this.queryParams).then(response => {
         this.OwnerUnitList = response.rows;
         this.total = response.total;
@@ -330,8 +339,8 @@ export default {
         type: '3',
         detectId: null,
         detectName: null,
-        projectId: null,
-        projectName: null,
+        projectId: this.$store.state.settings.projectId,
+        projectName: this.projectInfo.name,
         area: null,
         entrust: null,
         manager: null,
@@ -368,22 +377,19 @@ export default {
         updateBy: null,
         updateTime: null
       };
-      this.projectAreaDict = [],
-      this.ownerUnitUserDict = [],
-      this.gridmanDict = [],
       this.resetForm("form");
     },
     detectFormat(row){
       return this.selectDictLabel(this.detectUnitDict, row.detectId);
     },
     managerFormat(row){
-      return this.selectDictLabel(this.allUser, row.manager);
+      return this.selectDictLabel(this.ownerUnitUserDict, row.manager);
     },
     gridmanFormat(row){
-      return this.selectDictLabel(this.allUser, row.gridman);
+      return this.selectDictLabel(this.gridmanDict, row.gridman);
     },
     areaFormat(row) {
-      return this.selectDictLabel(this.allProjectArea, row.area);
+      return this.selectDictLabel(this.projectAreaDict, row.area);
     },
     selectDictLabel(datas, value) {
       if (value === undefined) {
@@ -420,38 +426,17 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
-      getProjectAreaDictByProjectId(1).then(response => {
-        this.projectAreaDict = response.data;
-      });
       this.open = true;
       this.title = "添加出租屋";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
-      getProjectAreaDictByProjectId(1).then(response => {
-        this.projectAreaDict = response.data;
-      });
       const id = row.id || this.ids
       getOwnerUnit(id).then(response => {
         this.form = response.data;
-        this.handleDetectUnitChange(this.form.detectId);
         this.open = true;
         this.title = "修改出租屋";
-      });
-    },
-    handleDetectUnitChange(value) {
-      getDetectUnitUserDictByType('05', value).then(response => {
-        this.ownerUnitUserDict = response.data;
-      });
-      getDetectUnitUserDictByType('04', value).then(response => {
-        this.gridmanDict = response.data;
       });
     },
     /** 提交按钮 */

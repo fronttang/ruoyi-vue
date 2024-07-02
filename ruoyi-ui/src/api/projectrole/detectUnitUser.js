@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询检测单位账号列表
 export function listDetectUnitUser(query) {
   return request({
-    url: '/projectrole/detectUnitUser/list',
+    url: '/electrical/user/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listDetectUnitUser(query) {
 // 查询检测单位账号详细
 export function getDetectUnitUser(id) {
   return request({
-    url: '/projectrole/detectUnitUser/' + id,
+    url: '/electrical/user/' + id,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getDetectUnitUser(id) {
 // 新增检测单位账号
 export function addDetectUnitUser(data) {
   return request({
-    url: '/projectrole/detectUnitUser',
+    url: '/electrical/user',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addDetectUnitUser(data) {
 // 修改检测单位账号
 export function updateDetectUnitUser(data) {
   return request({
-    url: '/projectrole/detectUnitUser',
+    url: '/electrical/user',
     method: 'put',
     data: data
   })
@@ -38,15 +38,15 @@ export function updateDetectUnitUser(data) {
 // 删除检测单位账号
 export function delDetectUnitUser(id) {
   return request({
-    url: '/projectrole/detectUnitUser/' + id,
+    url: '/electrical/user/' + id,
     method: 'delete'
   })
 }
 
 // 查询账号字典
-export function getDetectUnitUserDictByType(type, detectId) {
+export function getDetectUnitUserDictByTypeAndProjectId(type, projectId) {
   return request({
-    url: '/projectrole/detectUnitUser/dict/' + type + '/' + detectId,
+    url: '/electrical/user/dict/' + type + '/' + projectId,
     method: 'get'
   })
 }
@@ -54,7 +54,7 @@ export function getDetectUnitUserDictByType(type, detectId) {
 // 查询账号字典
 export function getDetectUnitUserDict() {
   return request({
-    url: '/projectrole/detectUnitUser/dict',
+    url: '/electrical/user/dict',
     method: 'get'
   })
 }

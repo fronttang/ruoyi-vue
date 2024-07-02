@@ -52,6 +52,14 @@ export function getProjectAreaDictByProjectId(projectId) {
 }
 
 // 查询项目区域字典
+export function getProjectAreaDictByProjectIdAndType(projectId, type) {
+  return request({
+    url: '/project/ProjectArea/dict/' + type + '/' + projectId,
+    method: 'get'
+  })
+}
+
+// 查询项目区域字典
 export function getProjectAreaDict() {
   return request({
     url: '/project/ProjectArea/dict',

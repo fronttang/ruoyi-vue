@@ -66,9 +66,14 @@
       <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="场站名称" align="center" prop="name" />
       <el-table-column label="轮次" align="center" prop="rounds" />
-      <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat"/>
-      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" />
-      <el-table-column label="检测地址" align="center" prop="address" />
+      <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat" :show-overflow-tooltip="true" />
+      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" :show-overflow-tooltip="true"  />
+      <el-table-column label="检测地址" align="center" prop="address" :show-overflow-tooltip="true"  />
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="全景图" align="center" prop="panoramaPic" width="100">
         <template slot-scope="scope">
           <image-preview :src="scope.row.panoramaPic" :width="50" :height="50"/>
@@ -110,20 +115,6 @@
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="检测单位" label-width="100px" prop="detectId">
-              <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable>
-                <el-option
-                  v-for="item in detectUnitDict"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-row>
             <el-col :span="12">
               <el-form-item label="场站名称" label-width="100px" prop="name">
@@ -220,12 +211,12 @@
         <el-row>
             <el-col :span="12">
               <el-form-item label="全景图" label-width="100px" prop="panoramaPic">
-                <image-upload v-model="form.panoramaPic" limit=1 />
+                <image-upload v-model="form.panoramaPic" :limit="limit" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="点位图" label-width="100px" prop="stationPic">
-                <image-upload v-model="form.stationPic" limit=1 />
+                <image-upload v-model="form.stationPic" :limit="limit" />
               </el-form-item>
             </el-col>
         </el-row>
@@ -241,8 +232,9 @@
 <script>
 import { listOwnerUnit, getOwnerUnit, delOwnerUnit, addOwnerUnit, updateOwnerUnit } from "@/api/project/OwnerUnit";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
+import { getProject } from "@/api/project/project";
 import { getProjectAreaDict, getProjectAreaDictByProjectId } from "@/api/project/ProjectArea";
-import { getDetectUnitUserDictByType, getDetectUnitUserDict } from "@/api/projectrole/detectUnitUser";
+import { getDetectUnitUserDictByTypeAndProjectId, getDetectUnitUserDict } from "@/api/projectrole/detectUnitUser";
 
 export default {
   name: "OwnerUnit",
@@ -261,12 +253,16 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      limit: 1,
       // 充电场站检测表格数据
       OwnerUnitList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      projectInfo: {
+
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -275,7 +271,7 @@ export default {
         type: '4',
         detectId: null,
         detectName: null,
-        projectId: null,
+        projectId: this.$store.state.settings.projectId,
         projectName: null,
         area: null,
         entrust: null,
@@ -312,14 +308,24 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        name: [
+          { required: true, message: "请输入名称", trigger: "blur" }
+        ],
+        area: [
+          { required: true, message: "请选择区域", trigger: "change" }
+        ],
+        stationType: [
+          { required: true, message: "请选择类型", trigger: "change" }
+        ],
+        detectModule: [
+          { required: true, message: "请选择检测模块", trigger: "change" }
+        ],
       },
       // 检测单位字典选项
       detectUnitDict: [],
       projectAreaDict: [],
       ownerUnitUserDict: [],
-      gridmanDict: [],
-      allUser: [],
-      allProjectArea: []
+      gridmanDict: []
     };
   },
   created() {
@@ -332,9 +338,16 @@ export default {
       detectUnitDict().then(response => {
         this.detectUnitDict = response.data;
       });
-      getProjectAreaDict().then(response => {
-        this.allProjectArea = response.data;
+
+      getProject(this.queryParams.projectId).then(response => {
+        this.projectInfo = response.data;
+        this.form.projectName = this.projectInfo.name;
       });
+
+      getProjectAreaDictByProjectId(this.queryParams.projectId).then(response => {
+        this.projectAreaDict = response.data;
+      });
+
       listOwnerUnit(this.queryParams).then(response => {
         this.OwnerUnitList = response.rows;
         this.total = response.total;
@@ -354,8 +367,8 @@ export default {
         type: '4',
         detectId: null,
         detectName: null,
-        projectId: null,
-        projectName: null,
+        projectId: this.$store.state.settings.projectId,
+        projectName: this.projectInfo.name,
         area: null,
         entrust: null,
         manager: null,
@@ -393,16 +406,13 @@ export default {
         updateBy: null,
         updateTime: null
       };
-      this.projectAreaDict = [],
-      this.ownerUnitUserDict = [],
-      this.gridmanDict = [],
       this.resetForm("form");
     },
     detectFormat(row){
       return this.selectDictLabel(this.detectUnitDict, row.detectId);
     },
     areaFormat(row) {
-      return this.selectDictLabel(this.allProjectArea, row.area);
+      return this.selectDictLabel(this.projectAreaDict, row.area);
     },
     selectDictLabel(datas, value) {
       if (value === undefined) {
@@ -439,24 +449,12 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
-      getProjectAreaDictByProjectId(1).then(response => {
-        this.projectAreaDict = response.data;
-      });
       this.open = true;
       this.title = "添加充电场站";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
-      getProjectAreaDictByProjectId(1).then(response => {
-        this.projectAreaDict = response.data;
-      });
       const id = row.id || this.ids
       getOwnerUnit(id).then(response => {
         this.form = response.data;

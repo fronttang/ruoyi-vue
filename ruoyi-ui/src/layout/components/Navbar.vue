@@ -6,8 +6,21 @@
     <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
 
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
+      <template >
+        <div class="right-menu-item">
+          <el-select v-model="projectId" placeholder="请选择项目" filterable class="right-menu-item" @change="handleProjectChange">
+            <el-option class="right-menu-item"
+              v-for="item in projectDict"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </div>
+      </template>
+      <template v-if="device!=='mobile'" >
+        <!--<search id="header-search" class="right-menu-item" />
+
 
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
@@ -16,6 +29,7 @@
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
         </el-tooltip>
+        -->
 
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
 
@@ -58,6 +72,18 @@ import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
 
 export default {
+  data() {
+    return {
+      projectId: this.$store.state.settings.projectId,
+      projectDict: this.$store.state.user.projects
+    };
+  },
+  created(){
+    if(this.projectDict != null && this.projectDict.length > 0){
+      this.projectId = this.projectDict[0].id;
+      this.handleProjectChange(this.projectId);
+    }
+  },
   components: {
     Breadcrumb,
     TopNav,
@@ -94,6 +120,14 @@ export default {
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+    },
+    handleProjectChange(value){
+      this.$store.dispatch('settings/changeSetting', {
+        key: 'projectId',
+        value: value
+      })
+      this.$tab.closeOtherPage();
+      this.$tab.refreshPage();
     },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {

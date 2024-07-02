@@ -72,7 +72,7 @@
         </template>
       </el-table-column>
       <el-table-column label="模板名称" align="center" prop="name" />
-      <el-table-column label="模板类型" align="center" prop="type">
+      <el-table-column label="场景类型" align="center" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
         </template>
@@ -162,12 +162,12 @@
             :value="item.id"
           ></el-option>
         </el-select>
-      </el-form-item>
+        </el-form-item>
         <el-form-item label="模板名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入模板名称" />
         </el-form-item>
-        <el-form-item label="模板类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择模板类型">
+        <el-form-item label="场景类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择场景类型">
             <el-option
               v-for="dict in dict.type.project_type"
               :key="dict.value"
@@ -228,7 +228,13 @@ export default {
       // 表单校验
       rules: {
         detectId: [
-          { required: true, message: "检测单位不能为空", trigger: "blur" }
+          { required: true, message: "请选择检测单位", trigger: "change" }
+        ],
+        name: [
+          { required: true, message: "请输入模板名称", trigger: "blur" }
+        ],
+        type: [
+          { required: true, message: "请选择场景类型", trigger: "change" }
         ],
       }
     };

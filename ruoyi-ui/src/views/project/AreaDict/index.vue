@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="区域类型" prop="dictType">
-        <el-select v-model="queryParams.dictType" placeholder="请选择区域类型" clearable>
+        <el-select v-model="queryParams.dictType" placeholder="请选择区域类型" filterable clearable>
           <el-option
             v-for="dict in dict.type.area_type"
             :key="dict.value"
@@ -103,9 +103,6 @@
     <!-- 添加或修改区域字典对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="名称" prop="dictLabel">
-          <el-input v-model="form.dictLabel" placeholder="请输入名称" />
-        </el-form-item>
         <el-form-item label="类型" prop="dictType">
           <el-select v-model="form.dictType" placeholder="请选择类型">
             <el-option
@@ -115,6 +112,9 @@
               :value="dict.value"
             ></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="名称" prop="dictLabel">
+          <el-input v-model="form.dictLabel" placeholder="请输入名称" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -155,12 +155,19 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        dictType: null
+        dictType: null,
+        projectId: this.$store.state.settings.projectId
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        dictLabel: [
+          { required: true, message: "名称不能为空", trigger: "blur" }
+        ],
+        dictType: [
+          { required: true, message: "请选择类型", trigger: "change" }
+        ],
       }
     };
   },
@@ -198,7 +205,8 @@ export default {
         createTime: null,
         updateBy: null,
         updateTime: null,
-        remark: null
+        remark: null,
+        projectId: this.$store.state.settings.projectId
       };
       this.resetForm("form");
     },

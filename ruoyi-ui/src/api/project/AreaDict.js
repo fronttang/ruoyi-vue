@@ -9,6 +9,15 @@ export function listAreaDict(query) {
   })
 }
 
+// 查询区域字典列表
+export function listProjectAreaDict(query) {
+  return request({
+    url: '/project/AreaDict/dict/list',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询区域字典详细
 export function getAreaDict(dictCode) {
   return request({

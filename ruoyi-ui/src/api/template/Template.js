@@ -50,3 +50,12 @@ export function getTemplateDict() {
     method: 'get'
   })
 }
+
+// 查询模板列表详细
+export function queryTemplateDict(query) {
+  return request({
+    url: '/template/Template/dict/list',
+    method: 'get',
+    params: query
+  })
+}

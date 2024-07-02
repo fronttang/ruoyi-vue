@@ -10,13 +10,23 @@
         />
       </el-form-item>
       <el-form-item label="项目类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择项目类型" clearable>
+        <el-select v-model="queryParams.type" placeholder="请选择项目类型" filterable clearable>
           <el-option
             v-for="dict in dict.type.project_type"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
           />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="检测单位">
+        <el-select v-model="queryParams.detectId" placeholder="请选择检测单位" filterable clearable>
+          <el-option
+            v-for="item in detectUnitDict"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -73,14 +83,19 @@
 
     <el-table v-loading="loading" :data="projectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="ID" align="center" prop="id" width="50" />
       <el-table-column label="项目名称" align="center" prop="name" />
       <el-table-column label="项目类型" align="center" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="检测单位" align="center" prop="detectName" />
+      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -112,11 +127,11 @@
     <!-- 添加或修改项目对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="项目名称" prop="name">
+        <el-form-item label="项目名称" label-width="130px" prop="name">
           <el-input v-model="form.name" placeholder="请输入项目名称" />
         </el-form-item>
-        <el-form-item label="项目类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择项目类型">
+        <el-form-item label="项目类型" label-width="130px" prop="type">
+          <el-select v-model="form.type" placeholder="请选择项目类型" filterable clearable @change="handleChangeProjectType" >
             <el-option
               v-for="dict in dict.type.project_type"
               :key="dict.value"
@@ -125,10 +140,25 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="检测单位" prop="detectId">
-          <el-select v-model="form.detectId" placeholder="请选择检测单位">
+        <el-form-item label="检测单位" label-width="130px" prop="detectId">
+          <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable clearable @change="handleChangeDetectUnit" >
             <el-option
               v-for="item in detectUnitDict"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <template  v-if="addHouseholdRate == true" >
+          <el-form-item label="入户率要求（%）" label-width="130px" prop="householdRate">
+              <el-input v-model="form.householdRate" placeholder="请输入入户率要求" />
+          </el-form-item>
+        </template>
+        <el-form-item label="直观检测模板" label-width="130px" prop="templateId" filterable clearable>
+          <el-select v-model="form.templateId" placeholder="请选择直观检测模板">
+            <el-option
+              v-for="item in templateDict"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -147,6 +177,7 @@
 <script>
 import { listProject, getProject, delProject, addProject, updateProject } from "@/api/project/project";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
+import { queryTemplateDict } from "@/api/template/Template";
 
 export default {
   name: "Project",
@@ -171,6 +202,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      addHouseholdRate: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -179,13 +211,30 @@ export default {
         type: null,
         detectId: null,
       },
+      templateQuery: {
+        type: null,
+        detectId: null,
+      },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        detectId: [
+          { required: true, message: "请选择检测单位", trigger: "change" }
+        ],
+        name: [
+          { required: true, message: "请输入项目名称", trigger: "blur" }
+        ],
+        type: [
+          { required: true, message: "请选择项目类型", trigger: "change" }
+        ],
+        templateId: [
+          { required: true, message: "请选择直观检测模板", trigger: "change" }
+        ],
       },
       // 检测单位字典选项
       detectUnitDict: [],
+      templateDict: []
     };
   },
   created() {
@@ -195,6 +244,9 @@ export default {
     /** 查询项目列表 */
     getList() {
       this.loading = true;
+      detectUnitDict().then(response => {
+        this.detectUnitDict = response.data;
+      });
       listProject(this.queryParams).then(response => {
         this.projectList = response.rows;
         this.total = response.total;
@@ -214,6 +266,8 @@ export default {
         type: null,
         detectId: null,
         detectName: null,
+        householdRate: null,
+        templateId: null,
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -240,6 +294,7 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.templateDict = [];
       detectUnitDict().then(response => {
         this.detectUnitDict = response.data;
       });
@@ -250,14 +305,51 @@ export default {
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
+      this.templateDict = [];
       detectUnitDict().then(response => {
         this.detectUnitDict = response.data;
       });
       getProject(id).then(response => {
         this.form = response.data;
+        this.templateQuery.detectId = this.form.detectId;
+        this.templateQuery.type = this.form.type;
+        queryTemplateDict(this.templateQuery).then(response => {
+          this.templateDict = response.data;
+        });
+        if(this.form.type == 'urban_village' || this.form.type == 'industrial_area'){
+          this.addHouseholdRate = true;
+        } else {
+          this.addHouseholdRate = false;
+        }
         this.open = true;
         this.title = "修改项目";
       });
+    },
+    handleChangeProjectType(value){
+      if(value == 'urban_village' || value == 'industrial_area'){
+        this.addHouseholdRate = true;
+      } else {
+        this.addHouseholdRate = false;
+      }
+      if(this.form.detectId != null && this.form.detectId != ''){
+        this.templateQuery.type = value;
+        queryTemplateDict(this.templateQuery).then(response => {
+          this.templateDict = response.data;
+        });
+      }
+      this.form.templateId = null;
+    },
+    handleChangeDetectUnit(value){
+      if(value != null && value != ''){
+        this.templateQuery.detectId = value;
+        this.templateQuery.type = this.form.type;
+        queryTemplateDict(this.templateQuery).then(response => {
+          this.templateDict = response.data;
+        });
+      } else {
+        this.templateDict = [];
+      }
+      this.form.templateId = null;
     },
     /** 提交按钮 */
     submitForm() {

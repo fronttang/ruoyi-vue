@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="账号" prop="account">
+      <el-form-item label="姓名/账号" prop="account" label-width="100px">
         <el-input
           v-model="queryParams.account"
-          placeholder="请输入账号"
+          placeholder="请输入姓名/账号"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -64,7 +64,8 @@
     <el-table v-loading="loading" :data="gridmanList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" />
+      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
+      <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
       <el-table-column label="姓名" align="center" prop="name" />
       <el-table-column label="账号" align="center" prop="account" />
       <el-table-column label="状态" align="center" prop="status">
@@ -76,6 +77,11 @@
           @change="handleStatusChange(scope.row)"
         ></el-switch>
       </template>
+      </el-table-column>
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -108,16 +114,6 @@
     <!-- 添加或修改业主账号对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="检测单位" prop="detectId">
-          <el-select v-model="form.detectId" placeholder="请选择检测单位">
-            <el-option
-              v-for="item in detectUnitDict"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名" />
         </el-form-item>
@@ -168,19 +164,23 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        detectName: null,
+        detectId: null,
         account: null,
-        type: '05'
+        type: '05',
+        projectId: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        detectId: [
-          { required: true, message: "检测单位不能为空", trigger: "blur" }
-        ],
         account: [
           { required: true, message: "账号不能为空", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur" }
+        ],
+        name: [
+          { required: true, message: "姓名不能为空", trigger: "blur" }
         ],
       },
       // 检测单位字典选项
@@ -194,6 +194,7 @@ export default {
     /** 查询业主账号列表 */
     getList() {
       this.loading = true;
+      this.queryParams.projectId = this.$store.state.settings.projectId;
       listDetectUnitUser(this.queryParams).then(response => {
         this.gridmanList = response.rows;
         this.total = response.total;
@@ -210,6 +211,8 @@ export default {
       this.form = {
         id: null,
         detectId: null,
+        projectId: null,
+        projectName: null,
         detectName: null,
         account: null,
         name: null,
@@ -242,9 +245,6 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
       this.open = true;
       this.title = "添加业主账号";
     },
@@ -252,9 +252,6 @@ export default {
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      detectUnitDict().then(response => {
-        this.detectUnitDict = response.data;
-      });
       getDetectUnitUser(id).then(response => {
         this.form = response.data;
         this.open = true;
@@ -283,6 +280,7 @@ export default {
               this.getList();
             });
           } else {
+            this.form.projectId = this.$store.state.settings.projectId;
             addDetectUnitUser(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;

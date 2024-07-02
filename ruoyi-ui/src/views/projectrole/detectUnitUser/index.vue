@@ -1,13 +1,23 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="账号" prop="account">
+      <el-form-item label="姓名/账号" prop="account" label-width="100px">
         <el-input
           v-model="queryParams.account"
-          placeholder="请输入账号"
+          placeholder="请输入姓名/账号"
           clearable
           @keyup.enter.native="handleQuery"
         />
+      </el-form-item>
+      <el-form-item label="检测单位" prop="detectId">
+        <el-select v-model="queryParams.detectId" placeholder="请选择检测单位" filterable clearable>
+          <el-option
+            v-for="item in detectUnitDict"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -64,7 +74,7 @@
     <el-table v-loading="loading" :data="detectUnitUserList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" />
+      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
       <el-table-column label="姓名" align="center" prop="name" />
       <el-table-column label="账号" align="center" prop="account" />
       <el-table-column label="状态" align="center" prop="status">
@@ -76,6 +86,11 @@
           @change="handleStatusChange(scope.row)"
         ></el-switch>
       </template>
+      </el-table-column>
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -109,7 +124,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="检测单位" prop="detectId">
-          <el-select v-model="form.detectId" placeholder="请选择检测单位">
+          <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable clearable>
             <el-option
               v-for="item in detectUnitDict"
               :key="item.id"
@@ -125,7 +140,7 @@
           <el-input v-model="form.account" placeholder="请输入账号" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" placeholder="请输入用户" type="password" maxlength="20" show-password/>
+          <el-input v-model="form.password" placeholder="请输入密码" type="password" maxlength="20" show-password/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -168,19 +183,25 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        detectName: null,
         account: null,
-        type: '01'
+        type: '01',
+        detectId: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         detectId: [
-          { required: true, message: "检测单位不能为空", trigger: "blur" }
+          { required: true, message: "请选择检测单位", trigger: "change" }
+        ],
+        name: [
+          { required: true, message: "姓名不能为空", trigger: "blur" }
         ],
         account: [
           { required: true, message: "账号不能为空", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur" }
         ],
       },
       // 检测单位字典选项
@@ -194,6 +215,9 @@ export default {
     /** 查询检测单位账号列表 */
     getList() {
       this.loading = true;
+      detectUnitDict().then(response => {
+        this.detectUnitDict = response.data;
+      });
       listDetectUnitUser(this.queryParams).then(response => {
         this.detectUnitUserList = response.rows;
         this.total = response.total;

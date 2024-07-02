@@ -9,30 +9,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="简称" prop="shortName">
-        <el-input
-          v-model="queryParams.shortName"
-          placeholder="请输入简称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="电话" prop="phone">
-        <el-input
-          v-model="queryParams.phone"
-          placeholder="请输入电话"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="地址" prop="address">
-        <el-input
-          v-model="queryParams.address"
-          placeholder="请输入地址"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -88,11 +64,9 @@
     <el-table v-loading="loading" :data="DetectUnitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" />
-      <el-table-column label="名称" align="center" prop="name" />
+      <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
       <el-table-column label="简称" align="center" prop="shortName" />
-      <el-table-column label="受控编号" align="center" prop="controlledNumber" />
-      <el-table-column label="电话" align="center" prop="phone" />
-      <el-table-column label="地址" align="center" prop="address" />
+      <el-table-column label="电话" align="center" prop="phone" />/>
       <el-table-column label="联系人" align="center" prop="contact" />
       <el-table-column label="联系电话" align="center" prop="contactPhone" />
       <el-table-column label="logo" align="center" prop="logo" width="100">
@@ -163,13 +137,13 @@
           <el-input v-model="form.contactPhone" placeholder="请输入联系电话" />
         </el-form-item>
         <el-form-item label="logo" prop="logo">
-          <image-upload v-model="form.logo" limit="1"/>
+          <image-upload v-model="form.logo" :limit="limit" />
         </el-form-item>
         <el-form-item label="营业执照" prop="businessLicense">
-          <image-upload v-model="form.businessLicense" limit="1"/>
+          <image-upload v-model="form.businessLicense" :limit="limit" />
         </el-form-item>
         <el-form-item label="资质" prop="qualification">
-          <image-upload v-model="form.qualification" limit="1"/>
+          <image-upload v-model="form.qualification" :limit="limit" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -218,7 +192,11 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+        name: [
+          { required: true, message: "检测单位名称不能为空", trigger: "blur" }
+        ],
+      },
+      limit: 1
     };
   },
   created() {

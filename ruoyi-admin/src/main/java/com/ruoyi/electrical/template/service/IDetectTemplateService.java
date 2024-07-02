@@ -61,4 +61,6 @@ public interface IDetectTemplateService
     public int deleteDetectTemplateById(Long id);
 
 	public List<DictVO> selectDetectTemplateDict();
+
+	public List<DictVO> queryDetectTemplateDict(DetectTemplate detectTemplate);
 }

@@ -62,6 +62,7 @@ public class AreaDictServiceImpl implements IAreaDictService
     public int insertAreaDict(AreaDict areaDict)
     {
         areaDict.setCreateTime(DateUtils.getNowDate());
+        areaDict.setUpdateTime(DateUtils.getNowDate());
         int row = areaDictMapper.insertAreaDict(areaDict);
         if (row > 0)
         {

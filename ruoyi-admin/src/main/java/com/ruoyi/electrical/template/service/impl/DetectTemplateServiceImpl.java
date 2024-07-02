@@ -100,4 +100,9 @@ public class DetectTemplateServiceImpl implements IDetectTemplateService
 	public List<DictVO> selectDetectTemplateDict() {
 		return detectTemplateMapper.selectDetectTemplateDict();
 	}
+
+	@Override
+	public List<DictVO> queryDetectTemplateDict(DetectTemplate detectTemplate) {
+		return detectTemplateMapper.queryDetectTemplateDict(detectTemplate);
+	}
 }

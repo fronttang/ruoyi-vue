@@ -23,20 +23,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="street"    column="street"    />
         <result property="community"    column="community"    />
         <result property="hamlet"    column="hamlet"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="projectName" column="project_name"  />
     </resultMap>
 
     <sql id="selectDetectUnitUserVo">
-        select s.user_id, s.detect_id, u.name as detect_name, s.user_type, s.user_name, s.nick_name, s.password, s.status, 
+        select s.user_id, s.project_id, p.name as project_name, s.detect_id, u.name as detect_name, s.user_type, s.user_name, s.nick_name, s.password, s.status, 
         s.recorder, s.district, s.street, s.community, s.hamlet, s.create_by, s.create_time, s.update_by, s.update_time 
         from sys_user s left join detect_unit u on s.detect_id = u.id
+        left join project p on s.project_id = p.id
     </sql>
 
     <select id="selectDetectUnitUserList" parameterType="DetectUnitUser" resultMap="DetectUnitUserResult">
         <include refid="selectDetectUnitUserVo"/>
         <where>  
         	<if test="type != null  and type != ''"> and s.user_type = #{type}</if>
-            <if test="detectName != null  and detectName != ''"> and s.detect_name = #{detectName}</if>
-            <if test="account != null  and account != ''"> and s.user_name = #{account}</if>
+            <if test="detectId != null  and detectId != ''"> and s.detect_id = #{detectId}</if>
+            <if test="projectId != null  and projectId != ''"> and s.project_id = #{projectId}</if>
+            <if test="account != null  and account != ''"> and (s.user_name like concat('%', #{account}, '%') or s.nick_name like concat('%', #{account}, '%') )</if>
             <if test="district != null  and district != ''"> and s.district = #{district}</if>
             <if test="street != null  and street != ''"> and s.street = #{street}</if>
             <if test="community != null  and community != ''"> and s.community = #{community}</if>
@@ -49,8 +53,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where s.user_id = #{id}
     </select>
     
-    <select id="sysUserDictByType" resultType="com.ruoyi.electrical.vo.DictVO">
-       	select user_id as id, nick_name as name from sys_user where user_type = #{type} and detect_id = #{detectId}
+    <select id="sysUserDictByTypeAndProjectId" resultType="com.ruoyi.electrical.vo.DictVO">
+       	select user_id as id, nick_name as name from sys_user where user_type = #{type} and project_id = #{projectId}
     </select>
     
     <select id="sysUserDict" resultType="com.ruoyi.electrical.vo.DictVO">
@@ -61,6 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into sys_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="detectId != null">detect_id,</if>
+            <if test="projectId != null">project_id,</if>
             <if test="detectName != null">detect_name,</if>
             <if test="account != null and account != ''">user_name,</if>
             <if test="name != null">nick_name,</if>
@@ -79,6 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="detectId != null">#{detectId},</if>
+            <if test="projectId != null">#{projectId},</if>
             <if test="detectName != null">#{detectName},</if>
             <if test="account != null and account != ''">#{account},</if>
             <if test="name != null">#{name},</if>
@@ -101,6 +107,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update sys_user
         <trim prefix="SET" suffixOverrides=",">
             <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
             <if test="detectName != null">detect_name = #{detectName},</if>
             <if test="account != null and account != ''">user_name = #{account},</if>
             <if test="name != null">nick_name = #{name},</if>

@@ -61,4 +61,6 @@ public interface DetectTemplateMapper
     public int deleteDetectTemplateByIds(Long[] ids);
 
 	public List<DictVO> selectDetectTemplateDict();
+
+	public List<DictVO> queryDetectTemplateDict(DetectTemplate detectTemplate);
 }

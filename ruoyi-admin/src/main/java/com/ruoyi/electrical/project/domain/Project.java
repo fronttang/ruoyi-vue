@@ -32,9 +32,16 @@ public class Project extends BaseEntity
     private Long detectId;
 
     /** 检测单位名称 */
+    @Excel(name = "检测单位名称")
     private String detectName;
-    
-    //private DetectUnit detectUnit;
+
+    /** 入户率要求 */
+    @Excel(name = "入户率要求")
+    private Long householdRate;
+
+    /** 模板ID */
+    @Excel(name = "模板ID")
+    private Long templateId;
 
     public void setId(Long id) 
     {
@@ -81,8 +88,26 @@ public class Project extends BaseEntity
     {
         return detectName;
     }
+    public void setHouseholdRate(Long householdRate) 
+    {
+        this.householdRate = householdRate;
+    }
 
-	@Override
+    public Long getHouseholdRate() 
+    {
+        return householdRate;
+    }
+    public void setTemplateId(Long templateId) 
+    {
+        this.templateId = templateId;
+    }
+
+    public Long getTemplateId() 
+    {
+        return templateId;
+    }
+
+    @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
@@ -90,6 +115,8 @@ public class Project extends BaseEntity
             .append("type", getType())
             .append("detectId", getDetectId())
             .append("detectName", getDetectName())
+            .append("householdRate", getHouseholdRate())
+            .append("templateId", getTemplateId())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

@@ -1,6 +1,8 @@
 package com.ruoyi.electrical.project.service;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.vo.DictVO;
 
@@ -65,4 +67,6 @@ public interface IProjectService
      * @return 结果
      */
     public int deleteProjectById(Long id);
+
+	public List<DictVO> getUserProjectDict(SysUser user);
 }

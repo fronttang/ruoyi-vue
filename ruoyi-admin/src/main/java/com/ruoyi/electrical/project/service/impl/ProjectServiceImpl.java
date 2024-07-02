@@ -1,6 +1,8 @@
 package com.ruoyi.electrical.project.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,7 @@ public class ProjectServiceImpl implements IProjectService
     public int insertProject(Project project)
     {
         project.setCreateTime(DateUtils.getNowDate());
+        project.setUpdateTime(DateUtils.getNowDate());
         return projectMapper.insertProject(project);
     }
 
@@ -97,6 +100,12 @@ public class ProjectServiceImpl implements IProjectService
 
 	@Override
 	public List<DictVO> selectProjectDict() {
+		return projectMapper.selectProjectDict();
+	}
+
+	//TODO 根据用户类型获取用户的项目
+	@Override
+	public List<DictVO> getUserProjectDict(SysUser user) {
 		return projectMapper.selectProjectDict();
 	}
 }

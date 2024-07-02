@@ -108,4 +108,11 @@ public class DetectTemplateController extends BaseController
     {
         return success(detectTemplateService.selectDetectTemplateDict());
     }
+    
+    @Log(title = "模板列表", businessType = BusinessType.OTHER)
+	@GetMapping("/dict/list")
+    public AjaxResult dict(DetectTemplate detectTemplate)
+    {
+        return success(detectTemplateService.queryDetectTemplateDict(detectTemplate));
+    }
 }

@@ -13,6 +13,8 @@ import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.electrical.project.service.IProjectService;
+import com.ruoyi.electrical.vo.DictVO;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.system.service.ISysMenuService;
@@ -33,6 +35,9 @@ public class SysLoginController
 
     @Autowired
     private SysPermissionService permissionService;
+    
+    @Autowired
+    private IProjectService projectService;
 
     /**
      * 登录方法
@@ -64,10 +69,13 @@ public class SysLoginController
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
+        
+        List<DictVO> projects = projectService.getUserProjectDict(user);
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);
         ajax.put("roles", roles);
         ajax.put("permissions", permissions);
+        ajax.put("projects", projects);
         return ajax;
     }
 

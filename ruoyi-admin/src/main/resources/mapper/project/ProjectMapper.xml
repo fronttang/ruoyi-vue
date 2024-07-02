@@ -10,6 +10,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="type"    column="type"    />
         <result property="detectId"    column="detect_id"    />
         <result property="detectName"    column="detect_name"    />
+        <result property="householdRate"    column="household_rate"    />
+        <result property="templateId"    column="template_id"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -17,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectProjectVo">
-        select p.id, p.name, p.type, p.detect_id, d.name as detect_name, p.create_by, p.create_time, p.update_by, p.update_time 
+        select p.id, p.name, p.type, p.detect_id, d.name as detect_name, p.household_rate, p.template_id, p.create_by, p.create_time, p.update_by, p.update_time 
         from project p left join detect_unit d on p.detect_id=d.id 
     </sql>
 
@@ -27,6 +29,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null  and name != ''"> and p.name like concat('%', #{name}, '%')</if>
             <if test="type != null  and type != ''"> and p.type = #{type}</if>
             <if test="detectId != null "> and p.detect_id = #{detectId}</if>
+            <if test="householdRate != null "> and household_rate = #{householdRate}</if>
+            <if test="templateId != null "> and template_id = #{templateId}</if>
         </where>
     </select>
     
@@ -46,6 +50,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="type != null">type,</if>
             <if test="detectId != null">detect_id,</if>
             <if test="detectName != null">detect_name,</if>
+            <if test="householdRate != null">household_rate,</if>
+            <if test="templateId != null">template_id,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -56,6 +62,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="type != null">#{type},</if>
             <if test="detectId != null">#{detectId},</if>
             <if test="detectName != null">#{detectName},</if>
+            <if test="householdRate != null">#{householdRate},</if>
+            <if test="templateId != null">#{templateId},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -70,6 +78,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="type != null">type = #{type},</if>
             <if test="detectId != null">detect_id = #{detectId},</if>
             <if test="detectName != null">detect_name = #{detectName},</if>
+            <if test="householdRate != null">household_rate = #{householdRate},</if>
+            <if test="templateId != null">template_id = #{templateId},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

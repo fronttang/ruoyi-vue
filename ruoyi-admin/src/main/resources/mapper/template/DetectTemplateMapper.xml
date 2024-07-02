@@ -38,6 +38,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDetectTemplateDict"  resultType="com.ruoyi.electrical.vo.DictVO">
         select id, name from detect_template
     </select>
+    
+    <select id="queryDetectTemplateDict" parameterType="DetectTemplate" resultType="com.ruoyi.electrical.vo.DictVO">
+        select id, name from detect_template 
+		<where>  
+            <if test="detectId != null "> and detect_id = #{detectId}</if>
+            <if test="detectName != null  and detectName != ''"> and detect_name like concat('%', #{detectName}, '%')</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+        </where>
+    </select>
 
     <insert id="insertDetectTemplate" parameterType="DetectTemplate" useGeneratedKeys="true" keyProperty="id">
         insert into detect_template

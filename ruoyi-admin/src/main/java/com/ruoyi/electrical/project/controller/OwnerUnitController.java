@@ -17,7 +17,9 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
+import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
+import com.ruoyi.electrical.project.service.IProjectService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -29,76 +31,76 @@ import com.ruoyi.common.core.page.TableDataInfo;
  */
 @RestController
 @RequestMapping("/project/OwnerUnit")
-public class OwnerUnitController extends BaseController
-{
-    @Autowired
-    private IOwnerUnitService ownerUnitService;
+public class OwnerUnitController extends BaseController {
+	@Autowired
+	private IOwnerUnitService ownerUnitService;
 
-    /**
-     * 查询业主单元列表
-     */
-    @PreAuthorize("@ss.hasPermi('project:OwnerUnit:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(OwnerUnit ownerUnit)
-    {
-        startPage();
-        List<OwnerUnit> list = ownerUnitService.selectOwnerUnitList(ownerUnit);
-        return getDataTable(list);
-    }
+	@Autowired
+	private IProjectService projectService;
 
-    /**
-     * 导出业主单元列表
-     */
-    @PreAuthorize("@ss.hasPermi('project:OwnerUnit:export')")
-    @Log(title = "业主单元", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, OwnerUnit ownerUnit)
-    {
-        List<OwnerUnit> list = ownerUnitService.selectOwnerUnitList(ownerUnit);
-        ExcelUtil<OwnerUnit> util = new ExcelUtil<OwnerUnit>(OwnerUnit.class);
-        util.exportExcel(response, list, "业主单元数据");
-    }
+	/**
+	 * 查询业主单元列表
+	 */
+	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:list')")
+	@GetMapping("/list")
+	public TableDataInfo list(OwnerUnit ownerUnit) {
+		startPage();
+		List<OwnerUnit> list = ownerUnitService.selectOwnerUnitList(ownerUnit);
+		return getDataTable(list);
+	}
 
-    /**
-     * 获取业主单元详细信息
-     */
-    @PreAuthorize("@ss.hasPermi('project:OwnerUnit:query')")
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
-        return success(ownerUnitService.selectOwnerUnitById(id));
-    }
+	/**
+	 * 导出业主单元列表
+	 */
+	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:export')")
+	@Log(title = "业主单元", businessType = BusinessType.EXPORT)
+	@PostMapping("/export")
+	public void export(HttpServletResponse response, OwnerUnit ownerUnit) {
+		List<OwnerUnit> list = ownerUnitService.selectOwnerUnitList(ownerUnit);
+		ExcelUtil<OwnerUnit> util = new ExcelUtil<OwnerUnit>(OwnerUnit.class);
+		util.exportExcel(response, list, "业主单元数据");
+	}
 
-    /**
-     * 新增业主单元
-     */
-    @PreAuthorize("@ss.hasPermi('project:OwnerUnit:add')")
-    @Log(title = "业主单元", businessType = BusinessType.INSERT)
-    @PostMapping
-    public AjaxResult add(@RequestBody OwnerUnit ownerUnit)
-    {
-        return toAjax(ownerUnitService.insertOwnerUnit(ownerUnit));
-    }
+	/**
+	 * 获取业主单元详细信息
+	 */
+	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:query')")
+	@GetMapping(value = "/{id}")
+	public AjaxResult getInfo(@PathVariable("id") Long id) {
+		return success(ownerUnitService.selectOwnerUnitById(id));
+	}
 
-    /**
-     * 修改业主单元
-     */
-    @PreAuthorize("@ss.hasPermi('project:OwnerUnit:edit')")
-    @Log(title = "业主单元", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult edit(@RequestBody OwnerUnit ownerUnit)
-    {
-        return toAjax(ownerUnitService.updateOwnerUnit(ownerUnit));
-    }
+	/**
+	 * 新增业主单元
+	 */
+	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:add')")
+	@Log(title = "业主单元", businessType = BusinessType.INSERT)
+	@PostMapping
+	public AjaxResult add(@RequestBody OwnerUnit ownerUnit) {
+		if (ownerUnit.getProjectId() != null) {
+			Project project = projectService.selectProjectById(ownerUnit.getProjectId());
+			ownerUnit.setDetectId(project.getDetectId());
+		}
+		return toAjax(ownerUnitService.insertOwnerUnit(ownerUnit));
+	}
 
-    /**
-     * 删除业主单元
-     */
-    @PreAuthorize("@ss.hasPermi('project:OwnerUnit:remove')")
-    @Log(title = "业主单元", businessType = BusinessType.DELETE)
+	/**
+	 * 修改业主单元
+	 */
+	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:edit')")
+	@Log(title = "业主单元", businessType = BusinessType.UPDATE)
+	@PutMapping
+	public AjaxResult edit(@RequestBody OwnerUnit ownerUnit) {
+		return toAjax(ownerUnitService.updateOwnerUnit(ownerUnit));
+	}
+
+	/**
+	 * 删除业主单元
+	 */
+	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:remove')")
+	@Log(title = "业主单元", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
-        return toAjax(ownerUnitService.deleteOwnerUnitByIds(ids));
-    }
+	public AjaxResult remove(@PathVariable Long[] ids) {
+		return toAjax(ownerUnitService.deleteOwnerUnitByIds(ids));
+	}
 }

@@ -45,6 +45,13 @@ public class AreaDictController extends BaseController
         List<AreaDict> list = areaDictService.selectAreaDictList(areaDict);
         return getDataTable(list);
     }
+    
+    @GetMapping("/dict/list")
+    public AjaxResult dict(AreaDict areaDict)
+    {
+        List<AreaDict> list = areaDictService.selectAreaDictList(areaDict);
+        return success(list);
+    }
 
     /**
      * 导出区域字典列表
@@ -77,7 +84,7 @@ public class AreaDictController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody AreaDict areaDict)
     {
-    	areaDict.setDictValue(System.currentTimeMillis()+"");
+    	areaDict.setDictValue(String.valueOf(System.currentTimeMillis()));
         return toAjax(areaDictService.insertAreaDict(areaDict));
     }
 

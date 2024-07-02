@@ -2,7 +2,10 @@ package com.ruoyi.electrical.project.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.electrical.project.domain.AreaDict;
 import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.vo.DictVO;
 
@@ -65,4 +68,6 @@ public interface ProjectAreaMapper
     public List<DictVO> queryProjectAreaDictByProjectId(Long projectId);
 
 	public List<DictVO> queryProjectAreaDict();
+
+	public List<AreaDict> queryProjectAreaDictByProjectIdAndType(@Param("projectId") Long projectId, @Param("type") String type);
 }

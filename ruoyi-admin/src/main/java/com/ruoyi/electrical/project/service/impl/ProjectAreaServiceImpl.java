@@ -2,13 +2,13 @@ package com.ruoyi.electrical.project.service.impl;
 
 import java.util.List;
 
-import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.electrical.project.mapper.ProjectAreaMapper;
+
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.project.domain.AreaDict;
 import com.ruoyi.electrical.project.domain.ProjectArea;
+import com.ruoyi.electrical.project.mapper.ProjectAreaMapper;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.vo.DictVO;
 
@@ -105,5 +105,10 @@ public class ProjectAreaServiceImpl implements IProjectAreaService {
 	@Override
 	public List<AreaDict> queryProjectAreaDictByProjectIdAndType(Long projectId, String type) {
 		return projectAreaMapper.queryProjectAreaDictByProjectIdAndType(projectId, type);
+	}
+
+	@Override
+	public List<ProjectArea> queryProjectAreaByProjectId(Long projectId) {
+		return projectAreaMapper.queryProjectAreaByProjectId(projectId);
 	}
 }

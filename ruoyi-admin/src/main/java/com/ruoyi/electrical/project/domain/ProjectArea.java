@@ -1,7 +1,5 @@
 package com.ruoyi.electrical.project.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -11,114 +9,138 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @author fronttang
  * @date 2024-06-19
  */
-public class ProjectArea extends BaseEntity
-{
-    private static final long serialVersionUID = 1L;
+public class ProjectArea extends BaseEntity {
 
-    /** ID */
-    private Long id;
+	private static final long serialVersionUID = 1L;
 
-    /** 项目ID */
-    private Long projectId;
+	/** ID */
+	private Long id;
 
-    /** 项目名称 */
-    @Excel(name = "项目名称")
-    private String projectName;
+	/** 项目ID */
+	private Long projectId;
 
-    /** 区县 */
-    @Excel(name = "区县")
-    private String district;
+	/** 项目名称 */
+	@Excel(name = "项目名称")
+	private String projectName;
 
-    /** 街道 */
-    @Excel(name = "街道")
-    private String street;
+	/** 区县 */
+	@Excel(name = "区县")
+	private String district;
 
-    /** 社区 */
-    @Excel(name = "社区")
-    private String community;
+	private String districtName;
 
-    /** 村 */
-    @Excel(name = "村")
-    private String hamlet;
+	/** 街道 */
+	@Excel(name = "街道")
+	private String street;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
+	private String streetName;
 
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setProjectId(Long projectId) 
-    {
-        this.projectId = projectId;
-    }
+	/** 社区 */
+	@Excel(name = "社区")
+	private String community;
 
-    public Long getProjectId() 
-    {
-        return projectId;
-    }
-    public void setProjectName(String projectName) 
-    {
-        this.projectName = projectName;
-    }
+	private String communityName;
 
-    public String getProjectName() 
-    {
-        return projectName;
-    }
-    public void setDistrict(String district) 
-    {
-        this.district = district;
-    }
+	/** 村 */
+	@Excel(name = "村")
+	private String hamlet;
 
-    public String getDistrict() 
-    {
-        return district;
-    }
-    public void setStreet(String street) 
-    {
-        this.street = street;
-    }
+	private String hamletName;
 
-    public String getStreet() 
-    {
-        return street;
-    }
-    public void setCommunity(String community) 
-    {
-        this.community = community;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getCommunity() 
-    {
-        return community;
-    }
-    public void setHamlet(String hamlet) 
-    {
-        this.hamlet = hamlet;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getHamlet() 
-    {
-        return hamlet;
-    }
+	public Long getProjectId() {
+		return projectId;
+	}
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("projectId", getProjectId())
-            .append("projectName", getProjectName())
-            .append("district", getDistrict())
-            .append("street", getStreet())
-            .append("community", getCommunity())
-            .append("hamlet", getHamlet())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .toString();
-    }
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
+	}
+
+	public String getStreet() {
+		return street;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
+	public String getStreetName() {
+		return streetName;
+	}
+
+	public void setStreetName(String streetName) {
+		this.streetName = streetName;
+	}
+
+	public String getCommunity() {
+		return community;
+	}
+
+	public void setCommunity(String community) {
+		this.community = community;
+	}
+
+	public String getCommunityName() {
+		return communityName;
+	}
+
+	public void setCommunityName(String communityName) {
+		this.communityName = communityName;
+	}
+
+	public String getHamlet() {
+		return hamlet;
+	}
+
+	public void setHamlet(String hamlet) {
+		this.hamlet = hamlet;
+	}
+
+	public String getHamletName() {
+		return hamletName;
+	}
+
+	public void setHamletName(String hamletName) {
+		this.hamletName = hamletName;
+	}
+
+	@Override
+	public String toString() {
+		return "ProjectArea [id=" + id + ", projectId=" + projectId + ", projectName=" + projectName + ", district="
+				+ district + ", districtName=" + districtName + ", street=" + street + ", streetName=" + streetName
+				+ ", community=" + community + ", communityName=" + communityName + ", hamlet=" + hamlet
+				+ ", hamletName=" + hamletName + "]";
+	}
+
 }

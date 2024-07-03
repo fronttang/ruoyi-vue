@@ -52,6 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="view != null  and view != ''"> and view = #{view}</if>
             <if test="viewParentId != null  and viewParentId != ''"> and view_parent_id = #{viewParentId}</if>
         </where>
+        order by weights asc
     </select>
     
     <select id="selectIntuitiveDetectDataViewList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">

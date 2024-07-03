@@ -2,8 +2,6 @@ package com.ruoyi.electrical.role.service;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.ruoyi.electrical.role.domain.DetectUnitUser;
 import com.ruoyi.electrical.vo.DictVO;
 

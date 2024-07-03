@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.ProjectWorkerMapper">
+    
+    <resultMap type="ProjectWorker" id="ProjectWorkerResult">
+        <result property="id"    column="id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="detectName"    column="detect_name"    />
+        <result property="userName"    column="user_name"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="bindType"    column="bind_type"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectProjectWorkerVo">
+        select w.id, w.project_id, w.detect_id, d.name as detect_name, w.user_id, u.user_name, u.nick_name, w.bind_type, w.create_by, w.create_time, w.update_by, w.update_time 
+        from project_worker w 
+        left join sys_user u on w.user_id = u.user_id 
+        left join detect_unit d on w.detect_id = d.id 
+    </sql>
+
+    <select id="selectProjectWorkerList" parameterType="ProjectWorker" resultMap="ProjectWorkerResult">
+        <include refid="selectProjectWorkerVo"/>
+        <where>  
+            <if test="projectId != null "> and w.project_id = #{projectId}</if>
+            <if test="detectId != null "> and w.detect_id = #{detectId}</if>
+            <if test="userId != null "> and w.user_id = #{userId}</if>
+            <if test="account != null  and account != ''"> and (u.user_name like concat('%', #{account}, '%') or u.nick_name like concat('%', #{account}, '%') )</if>
+            <if test="bindType != null  and bindType != ''"> and w.bind_type = #{bindType}</if>
+        </where>
+    </select>
+    
+    <select id="selectProjectWorkerById" parameterType="Long" resultMap="ProjectWorkerResult">
+        <include refid="selectProjectWorkerVo"/>
+        where w.id = #{id}
+    </select>
+
+    <insert id="insertProjectWorker" parameterType="ProjectWorker">
+        insert into project_worker
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="detectId != null">detect_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="bindType != null and bindType != ''">bind_type,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="detectId != null">#{detectId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="bindType != null and bindType != ''">#{bindType},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProjectWorker" parameterType="ProjectWorker">
+        update project_worker
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="bindType != null and bindType != ''">bind_type = #{bindType},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProjectWorkerById" parameterType="Long">
+        delete from project_worker where id = #{id}
+    </delete>
+
+    <delete id="deleteProjectWorkerByIds" parameterType="String">
+        delete from project_worker where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

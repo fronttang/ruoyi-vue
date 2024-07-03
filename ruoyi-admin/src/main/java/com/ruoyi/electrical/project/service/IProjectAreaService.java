@@ -66,4 +66,6 @@ public interface IProjectAreaService {
 	public List<DictVO> queryProjectAreaDict();
 
 	public List<AreaDict> queryProjectAreaDictByProjectIdAndType(Long projectId, String type);
+
+	public List<ProjectArea> queryProjectAreaByProjectId(Long projectId);
 }

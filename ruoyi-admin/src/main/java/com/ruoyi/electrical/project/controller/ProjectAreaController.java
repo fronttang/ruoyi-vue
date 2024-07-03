@@ -1,25 +1,34 @@
 package com.ruoyi.electrical.project.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
-import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.electrical.vo.ProjectAreaTree;
 
 /**
  * 项目区域Controller
@@ -110,6 +119,69 @@ public class ProjectAreaController extends BaseController {
 	@GetMapping("/dict/{type}/{projectId}")
 	public AjaxResult dictOption(@PathVariable("projectId") Long projectId, @PathVariable("type") String type) {
 		return success(projectAreaService.queryProjectAreaDictByProjectIdAndType(projectId, type));
+	}
+
+	@GetMapping("/tree/{projectId}")
+	public AjaxResult areaTree(@PathVariable("projectId") Long projectId) {
+
+		List<ProjectArea> projectAreas = projectAreaService.queryProjectAreaByProjectId(projectId);
+
+		Map<String, ProjectAreaTree> districtMap = new HashMap<String, ProjectAreaTree>();
+		Map<String, ProjectAreaTree> streetMap = new HashMap<String, ProjectAreaTree>();
+		Map<String, ProjectAreaTree> communityMap = new HashMap<String, ProjectAreaTree>();
+		Map<String, ProjectAreaTree> hamletMap = new HashMap<String, ProjectAreaTree>();
+		if (!CollectionUtils.isEmpty(projectAreas)) {
+			projectAreas.forEach((area) -> {
+
+				if (StringUtils.hasText(area.getDistrict())) {
+					ProjectAreaTree districtVo = districtMap.get(area.getDistrict());
+					if (districtVo == null) {
+						districtVo = new ProjectAreaTree();
+						districtVo.setId(area.getDistrict());
+						districtVo.setLabel(area.getDistrictName());
+						districtVo.setArea(area);
+						districtMap.put(area.getDistrict(), districtVo);
+					}
+
+					if (StringUtils.hasText(area.getStreet())) {
+						ProjectAreaTree streetVo = streetMap.get(area.getStreet());
+						if (streetVo == null) {
+							streetVo = new ProjectAreaTree();
+							streetVo.setId(area.getStreet());
+							streetVo.setLabel(area.getStreetName());
+							streetVo.setArea(area);
+							streetMap.put(area.getStreet(), streetVo);
+							districtVo.getChildren().add(streetVo);
+						}
+						if (StringUtils.hasText(area.getCommunity())) {
+							ProjectAreaTree communityVo = communityMap.get(area.getCommunity());
+							if (communityVo == null) {
+								communityVo = new ProjectAreaTree();
+								communityVo.setId(area.getCommunity());
+								communityVo.setLabel(area.getCommunityName());
+								communityVo.setArea(area);
+								communityMap.put(area.getCommunity(), streetVo);
+								streetVo.getChildren().add(communityVo);
+							}
+							if (StringUtils.hasText(area.getHamlet())) {
+								ProjectAreaTree hamletVo = hamletMap.get(area.getHamlet());
+								if (hamletVo == null) {
+									hamletVo = new ProjectAreaTree();
+									hamletVo.setId(area.getHamlet());
+									hamletVo.setLabel(area.getHamletName());
+									hamletVo.setArea(area);
+									hamletMap.put(area.getHamlet(), hamletVo);
+									communityVo.getChildren().add(hamletVo);
+								}
+							}
+						}
+					}
+				}
+
+			});
+		}
+		List<ProjectAreaTree> result = new ArrayList<ProjectAreaTree>(districtMap.values());
+		return success(result);
 	}
 
 }

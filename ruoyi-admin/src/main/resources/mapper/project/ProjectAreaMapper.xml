@@ -9,9 +9,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="projectId"    column="project_id"    />
         <result property="projectName"    column="project_name"    />
         <result property="district"    column="district"    />
+        <result property="districtName"    column="district_name"    />
         <result property="street"    column="street"    />
+        <result property="streetName"    column="street_name"    />
         <result property="community"    column="community"    />
+        <result property="communityName"    column="community_name"    />
         <result property="hamlet"    column="hamlet"    />
+        <result property="hamletName"    column="hamlet_name"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -50,6 +54,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="community != null "> and a.community = #{community}</if>
             <if test="hamlet != null "> and a.hamlet = #{hamlet}</if>
         </where>
+    </select>
+    
+    <select id="queryProjectAreaByProjectId" parameterType="Long" resultMap="ProjectAreaResult">
+        select pa.id, pa.project_id, pa.district,a.dict_label as district_name, pa.street, b.dict_label as street_name, pa.community, c.dict_label as community_name, pa.hamlet, d.dict_label as hamlet_name from project_area pa
+		left join sys_dict_data a on pa.district = a.dict_value and a.dict_type='district'
+		left join sys_dict_data b on pa.street = b.dict_value and b.dict_type='street'
+		left join sys_dict_data c on pa.community = c.dict_value and c.dict_type='community'
+		left join sys_dict_data d on pa.hamlet = d.dict_value and d.dict_type='hamlet'
+		where pa.project_id = #{projectId}
     </select>
     
     <select id="selectProjectAreaById" parameterType="Long" resultMap="ProjectAreaResult">

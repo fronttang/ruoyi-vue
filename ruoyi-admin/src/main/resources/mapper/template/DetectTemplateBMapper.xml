@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.template.mapper.DetectTemplateBMapper">
+    
+    <resultMap type="DetectTemplateB" id="DetectTemplateBResult">
+        <result property="id"    column="id"    />
+        <result property="templateId"    column="template_id"    />
+        <result property="bid"    column="bid"    />
+        <result property="type"    column="type"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectDetectTemplateBVo">
+        select id, template_id, bid, type, create_by, create_time, update_by, update_time from detect_template_b
+    </sql>
+
+    <select id="selectDetectTemplateBList" parameterType="DetectTemplateB" resultMap="DetectTemplateBResult">
+        <include refid="selectDetectTemplateBVo"/>
+        <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
+            <if test="bid != null  and bid != ''"> and bid = #{bid}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+        </where>
+    </select>
+    
+    <select id="selectDetectTemplateBById" parameterType="Long" resultMap="DetectTemplateBResult">
+        <include refid="selectDetectTemplateBVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectDetectTemplateBByTemplateId" parameterType="Long" resultMap="DetectTemplateBResult">
+        <include refid="selectDetectTemplateBVo"/>
+        where template_id = #{templateId}
+    </select>
+
+    <insert id="insertDetectTemplateB" parameterType="DetectTemplateB" useGeneratedKeys="true" keyProperty="id">
+        insert into detect_template_b
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
+            <if test="bid != null">bid,</if>
+            <if test="type != null">type,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
+            <if test="bid != null">#{bid},</if>
+            <if test="type != null">#{type},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDetectTemplateB" parameterType="DetectTemplateB">
+        update detect_template_b
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="bid != null">bid = #{bid},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDetectTemplateBById" parameterType="Long">
+        delete from detect_template_b where id = #{id}
+    </delete>
+    
+    <delete id="deleteDetectTemplateBByTemplateId" parameterType="Long">
+        delete from detect_template_b where template_id = #{templateId}
+    </delete>
+
+    <delete id="deleteDetectTemplateBByIds" parameterType="String">
+        delete from detect_template_b where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

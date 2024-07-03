@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.ProjectWorkerAreaMapper">
+    
+    <resultMap type="ProjectWorkerArea" id="ProjectWorkerAreaResult">
+        <result property="id"    column="id"    />
+        <result property="workerId"    column="worker_id"    />
+        <result property="type"    column="type"    />
+        <result property="district"    column="district"    />
+        <result property="street"    column="street"    />
+        <result property="community"    column="community"    />
+        <result property="hamlet"    column="hamlet"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectProjectWorkerAreaVo">
+        select id, worker_id, type, district, street, community, hamlet, create_by, create_time, update_by, update_time from project_worker_area
+    </sql>
+
+    <select id="selectProjectWorkerAreaList" parameterType="ProjectWorkerArea" resultMap="ProjectWorkerAreaResult">
+        <include refid="selectProjectWorkerAreaVo"/>
+        <where>  
+            <if test="workerId != null "> and worker_id = #{workerId}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="district != null  and district != ''"> and district = #{district}</if>
+            <if test="street != null  and street != ''"> and street = #{street}</if>
+            <if test="community != null  and community != ''"> and community = #{community}</if>
+            <if test="hamlet != null  and hamlet != ''"> and hamlet = #{hamlet}</if>
+        </where>
+    </select>
+    
+    <select id="selectProjectWorkerAreaById" parameterType="Long" resultMap="ProjectWorkerAreaResult">
+        <include refid="selectProjectWorkerAreaVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectProjectWorkerAreaByWorkerId" parameterType="Long" resultMap="ProjectWorkerAreaResult">
+        <include refid="selectProjectWorkerAreaVo"/>
+        where worker_id = #{workerId}
+    </select>
+
+    <insert id="insertProjectWorkerArea" parameterType="ProjectWorkerArea">
+        insert into project_worker_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="workerId != null">worker_id,</if>
+            <if test="type != null">type,</if>
+            <if test="district != null">district,</if>
+            <if test="street != null">street,</if>
+            <if test="community != null">community,</if>
+            <if test="hamlet != null">hamlet,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="workerId != null">#{workerId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="district != null">#{district},</if>
+            <if test="street != null">#{street},</if>
+            <if test="community != null">#{community},</if>
+            <if test="hamlet != null">#{hamlet},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProjectWorkerArea" parameterType="ProjectWorkerArea">
+        update project_worker_area
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workerId != null">worker_id = #{workerId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="street != null">street = #{street},</if>
+            <if test="community != null">community = #{community},</if>
+            <if test="hamlet != null">hamlet = #{hamlet},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProjectWorkerAreaById" parameterType="Long">
+        delete from project_worker_area where id = #{id}
+    </delete>
+
+    <delete id="deleteProjectWorkerAreaByIds" parameterType="String">
+        delete from project_worker_area where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteProjectWorkerAreaByWorkerIdAndType" >
+        delete from project_worker_area where type = #{type} and worker_id in 
+        <foreach  item="id" collection="workerIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

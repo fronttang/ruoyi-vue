@@ -75,16 +75,16 @@
 
     <el-table v-loading="loading" :data="DetectDeviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="ID" align="center" width="60" prop="id" />
       <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
-      <el-table-column label="仪器编号" align="center" prop="deviceId" />
-      <el-table-column label="类型" align="center" prop="type">
+      <el-table-column label="仪器编号" align="center" prop="deviceId" :show-overflow-tooltip="true" />
+      <el-table-column label="类型" align="center" prop="type" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="dict.type.detect_device_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="仪器名称" align="center" prop="name" />
-      <el-table-column label="校准日期" align="center" prop="calibrationDate" width="180">
+      <el-table-column label="仪器名称" align="center" prop="name" :show-overflow-tooltip="true"/>
+      <el-table-column label="校准日期" align="center" prop="calibrationDate" width="120" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.calibrationDate, '{y}-{m}-{d}') }}</span>
         </template>
@@ -94,7 +94,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

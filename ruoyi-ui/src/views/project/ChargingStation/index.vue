@@ -63,13 +63,13 @@
 
     <el-table v-loading="loading" :data="OwnerUnitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="场站名称" align="center" prop="name" />
-      <el-table-column label="轮次" align="center" prop="rounds" />
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="场站名称" align="center" prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="轮次" align="center" prop="rounds" width="50" />
       <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat" :show-overflow-tooltip="true" />
       <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" :show-overflow-tooltip="true"  />
       <el-table-column label="检测地址" align="center" prop="address" :show-overflow-tooltip="true"  />
-      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
@@ -84,7 +84,7 @@
           <image-preview :src="scope.row.stationPic" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

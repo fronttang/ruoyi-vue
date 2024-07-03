@@ -97,22 +97,22 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
-      <el-table-column label="一级区域" align="center" prop="district" >
+      <el-table-column label="一级区域" align="center" prop="district" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="districtOptions" :value="scope.row.district"/>
         </template>
       </el-table-column>
-      <el-table-column label="二级区域" align="center" prop="street">
+      <el-table-column label="二级区域" align="center" prop="street" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="streetOptions" :value="scope.row.street"/>
         </template>
       </el-table-column>
-      <el-table-column label="三级区域" align="center" prop="community">
+      <el-table-column label="三级区域" align="center" prop="community" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="communityOptions" :value="scope.row.community"/>
         </template>
       </el-table-column>
-      <el-table-column label="四级区域" align="center" prop="hamlet">
+      <el-table-column label="四级区域" align="center" prop="hamlet" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
         </template>
@@ -122,7 +122,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

@@ -82,9 +82,9 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
       <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
-      <el-table-column label="姓名" align="center" width="80" prop="nickName" />
-      <el-table-column label="账号" align="center" width="100" prop="userName" />
-      <el-table-column label="绑定类型" align="center" width="80" prop="bindType">
+      <el-table-column label="姓名" align="center" width="120" prop="nickName" :show-overflow-tooltip="true"/>
+      <el-table-column label="账号" align="center" width="120" prop="userName" :show-overflow-tooltip="true"/>
+      <el-table-column label="绑定类型" align="center" width="80" prop="bindType" >
         <template slot-scope="scope">
           <dict-tag :options="dict.type.worker_bind_type" :value="scope.row.bindType"/>
         </template>

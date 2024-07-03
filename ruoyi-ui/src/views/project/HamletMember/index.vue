@@ -103,11 +103,11 @@
 
     <el-table v-loading="loading" :data="HamletMemberList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="ID" align="center" width="60" prop="id" />
       <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true"  />
       <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
-      <el-table-column label="姓名" align="center" prop="name" />
-      <el-table-column label="账号" align="center" prop="account" />
+      <el-table-column label="姓名" align="center" prop="name"  width="120"/>
+      <el-table-column label="账号" align="center" prop="account"  width="120" />
       <el-table-column label="区域" align="center" prop="district" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <dict-tag :options="districtOptions" :value="scope.row.district"/>
@@ -116,7 +116,7 @@
           <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status">
+      <el-table-column label="状态" align="center"  width="60" prop="status">
       <template slot-scope="scope">
         <el-switch
           v-model="scope.row.status"
@@ -131,7 +131,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

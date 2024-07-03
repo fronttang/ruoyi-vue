@@ -85,7 +85,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" width="50" />
       <el-table-column label="项目名称" align="center" prop="name" :show-overflow-tooltip="true"/>
-      <el-table-column label="项目类型" align="center" prop="type" width="80">
+      <el-table-column label="项目类型" align="center" prop="type" width="120">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
         </template>

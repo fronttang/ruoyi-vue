@@ -101,20 +101,25 @@
 
     <el-table v-loading="loading" :data="IntuitiveDetectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="代号" align="center" prop="code" />
-      <el-table-column label="名称" align="center" prop="name" />
-      <el-table-column label="类型" align="center" prop="type">
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="代号" align="center" width="60" prop="code" />
+      <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="类型" align="center" width="60" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.intuitive_detect_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="业主单元类型" align="center" prop="unitType">
+      <el-table-column label="业主单元类型" width="100" align="center" prop="unitType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.high_risk_type" :value="scope.row.unitType"/>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -151,7 +156,7 @@
     <!-- 添加或修改直观检测标题对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="业主单元类型" label-width="100px" prop="unitType">
+        <el-form-item label="业主单元类型" label-width="120px" prop="unitType">
           <el-select v-model="form.unitType" placeholder="请选择业主单元类型" filterable @change="handleUnitType">
             <el-option
               v-for="dict in dict.type.high_risk_type"
@@ -161,11 +166,11 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="名称" label-width="100px" prop="name">
-          <el-input v-model="form.name" placeholder="请输入名称" />
+        <el-form-item label="名称" label-width="120px" prop="name">
+          <el-input v-model="form.name" placeholder="请输入名称"  />
         </el-form-item>
-        <el-form-item label="类型" label-width="100px" prop="type">
-          <el-select v-model="form.type" placeholder="请选择类型">
+        <el-form-item label="类型" label-width="120px" prop="type">
+          <el-select v-model="form.type" placeholder="请选择类型" :disabled="this.form.id != null" >
             <el-option
               v-for="dict in dict.type.intuitive_detect_type"
               :key="dict.value"
@@ -174,7 +179,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="代号" label-width="100px" prop="code">
+        <el-form-item label="代号" label-width="120px" prop="code">
           <el-input v-model="form.code" placeholder="请输入代号" />
         </el-form-item>
       </el-form>
@@ -227,8 +232,16 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      },
-      templateId: null
+        name: [
+          { required: true, message: "名称不能为空", trigger: "blur" }
+        ],
+        type: [
+          { required: true, message: "请选择类型", trigger: "change" }
+        ],
+        unitType: [
+          { required: true, message: "请选择业主单元类型", trigger: "change" }
+        ],
+      }
     };
   },
   created() {

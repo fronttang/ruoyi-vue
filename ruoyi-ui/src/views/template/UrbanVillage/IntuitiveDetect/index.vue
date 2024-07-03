@@ -91,15 +91,20 @@
 
     <el-table v-loading="loading" :data="IntuitiveDetectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="名称" align="center" prop="name" />
-      <el-table-column label="类型" align="center" prop="type">
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="代号" align="center" width="60" prop="code" />
+      <el-table-column label="类型" align="center" width="60" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.intuitive_detect_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="代号" align="center" prop="code" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -134,7 +139,7 @@
           <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择类型">
+          <el-select v-model="form.type" placeholder="请选择类型" :disabled="this.form.id != null">
             <el-option
               v-for="dict in dict.type.intuitive_detect_type"
               :key="dict.value"
@@ -196,6 +201,12 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        name: [
+          { required: true, message: "名称不能为空", trigger: "blur" }
+        ],
+        type: [
+          { required: true, message: "请选择类型", trigger: "change" }
+        ],
       },
       templateId: null
     };

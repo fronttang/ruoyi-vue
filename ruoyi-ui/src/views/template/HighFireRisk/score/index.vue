@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="业主单元类型" label-width="100px" prop="unitType">
-        <el-select v-model="queryParams.unitType" placeholder="请选择业主单元类型" filterable >
+        <el-select v-model="queryParams.unitType" placeholder="请选择业主单元类型" filterable clearable >
           <el-option
             v-for="dict in dict.type.high_risk_type"
             :key="dict.value"
@@ -85,26 +85,26 @@
 
     <el-table v-loading="loading" :data="IntuitiveDetectDataList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="编号" align="center" prop="firstCode" />
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="编号" align="center" width="60" prop="firstCode" />
       <el-table-column label="名称" align="center" prop="firstContent"  :show-overflow-tooltip="true"/>
-      <el-table-column label="业主单元类型" align="center" prop="unitType">
+      <el-table-column label="业主单元类型" align="center" width="100" prop="unitType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.high_risk_type" :value="scope.row.unitType"/>
         </template>
       </el-table-column>
-      <el-table-column label="模块类型" align="center" prop="moduleType">
+      <el-table-column label="模块类型" align="center" width="80" prop="moduleType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.highfirerisk_template_module_type" :value="scope.row.moduleType"/>
         </template>
       </el-table-column>
-      <el-table-column label="最高扣分数" align="center" prop="maxScore" />
+      <el-table-column label="最高扣分数" align="center" width="100" prop="maxScore" />
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -135,7 +135,7 @@
     <!-- 添加或修改直观检测表内容对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="业主单元类型" label-width="100px" prop="unitType">
+        <el-form-item label="业主单元类型" label-width="120px" prop="unitType">
           <el-select v-model="form.unitType" placeholder="请选择业主单元类型" filterable @change="handleUnitType">
             <el-option
               v-for="dict in dict.type.high_risk_type"
@@ -145,7 +145,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="模块类型" label-width="100px" prop="moduleType">
+        <el-form-item label="模块类型" label-width="120px" prop="moduleType">
           <el-select v-model="form.moduleType" placeholder="请选择模块类型" filterable @change="handleChangeModuleType">
             <el-option
               v-for="dict in dict.type.highfirerisk_template_module_type"
@@ -156,7 +156,7 @@
           </el-select>
         </el-form-item>
         <template  v-if="addDanger == true" >
-          <el-form-item label="上级模块" label-width="100px" prop="parentId">
+          <el-form-item label="上级模块" label-width="120px" prop="parentId">
             <el-select v-model="form.parentId" placeholder="请选择上级模块" filterable>
               <el-option
                 v-for="item in IntuitiveDetectDataDict"
@@ -167,12 +167,12 @@
             </el-select>
           </el-form-item>
         </template>
-        <el-form-item label="编号/内容" label-width="100px" prop="firstCode">
+        <el-form-item label="编号/内容" label-width="120px" prop="firstCode">
           <el-input v-model="form.firstCode" placeholder="请输入编号" />
           <el-input v-model="form.firstContent" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="最高扣分数" label-width="100px" prop="maxScore">
-          <el-input v-model="form.maxScore" placeholder="请输入最高扣分数" />
+        <el-form-item label="最高扣分数" label-width="120px" prop="maxScore">
+          <el-input-number v-model="form.maxScore" placeholder="请输入最高扣分数" :min="0" controls-position="right" />
         </el-form-item>
         <template  v-if="addDanger == true" >
           <el-row :gutter="10" class="mb8">
@@ -189,19 +189,19 @@
             </el-row>
 
             <el-table v-loading="loading" :data="IntuitiveDetectDangerList">
-              <el-table-column label="隐患等级" align="center" prop="level">
+              <el-table-column label="隐患等级" width="80" align="center" prop="level">
                 <template slot-scope="scope">
-                  <dict-tag :options="dict.type.hazard_level" :value="scope.row.level"/>
+                  <dict-tag :options="dict.type.hazard_level_high" :value="scope.row.level"/>
                 </template>
               </el-table-column>
               <el-table-column label="隐患描述" align="center" prop="description" :show-overflow-tooltip="true" />
               <el-table-column label="整改建议" align="center" prop="suggestions" :show-overflow-tooltip="true" />
-              <el-table-column label="累计方式" align="center" prop="accMethod">
+              <el-table-column label="累计方式" align="center" width="80" prop="accMethod">
                 <template slot-scope="scope">
                   <dict-tag :options="dict.type.accumulation_method" :value="scope.row.accMethod"/>
                 </template>
               </el-table-column>
-              <el-table-column label="扣分数" align="center" prop="score" />
+              <el-table-column label="扣分数" align="center" width="60" prop="score" />
               <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <el-button
@@ -219,7 +219,6 @@
                 </template>
               </el-table-column>
             </el-table>
-
         </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -230,11 +229,11 @@
 
     <!-- 添加或修改检测内容隐患对话框 -->
     <el-dialog :title="titleDanger" :visible.sync="openDanger" width="500px" append-to-body>
-      <el-form ref="form" :model="danger" :rules="rules" label-width="80px">
+      <el-form ref="formDanger" :model="danger" :rules="dangerRules" label-width="80px">
         <el-form-item label="隐患等级" prop="level">
           <el-select v-model="danger.level" placeholder="请选择隐患等级">
             <el-option
-              v-for="dict in dict.type.hazard_level"
+              v-for="dict in dict.type.hazard_level_high"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
@@ -257,7 +256,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="扣分数" prop="score">
-          <el-input v-model="danger.score" placeholder="请输入扣分数" />
+          <el-input-number v-model="danger.score" placeholder="请输入扣分数" :min="0" controls-position="right" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -275,7 +274,7 @@ import { getTemplateDict } from "@/api/template/Template";
 
 export default {
   name: "IntuitiveDetectData",
-  dicts: ['intuitive_detect_data_type', 'hazard_level', 'high_risk_type', 'highfirerisk_template_module_type', 'accumulation_method'],
+  dicts: ['intuitive_detect_data_type', 'hazard_level_high', 'high_risk_type', 'highfirerisk_template_module_type', 'accumulation_method'],
   data() {
     return {
       // 遮罩层
@@ -332,6 +331,20 @@ export default {
       danger: {},
       // 表单校验
       rules: {
+        unitType: [
+          { required: true, message: "请选择业主单元类型", trigger: "change" }
+        ],
+        moduleType: [
+          { required: true, message: "请选择模块类型", trigger: "change" }
+        ]
+      },
+      dangerRules: {
+        level: [
+          { required: true, message: "请选择隐患等级", trigger: "change" }
+        ],
+        description: [
+          { required: true, message: "请输入隐患描述", trigger: "blur" }
+        ]
       }
     };
   },
@@ -342,12 +355,11 @@ export default {
     /** 查询直观检测表内容列表 */
     getList() {
       this.loading = true;
+
       getTemplateDict().then(response => {
         this.TemplateDict = response.data;
       });
-      getIntuitiveDetectDict(this.queryParams.templateId).then(response => {
-        this.IntuitiveDetectList = response.data;
-      });
+
       listIntuitiveDetectData(this.queryParams).then(response => {
         this.IntuitiveDetectDataList = response.rows;
         this.total = response.total;
@@ -374,7 +386,7 @@ export default {
         score: null,
         templateId: this.$route.params.templateId
       };
-      this.resetForm("danger");
+      //this.resetForm("formDanger");
     },
     // 表单重置
     reset() {
@@ -416,16 +428,13 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.dangerId)
+      this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      getIntuitiveDetectDict(this.queryParams.templateId).then(response => {
-        this.IntuitiveDetectList = response.data;
-      });
       this.open = true;
       this.title = "添加计分模块";
     },
@@ -451,6 +460,7 @@ export default {
       getIntuitiveDetectDataDict(this.dictQuery).then(response => {
         this.IntuitiveDetectDataDict = response.data;
       });
+
       if(value == '2'){
         this.addDanger = true;
       } else {
@@ -502,11 +512,15 @@ export default {
       this.titleDanger = "修改隐患";
     },
     submitDangerForm() {
-      if(!this.updateDanger){
-        this.IntuitiveDetectDangerList.push(this.danger);
-      }
-      this.$modal.msgSuccess("操作成功");
-      this.openDanger = false;
+      this.$refs["formDanger"].validate(valid => {
+        if (valid) {
+          if(!this.updateDanger){
+            this.IntuitiveDetectDangerList.push(this.danger);
+          }
+          this.$modal.msgSuccess("操作成功");
+          this.openDanger = false;
+        }
+      });
     },
     /** 提交按钮 */
     submitForm() {

@@ -65,15 +65,20 @@
 
     <el-table v-loading="loading" :data="IntuitiveDetectDataList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="编号" align="center" prop="firstCode" />
-      <el-table-column label="检测板块" align="center" prop="detectModule">
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="编号" align="center" width="60" prop="firstCode" />
+      <el-table-column label="检测板块" align="center" width="160" prop="detectModule">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.detect_module" :value="scope.row.detectModule"/>
         </template>
       </el-table-column>
-      <el-table-column label="内容" align="center" prop="firstContent" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="内容" align="center" prop="firstContent" :show-overflow-tooltip="true" />
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -136,14 +141,14 @@
             </el-row>
 
             <el-table v-loading="loading" :data="IntuitiveDetectDangerList">
-              <el-table-column label="隐患等级" align="center" prop="level">
+              <el-table-column label="隐患等级" align="center" width="80" prop="level">
                 <template slot-scope="scope">
-                  <dict-tag :options="dict.type.hazard_level" :value="scope.row.level"/>
+                  <dict-tag :options="dict.type.hazard_level_charging_station" :value="scope.row.level"/>
                 </template>
               </el-table-column>
-              <el-table-column label="隐患描述" align="center" prop="description" />
-              <el-table-column label="整改建议" align="center" prop="suggestions" />
-              <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+              <el-table-column label="隐患描述" align="center" prop="description" :show-overflow-tooltip="true"/>
+              <el-table-column label="整改建议" align="center" prop="suggestions" :show-overflow-tooltip="true"/>
+              <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
@@ -171,11 +176,11 @@
 
     <!-- 添加或修改检测内容隐患对话框 -->
     <el-dialog :title="titleDanger" :visible.sync="openDanger" width="500px" append-to-body>
-      <el-form ref="form" :model="danger" :rules="rules" label-width="80px">
+      <el-form ref="formDanger" :model="danger" :rules="dangerRules" label-width="80px">
         <el-form-item label="隐患等级" prop="level">
           <el-select v-model="danger.level" placeholder="请选择隐患等级">
             <el-option
-              v-for="dict in dict.type.hazard_level"
+              v-for="dict in dict.type.hazard_level_charging_station"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
@@ -204,7 +209,7 @@ import { getTemplateDict } from "@/api/template/Template";
 
 export default {
   name: "IntuitiveDetectData",
-  dicts: ['intuitive_detect_data_type', 'hazard_level', 'detect_module'],
+  dicts: ['intuitive_detect_data_type', 'hazard_level_charging_station', 'detect_module'],
   data() {
     return {
       // 遮罩层
@@ -253,6 +258,17 @@ export default {
       danger: {},
       // 表单校验
       rules: {
+        detectModule: [
+          { required: true, message: "请选择检测板块", trigger: "change" }
+        ],
+      },
+      dangerRules: {
+        level: [
+          { required: true, message: "请选择隐患等级", trigger: "change" }
+        ],
+        description: [
+          { required: true, message: "请输入隐患描述", trigger: "blur" }
+        ],
       }
     };
   },
@@ -290,7 +306,7 @@ export default {
         suggestions: null,
         templateId: this.$route.params.templateId
       };
-      this.resetForm("danger");
+      //this.resetForm("formDanger");
     },
     // 表单重置
     reset() {
@@ -327,7 +343,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.dangerId)
+      this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -385,11 +401,15 @@ export default {
       this.titleDanger = "修改隐患";
     },
     submitDangerForm() {
-      if(!this.updateDanger){
-        this.IntuitiveDetectDangerList.push(this.danger);
-      }
-      this.$modal.msgSuccess("操作成功");
-      this.openDanger = false;
+      this.$refs["formDanger"].validate(valid => {
+        if (valid) {
+          if(!this.updateDanger){
+            this.IntuitiveDetectDangerList.push(this.danger);
+          }
+          this.$modal.msgSuccess("操作成功");
+          this.openDanger = false;
+        }
+      });
     },
     /** 提交按钮 */
     submitForm() {

@@ -84,9 +84,9 @@
 
     <el-table v-loading="loading" :data="IntuitiveDetectDataList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="编号" align="center" prop="firstCode" />
-      <el-table-column label="业主单元类型" align="center" prop="unitType">
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="编号" align="center" width="60" prop="firstCode" />
+      <el-table-column label="业主单元类型" align="center" width="100" prop="unitType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.high_risk_type" :value="scope.row.unitType"/>
         </template>
@@ -99,7 +99,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -130,7 +130,7 @@
     <!-- 添加或修改直观检测表内容对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="业主单元类型" label-width="100px" prop="unitType">
+        <el-form-item label="业主单元类型" label-width="120px" prop="unitType">
           <el-select v-model="form.unitType" placeholder="请选择业主单元类型" @change="handleChangeUnitType" filterable clearable>
             <el-option
               v-for="dict in dict.type.high_risk_type"
@@ -140,7 +140,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="检测表" label-width="100px" prop="detect_title">
+        <el-form-item label="检测表" label-width="120px" prop="detect_title">
           <el-select v-model="form.detect_title" placeholder="请选择检测表" filterable clearable @change="handleChangeDetectTitle">
             <el-option
               v-for="item in IntuitiveDetectList"
@@ -150,7 +150,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="一级展示模块" label-width="100px" prop="viewParentId">
+        <el-form-item label="一级展示模块" label-width="120px" prop="viewParentId">
           <el-select v-model="form.viewParentId" placeholder="请选择一级展示模块" filterable clearable >
             <el-option
               v-for="item in IntuitiveDetectDataDict"
@@ -160,7 +160,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="二级计分模块" label-width="100px" prop="id">
+        <el-form-item label="二级计分模块" label-width="120px" prop="id">
           <el-select v-model="form.id" placeholder="请选择二级计分模块" filterable clearable>
             <el-option
               v-for="item in IntuitiveDetectDataScoreDict"
@@ -236,6 +236,18 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        detect_title: [
+          { required: true, message: "请选择检测表", trigger: "change" }
+        ],
+        unitType: [
+          { required: true, message: "请选择业主单元类型", trigger: "change" }
+        ],
+        viewParentId: [
+          { required: true, message: "请选择一级展示模块", trigger: "change" }
+        ],
+        id: [
+          { required: true, message: "请选择二级计分模块", trigger: "change" }
+        ],
       },
       queryDetectDict: {
         templateId: parseInt(this.$route.params.templateId),

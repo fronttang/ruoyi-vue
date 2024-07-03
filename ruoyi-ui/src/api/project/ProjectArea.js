@@ -66,3 +66,11 @@ export function getProjectAreaDict() {
     method: 'get'
   })
 }
+
+// 查询项目区域树
+export function getProjectAreaTree(projectId) {
+  return request({
+    url: '/project/ProjectArea/tree/' + projectId,
+    method: 'get'
+  })
+}

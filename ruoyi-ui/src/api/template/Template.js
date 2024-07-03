@@ -59,3 +59,19 @@ export function queryTemplateDict(query) {
     params: query
   })
 }
+
+export function getTemplateDetectB(templateId) {
+  return request({
+    url: '/template/Template/tableb/' + templateId,
+    method: 'get'
+  })
+}
+
+// 新增模板列表
+export function saveTemplateDetectB(data) {
+  return request({
+    url: '/template/Template/tableb',
+    method: 'post',
+    data: data
+  })
+}

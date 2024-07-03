@@ -85,11 +85,11 @@
 
     <el-table v-loading="loading" :data="IntuitiveDetectDataList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="ID" align="center" width="60" prop="id" />
       <el-table-column label="上级检测表" align="center" prop="detectTitle" :show-overflow-tooltip="true" :formatter="detectTitleFormat"/>
-      <el-table-column label="编号" align="center" prop="firstCode" />
+      <el-table-column label="编号" align="center"  width="60" prop="firstCode" />
       <el-table-column label="内容" align="center" prop="firstContent" :show-overflow-tooltip="true" />
-      <el-table-column label="业主单元类型" align="center" prop="unitType">
+      <el-table-column label="业主单元类型" align="center"  width="100"  prop="unitType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.high_risk_type" :value="scope.row.unitType"/>
         </template>
@@ -99,7 +99,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -136,7 +136,7 @@
     <!-- 添加或修改直观检测表内容对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="业主单元类型" label-width="100px" prop="unitType">
+        <el-form-item label="业主单元类型" label-width="120px" prop="unitType">
           <el-select v-model="form.unitType" placeholder="请选择业主单元类型" @change="handleChangeUnitType" filterable clearable>
             <el-option
               v-for="dict in dict.type.high_risk_type"
@@ -146,7 +146,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="检测表" label-width="100px" prop="detectTitle">
+        <el-form-item label="检测表" label-width="120px" prop="detectTitle">
           <el-select v-model="form.detectTitle" placeholder="请选择检测表" filterable>
             <el-option
               v-for="item in IntuitiveDetectList"
@@ -156,7 +156,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="编号/内容" label-width="100px" prop="firstCode">
+        <el-form-item label="编号/内容" label-width="120px" prop="firstCode">
           <el-input v-model="form.firstCode" placeholder="请输入一级编号" />
           <el-input v-model="form.firstContent" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -222,6 +222,12 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        detectTitle: [
+          { required: true, message: "请选择检测表", trigger: "change" }
+        ],
+        unitType: [
+          { required: true, message: "请选择业主单元类型", trigger: "change" }
+        ],
       },
       queryDetectDict: {
         templateId: parseInt(this.$route.params.templateId),
@@ -291,7 +297,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.dangerId)
+      this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },

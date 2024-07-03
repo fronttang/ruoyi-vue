@@ -167,7 +167,7 @@ export default {
         detectId: null,
         account: null,
         type: '04',
-        projectId: null,
+        projectId: this.$store.state.settings.projectId,
       },
       // 表单参数
       form: {},
@@ -194,7 +194,6 @@ export default {
     /** 查询检测单位账号列表 */
     getList() {
       this.loading = true;
-      this.queryParams.projectId = this.$store.state.settings.projectId;
       listDetectUnitUser(this.queryParams).then(response => {
         this.gridmanList = response.rows;
         this.total = response.total;
@@ -210,7 +209,7 @@ export default {
     reset() {
       this.form = {
         id: null,
-        projectId: null,
+        projectId: this.$store.state.settings.projectId,
         projectName: null,
         detectId: null,
         detectName: null,
@@ -281,7 +280,6 @@ export default {
               this.getList();
             });
           } else {
-            this.form.projectId = this.$store.state.settings.projectId;
             addDetectUnitUser(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;

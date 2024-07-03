@@ -65,14 +65,14 @@
 
     <el-table v-loading="loading" :data="TemplateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectId"  :show-overflow-tooltip="true" >
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="检测单位" align="center" prop="detectId" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <span>{{ formatDetectName(scope.row.detectId) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="模板名称" align="center" prop="name" />
-      <el-table-column label="场景类型" align="center" prop="type">
+      <el-table-column label="模板名称" align="center"  prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="场景类型" align="center" width="160" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
         </template>
@@ -82,7 +82,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -90,54 +90,29 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
           >修改</el-button>
-          <span v-if="scope.row.type === 'urban_village' || scope.row.type === 'industrial_area'">
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleUrbanVillageIntuitiveDatect(scope.row)"
-            >直观标题</el-button>
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleUrbanVillageIntuitiveDatectData(scope.row)"
-            >直观内容</el-button>
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleUrbanVillageDatectDevice(scope.row)"
-            >仪器模板</el-button>
-          </span>
-          <span v-if="scope.row.type === 'charging_station'">
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleChargingStationIntuitiveDatectData(scope.row)"
-            >检测项</el-button>
-          </span>
-          <span v-if="scope.row.type === 'high_fire_risk'">
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleHighFireRiskScore(scope.row)"
-            >记分模块</el-button>
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleHighFireRiskView(scope.row)"
-            >展示模块</el-button>
-          </span>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除</el-button>
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" >
+            <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
+            <el-dropdown-menu slot="dropdown">
+              <span v-if="scope.row.type === 'urban_village' || scope.row.type === 'industrial_area'">
+                <el-dropdown-item command="urbanVillageIntuitiveDatect" icon="el-icon-edit" >直观标题</el-dropdown-item>
+                <el-dropdown-item command="urbanVillageIntuitiveDatectData" icon="el-icon-edit" >直观内容</el-dropdown-item>
+                <el-dropdown-item command="urbanVillageDatectDevice" icon="el-icon-edit" >仪器模板</el-dropdown-item>
+              </span>
+              <span v-if="scope.row.type === 'charging_station'">
+                <el-dropdown-item command="chargingStationIntuitiveDatectData" icon="el-icon-edit" >检测项</el-dropdown-item>
+              </span>
+              <span v-if="scope.row.type === 'high_fire_risk'">
+                <el-dropdown-item command="highFireRiskScore" icon="el-icon-edit" >记分模块</el-dropdown-item>
+                <el-dropdown-item command="highFireRiskView" icon="el-icon-edit" >展示模块</el-dropdown-item>
+              </span>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -182,16 +157,50 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 仪器检测列表对话框 -->
+    <el-dialog :title="titleb" :visible.sync="openb" width="600px" append-to-body>
+      <el-form ref="formb" :model="formb" :rules="rules" label-width="80px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item prop="views" label-width="0px">
+              <label>检测员端显示检测表</label>
+              <el-checkbox-group type="" v-model="formb.views">
+                <el-checkbox v-for="dict in dict.type.detect_table_b"
+                  :key="dict.value"
+                  :label="dict.value"
+                  :value="dict.value">{{dict.label}}</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item prop="reports"  label-width="0px">
+              <label>初检报告显示检测模块</label>
+              <el-checkbox-group type="" v-model="formb.reports">
+                <el-checkbox v-for="dict in dict.type.detect_table_b"
+                  :key="dict.value"
+                  :label="dict.value"
+                  :value="dict.value" >{{dict.label}}</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFormb">确 定</el-button>
+        <el-button @click="cancelb">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/template/Template";
+import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate, getTemplateDetectB, saveTemplateDetectB } from "@/api/template/Template";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 
 export default {
   name: "Template",
-  dicts: ['project_type'],
+  dicts: ['project_type', 'detect_table_b'],
   data() {
     return {
       // 遮罩层
@@ -214,6 +223,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 弹出层标题
+      titleb: "仪器检测配置",
+      // 是否显示弹出层
+      openb: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -225,6 +238,11 @@ export default {
       },
       // 表单参数
       form: {},
+      formb: {
+        templateId: null,
+        views: [],
+        reports: []
+      },
       // 表单校验
       rules: {
         detectId: [
@@ -260,6 +278,11 @@ export default {
       this.open = false;
       this.reset();
     },
+    // 取消按钮
+    cancelb() {
+      this.openb = false;
+      this.resetb();
+    },
     // 表单重置
     reset() {
       this.form = {
@@ -274,6 +297,14 @@ export default {
         updateTime: null
       };
       this.resetForm("form");
+    },
+    resetb() {
+      this.formb = {
+        templateId: null,
+        views: [],
+        reports: []
+      };
+      this.resetForm("formb");
     },
     formatDetectName(detectId) {
       return this.selectDictLabel(this.detectUnitDict, detectId);
@@ -294,6 +325,31 @@ export default {
       }
       return actions.join('');
     },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "urbanVillageIntuitiveDatect":
+          this.handleUrbanVillageIntuitiveDatect(row);
+          break;
+        case "urbanVillageIntuitiveDatectData":
+          this.handleUrbanVillageIntuitiveDatectData(row);
+          break;
+        case "urbanVillageDatectDevice":
+          this.handleUrbanVillageDatectDevice(row);
+          break;
+        case "chargingStationIntuitiveDatectData":
+          this.handleChargingStationIntuitiveDatectData(row);
+          break;
+        case "highFireRiskScore":
+          this.handleHighFireRiskScore(row);
+          break;
+        case "highFireRiskView":
+          this.handleHighFireRiskView(row);
+          break;
+        default:
+          break;
+      }
+    },
     /** 打开直观标题 */
     handleUrbanVillageIntuitiveDatect(row){
       const templateId = row.id || this.ids[0];
@@ -308,7 +364,12 @@ export default {
     },
     /** 打开仪器模板 */
     handleUrbanVillageDatectDevice(row){
-
+      const templateId = row.id || this.ids[0];
+      this.formb.templateId = templateId;
+      getTemplateDetectB(this.formb.templateId).then(response => {
+        this.formb = response.data;
+        this.openb = true;
+      });
     },
     handleChargingStationIntuitiveDatectData(row) {
       const templateId = row.id || this.ids[0];
@@ -355,6 +416,13 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改模板列表";
+      });
+    },
+    submitFormb(){
+      saveTemplateDetectB(this.formb).then(response => {
+        this.$modal.msgSuccess("操作成功");
+        this.openb = false;
+        this.getList();
       });
     },
     /** 提交按钮 */

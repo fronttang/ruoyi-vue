@@ -63,12 +63,16 @@
 
     <el-table v-loading="loading" :data="DetectUnitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="id" />
+      <el-table-column label="id" align="center" width="60" prop="id" />
       <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
       <el-table-column label="简称" align="center" prop="shortName" />
-      <el-table-column label="电话" align="center" prop="phone" />/>
-      <el-table-column label="联系人" align="center" prop="contact" />
-      <el-table-column label="联系电话" align="center" prop="contactPhone" />
+      <el-table-column label="联系人" align="center" width="100" prop="contact" />
+      <el-table-column label="联系电话" align="center" width="100" prop="contactPhone" :show-overflow-tooltip="true"/>
+      <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="logo" align="center" prop="logo" width="100">
         <template slot-scope="scope">
           <image-preview :src="scope.row.logo" :width="50" :height="50"/>
@@ -84,7 +88,7 @@
           <image-preview :src="scope.row.qualification" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center"  width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

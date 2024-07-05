@@ -316,7 +316,7 @@ export default {
         queryTemplateDict(this.templateQuery).then(response => {
           this.templateDict = response.data;
         });
-        if(this.form.type == 'urban_village' || this.form.type == 'industrial_area'){
+        if(this.form.type == '1' || this.form.type == '2'){
           this.addHouseholdRate = true;
         } else {
           this.addHouseholdRate = false;
@@ -326,7 +326,7 @@ export default {
       });
     },
     handleChangeProjectType(value){
-      if(value == 'urban_village' || value == 'industrial_area'){
+      if(value == '1' || value == '2'){
         this.addHouseholdRate = true;
       } else {
         this.addHouseholdRate = false;

@@ -12,7 +12,7 @@
       <el-form-item label="绑定类型" prop="bindType">
         <el-select v-model="queryParams.bindType" placeholder="请选择绑定类型" clearable>
           <el-option
-            v-for="dict in dict.type.worker_bind_type"
+            v-for="dict in dict.type.project_worker_bind_type"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -30,7 +30,7 @@
         <el-dropdown size="mini" @command="handleCommand">
           <el-button size="mini" type="primary" plain icon="el-icon-plus">绑定人员<i class="el-icon-arrow-down el-icon--right"></i></el-button>
           <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item v-for="type in dict.type.worker_bind_type" :command="type.value" >{{type.label}}</el-dropdown-item>
+              <el-dropdown-item v-for="type in dict.type.project_worker_bind_type" :command="type.value" >{{type.label}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-col>
@@ -86,7 +86,7 @@
       <el-table-column label="账号" align="center" width="120" prop="userName" :show-overflow-tooltip="true"/>
       <el-table-column label="绑定类型" align="center" width="80" prop="bindType" >
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.worker_bind_type" :value="scope.row.bindType"/>
+          <dict-tag :options="dict.type.project_worker_bind_type" :value="scope.row.bindType"/>
         </template>
       </el-table-column>
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
@@ -180,6 +180,7 @@
             class="filter-tree"
             :data="areaOptions"
             show-checkbox
+            default-expand-all
             ref="area"
             node-key="id"
             :check-strictly="checkStrictly"
@@ -206,7 +207,7 @@ import { getProjectAreaTree } from "@/api/project/ProjectArea";
 
 export default {
   name: "ProjectWorker",
-  dicts: ['worker_bind_type'],
+  dicts: ['project_worker_bind_type'],
   watch: {
     filterText(val) {
       this.$refs.area.filter(val);

@@ -18,7 +18,9 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.domain.Project;
+import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
+import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.project.service.IProjectService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -37,6 +39,9 @@ public class OwnerUnitController extends BaseController {
 
 	@Autowired
 	private IProjectService projectService;
+
+	@Autowired
+	private IProjectAreaService projectAreaService;
 
 	/**
 	 * 查询业主单元列表
@@ -81,6 +86,15 @@ public class OwnerUnitController extends BaseController {
 			Project project = projectService.selectProjectById(ownerUnit.getProjectId());
 			ownerUnit.setDetectId(project.getDetectId());
 		}
+
+		ProjectArea projectArea = projectAreaService.selectProjectAreaById(ownerUnit.getArea());
+		if (projectArea != null) {
+			ownerUnit.setDistrict(projectArea.getDistrict());
+			ownerUnit.setStreet(projectArea.getStreet());
+			ownerUnit.setCommunity(projectArea.getCommunity());
+			ownerUnit.setHamlet(projectArea.getHamlet());
+		}
+
 		return toAjax(ownerUnitService.insertOwnerUnit(ownerUnit));
 	}
 
@@ -91,6 +105,20 @@ public class OwnerUnitController extends BaseController {
 	@Log(title = "业主单元", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody OwnerUnit ownerUnit) {
+
+		if (ownerUnit.getProjectId() != null) {
+			Project project = projectService.selectProjectById(ownerUnit.getProjectId());
+			ownerUnit.setDetectId(project.getDetectId());
+		}
+
+		ProjectArea projectArea = projectAreaService.selectProjectAreaById(ownerUnit.getArea());
+		if (projectArea != null) {
+			ownerUnit.setDistrict(projectArea.getDistrict());
+			ownerUnit.setStreet(projectArea.getStreet());
+			ownerUnit.setCommunity(projectArea.getCommunity());
+			ownerUnit.setHamlet(projectArea.getHamlet());
+		}
+
 		return toAjax(ownerUnitService.updateOwnerUnit(ownerUnit));
 	}
 

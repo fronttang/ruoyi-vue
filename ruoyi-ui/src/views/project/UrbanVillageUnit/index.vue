@@ -479,8 +479,12 @@ export default {
       const id = row.id || this.ids
       getOwnerUnit(id).then(response => {
         this.form = response.data;
-        this.form.testDate = [this.form.testStartDate, this.form.testEndDate];
-        this.form.testContent = this.form.testContent.split(',');
+        if(this.form.testStartDate != null && this.form.testEndDate != null ){
+          this.form.testDate = [this.form.testStartDate, this.form.testEndDate];
+        }
+        if(this.form.testContent != null) {
+          this.form.testContent = this.form.testContent.split(',');
+        }
         this.open = true;
         this.title = "修改城中村电检";
       });

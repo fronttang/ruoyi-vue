@@ -13,6 +13,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="projectId"    column="project_id"    />
         <result property="projectName"    column="project_name"    />
         <result property="area"    column="area"    />
+        <result property="district"    column="district"    />
+        <result property="districtName"    column="district_name"    />
+        <result property="street"    column="street"    />
+        <result property="streetName"    column="street_name"    />
+        <result property="community"    column="community"    />
+        <result property="communityName"    column="community_name"    />
+        <result property="hamlet"    column="hamlet"    />
+        <result property="hamletName"    column="hamlet_name"    />
         <result property="entrust"    column="entrust"    />
         <result property="manager"    column="manager"    />
         <result property="gridman"    column="gridman"    />
@@ -55,7 +63,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, name, type, detect_id, detect_name, project_id, project_name, area, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
+        select id, name, type, detect_id, detect_name, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
@@ -122,6 +130,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="projectId != null">project_id,</if>
             <if test="projectName != null">project_name,</if>
             <if test="area != null">area,</if>
+            <if test="district != null">district,</if>
+            <if test="street != null">street,</if>
+            <if test="community != null">community,</if>
+            <if test="hamlet != null">hamlet,</if>
             <if test="entrust != null">entrust,</if>
             <if test="manager != null">manager,</if>
             <if test="gridman != null">gridman,</if>
@@ -171,6 +183,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="projectId != null">#{projectId},</if>
             <if test="projectName != null">#{projectName},</if>
             <if test="area != null">#{area},</if>
+            <if test="district != null">#{district},</if>
+            <if test="street != null">#{street},</if>
+            <if test="community != null">#{community},</if>
+            <if test="hamlet != null">#{hamlet},</if>
             <if test="entrust != null">#{entrust},</if>
             <if test="manager != null">#{manager},</if>
             <if test="gridman != null">#{gridman},</if>
@@ -223,6 +239,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="projectId != null">project_id = #{projectId},</if>
             <if test="projectName != null">project_name = #{projectName},</if>
             <if test="area != null">area = #{area},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="street != null">street = #{street},</if>
+            <if test="community != null">community = #{community},</if>
+            <if test="hamlet != null">hamlet = #{hamlet},</if>
             <if test="entrust != null">entrust = #{entrust},</if>
             <if test="manager != null">manager = #{manager},</if>
             <if test="gridman != null">gridman = #{gridman},</if>

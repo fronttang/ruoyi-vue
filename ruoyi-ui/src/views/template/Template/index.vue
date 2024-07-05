@@ -99,15 +99,15 @@
           <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" >
             <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
             <el-dropdown-menu slot="dropdown">
-              <span v-if="scope.row.type === 'urban_village' || scope.row.type === 'industrial_area'">
+              <span v-if="scope.row.type === '1' || scope.row.type === '2'">
                 <el-dropdown-item command="urbanVillageIntuitiveDatect" icon="el-icon-edit" >直观标题</el-dropdown-item>
                 <el-dropdown-item command="urbanVillageIntuitiveDatectData" icon="el-icon-edit" >直观内容</el-dropdown-item>
                 <el-dropdown-item command="urbanVillageDatectDevice" icon="el-icon-edit" >仪器模板</el-dropdown-item>
               </span>
-              <span v-if="scope.row.type === 'charging_station'">
+              <span v-if="scope.row.type === '3'">
                 <el-dropdown-item command="chargingStationIntuitiveDatectData" icon="el-icon-edit" >检测项</el-dropdown-item>
               </span>
-              <span v-if="scope.row.type === 'high_fire_risk'">
+              <span v-if="scope.row.type === '4'">
                 <el-dropdown-item command="highFireRiskScore" icon="el-icon-edit" >记分模块</el-dropdown-item>
                 <el-dropdown-item command="highFireRiskView" icon="el-icon-edit" >展示模块</el-dropdown-item>
               </span>

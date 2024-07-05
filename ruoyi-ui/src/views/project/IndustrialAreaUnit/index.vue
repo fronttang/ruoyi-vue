@@ -490,11 +490,11 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
-        this.form.testStartDate = this.form.testDate[0];
-        this.form.testEndDate = this.form.testDate[1];
-        this.form.testDate = this.form.testDate.join(",");
-        this.form.testContent = this.form.testContent.join(",");
         if (valid) {
+          this.form.testStartDate = this.form.testDate[0];
+          this.form.testEndDate = this.form.testDate[1];
+          this.form.testDate = this.form.testDate.join(",");
+          this.form.testContent = this.form.testContent.join(",");
           if (this.form.id != null) {
             updateOwnerUnit(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");

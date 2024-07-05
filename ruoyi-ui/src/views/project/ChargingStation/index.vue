@@ -466,8 +466,8 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
-        this.form.detectModule = this.form.detectModule.join(",");
         if (valid) {
+          this.form.detectModule = this.form.detectModule.join(",");
           if (this.form.id != null) {
             updateOwnerUnit(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");

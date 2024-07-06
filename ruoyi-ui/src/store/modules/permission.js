@@ -93,7 +93,7 @@ const permission = {
             (route) => {
               var children = []
               route.children.forEach((child, index) =>{
-                if(child.path !== 'ownerunit'){
+                if(child.name !== 'ownerunit'){
                   children = children.concat(child);
                 }
               })

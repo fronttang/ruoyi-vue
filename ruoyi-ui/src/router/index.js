@@ -249,27 +249,27 @@ export const dynamicRoutes = [
 
 export const urbanVillageUnitRouters = [
   {
-    path: 'ownerunit',
+    path: 'UrbanVillageUnit',
     component: () => import('@/views/project/UrbanVillageUnit/index'),
-    name: 'UrbanVillageUnit',
+    name: 'ownerunit',
     meta: { title: '业主单元', icon: 'row'}
   }
 ]
 
 export const industrialAreaUnitRouters = [
   {
-    path: 'ownerunit',
+    path: 'IndustrialAreaUnit',
     component: () => import('@/views/project/IndustrialAreaUnit/index'),
-    name: 'IndustrialAreaUnit',
+    name: 'ownerunit',
     meta: { title: '业主单元', icon: 'row'}
   }
 ]
 
 export const highFireRiskUnitRouters = [
   {
-    path: 'ownerunit',
+    path: 'HighFireRisk',
     component: ParentView,
-    name: 'HighFireRisk',
+    name: 'ownerunit',
     meta: { title: '业主单元', icon: 'row'},
     children: [
       {
@@ -314,9 +314,9 @@ export const highFireRiskUnitRouters = [
 
 export const chargingStationRouters = [
   {
-    path: 'ownerunit',
+    path: 'ChargingStation',
     component: () => import('@/views/project/ChargingStation/index'),
-    name: 'ChargingStation',
+    name: 'ownerunit',
     meta: { title: '业主单元', icon: 'row'}
   }
 ]

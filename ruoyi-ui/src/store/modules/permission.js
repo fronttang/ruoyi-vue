@@ -1,9 +1,11 @@
 import auth from '@/plugins/auth'
-import router, { constantRoutes, dynamicRoutes } from '@/router'
+import router, { constantRoutes, dynamicRoutes, urbanVillageUnitRouters, highFireRiskUnitRouters, industrialAreaUnitRouters, chargingStationRouters } from '@/router'
 import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
 import ParentView from '@/components/ParentView'
 import InnerLink from '@/layout/components/InnerLink'
+import { getProject } from "@/api/project/project";
+import store from "@/store";
 
 const permission = {
   state: {
@@ -27,6 +29,20 @@ const permission = {
     SET_SIDEBAR_ROUTERS: (state, routes) => {
       state.sidebarRouters = routes
     },
+    UPDATE_SETTING_ROUTES: (state, [routes, insertIndex]) => {
+      if (!insertIndex) {
+        state.sidebarRouters = state.sidebarRouters.concat(routes);
+      } else {
+        let arr = [...state.sidebarRouters];
+        arr.splice(insertIndex, 0, ...routes);
+        state.sidebarRouters = arr;
+      }
+    },
+    REMOVE_SETTING_ROUTES: (state, routePath) => {
+      state.sidebarRouters = state.sidebarRouters.filter(
+        (item) => item.path !== routePath
+      );
+    },
   },
   actions: {
     // 生成路由
@@ -48,7 +64,54 @@ const permission = {
           resolve(rewriteRoutes)
         })
       })
-    }
+    },
+    // 动态路由
+    GeneProAppRoutes({ commit }, projectId) {
+      return new Promise((resolve) => {
+        // 根据项目id生成项目库应用路由列表
+        getProject(projectId).then((res) => {
+          if(res.data == null) return;
+          const type = res.data.type;
+          let newRoutes = [];
+          if(type === '1'){
+            newRoutes = urbanVillageUnitRouters;
+          } else if(type === '2'){
+            newRoutes = industrialAreaUnitRouters;
+          } else if(type === '3'){
+            newRoutes = highFireRiskUnitRouters;
+          } else if(type === '4'){
+            newRoutes = chargingStationRouters;
+          }
+
+          let routers = permission.state.sidebarRouters;
+
+          let settingRoutes = routers.filter(
+            (route) => route.path === '/setting'
+          );
+
+          settingRoutes = settingRoutes.filter(
+            (route) => {
+              var children = []
+              route.children.forEach((child, index) =>{
+                if(child.path !== 'ownerunit'){
+                  children = children.concat(child);
+                }
+              })
+              children = children.concat(newRoutes);
+              route.children = children;
+              return true;
+            }
+          )
+
+          //newRoutes.push({ path: '*', redirect: '/404', hidden: true })
+          router.addRoutes(settingRoutes);
+          // 在原路由的基础上清除、更新
+          commit("REMOVE_SETTING_ROUTES", "/setting");
+          commit("UPDATE_SETTING_ROUTES", [settingRoutes, 12]);
+          resolve(settingRoutes);
+        });
+      });
+    },
   }
 }
 

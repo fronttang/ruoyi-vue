@@ -9,8 +9,8 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="一级区域" prop="district">
-        <el-select v-model="queryParams.district" placeholder="请选择一级区域"  filterable clearable>
+      <el-form-item label="区" prop="district">
+        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable>
           <el-option
             v-for="dict in districtOptions"
             :key="dict.value"
@@ -19,8 +19,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="二级区域" prop="street">
-        <el-select v-model="queryParams.street" placeholder="请选择二级区域"  filterable clearable>
+      <el-form-item label="街道" prop="street">
+        <el-select v-model="queryParams.street" placeholder="请选择街道"  filterable clearable>
           <el-option
             v-for="dict in streetOptions"
             :key="dict.value"
@@ -29,8 +29,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="三级区域" prop="community">
-        <el-select v-model="queryParams.community" placeholder="请选择三级区域"  filterable clearable>
+      <el-form-item label="社区" prop="community" v-if="projectType === '1' || projectType == '3'">
+        <el-select v-model="queryParams.community" placeholder="请选择社区"  filterable clearable >
           <el-option
             v-for="dict in communityOptions"
             :key="dict.value"
@@ -39,8 +39,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="四级区域" prop="hamlet">
-        <el-select v-model="queryParams.hamlet" placeholder="请选择四级区域"  filterable clearable>
+      <el-form-item label="村" prop="hamlet" v-if="projectType === '1'">
+        <el-select v-model="queryParams.hamlet" placeholder="请选择村"  filterable clearable>
           <el-option
             v-for="dict in hamletOptions"
             :key="dict.value"
@@ -108,14 +108,7 @@
       <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
       <el-table-column label="姓名" align="center" prop="name"  width="120"/>
       <el-table-column label="账号" align="center" prop="account"  width="120" />
-      <el-table-column label="区域" align="center" prop="district" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <dict-tag :options="districtOptions" :value="scope.row.district"/>
-          <dict-tag :options="streetOptions" :value="scope.row.street"/>
-          <dict-tag :options="communityOptions" :value="scope.row.community"/>
-          <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" :show-overflow-tooltip="true" />
       <el-table-column label="状态" align="center"  width="60" prop="status">
       <template slot-scope="scope">
         <el-switch
@@ -162,8 +155,8 @@
     <!-- 添加或修改街区账号对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="一级区域" prop="district">
-          <el-select v-model="form.district" placeholder="请选择一级区域" filterable clearable>
+        <el-form-item label="区" prop="district">
+          <el-select v-model="form.district" placeholder="请选择区" filterable clearable>
             <el-option
               v-for="dict in districtOptions"
               :key="dict.value"
@@ -172,8 +165,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="二级区域" prop="street">
-          <el-select v-model="form.street" placeholder="请选择二级区域" filterable clearable>
+        <el-form-item label="街道" prop="street">
+          <el-select v-model="form.street" placeholder="请选择街道" filterable clearable>
             <el-option
               v-for="dict in streetOptions"
               :key="dict.value"
@@ -182,8 +175,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="三级区域" prop="community">
-          <el-select v-model="form.community" placeholder="请选择三级区域" filterable clearable>
+        <el-form-item label="社区" prop="community" v-if="projectType === '1' || projectType == '3'">
+          <el-select v-model="form.community" placeholder="请选择社区" filterable clearable >
             <el-option
               v-for="dict in communityOptions"
               :key="dict.value"
@@ -192,8 +185,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="四级区域" prop="hamlet">
-          <el-select v-model="form.hamlet" placeholder="请选择四级区域" filterable clearable>
+        <el-form-item label="村" prop="hamlet" v-if="projectType === '1'">
+          <el-select v-model="form.hamlet" placeholder="请选择村" filterable clearable >
             <el-option
               v-for="dict in hamletOptions"
               :key="dict.value"
@@ -225,6 +218,7 @@ import { listDetectUnitUser, getDetectUnitUser, delDetectUnitUser, addDetectUnit
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { changeUserStatus } from "@/api/system/user";
 import { listProjectAreaDict } from "@/api/project/AreaDict";
+import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
 
@@ -280,7 +274,7 @@ export default {
       // 表单校验
       rules: {
         district: [
-          { required: true, message: "一级区域不能为空", trigger: "change" }
+          { required: true, message: "区不能为空", trigger: "change" }
         ],
         name: [
           { required: true, message: "姓名不能为空", trigger: "blur" }
@@ -293,7 +287,8 @@ export default {
         ],
       },
       // 检测单位字典选项
-      detectUnitDict: []
+      detectUnitDict: [],
+      projectType: null
     };
   },
   created() {
@@ -303,6 +298,10 @@ export default {
     /** 查询街区账号列表 */
     getList() {
       this.loading = true;
+
+      getProject(this.queryParams.projectId).then(response => {
+        this.projectType = response.data.type;
+      });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
         this.districtList = response.data;
@@ -376,6 +375,26 @@ export default {
       this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    areaFormat(row) {
+      var area = [];
+      var districtName = this.selectDictLabel(this.districtOptions, row.district);
+      var streetName = this.selectDictLabel(this.streetOptions, row.street);
+      var communityName = this.selectDictLabel(this.communityOptions, row.community);
+      var hamletName = this.selectDictLabel(this.hamletOptions, row.hamlet);
+
+      area.push(districtName);
+      if(streetName && streetName != null && streetName != ''){
+        area.push(streetName);
+      }
+      if(communityName && communityName != null && communityName != ''){
+        area.push(communityName);
+      }
+      if(hamletName && hamletName != null && hamletName != ''){
+        area.push(hamletName);
+      }
+
+      return area.join('/');
     },
     /** 新增按钮操作 */
     handleAdd() {

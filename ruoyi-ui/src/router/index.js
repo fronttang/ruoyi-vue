@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import ParentView from '@/components/ParentView'
 
 /**
  * Note: 路由配置项
@@ -243,6 +244,80 @@ export const dynamicRoutes = [
         meta: { title: '二级展示模块', activeMenu: '/template/Template' }
       }
     ]
+  }
+]
+
+export const urbanVillageUnitRouters = [
+  {
+    path: 'ownerunit',
+    component: () => import('@/views/project/UrbanVillageUnit/index'),
+    name: 'UrbanVillageUnit',
+    meta: { title: '业主单元', icon: 'row'}
+  }
+]
+
+export const industrialAreaUnitRouters = [
+  {
+    path: 'ownerunit',
+    component: () => import('@/views/project/IndustrialAreaUnit/index'),
+    name: 'IndustrialAreaUnit',
+    meta: { title: '业主单元', icon: 'row'}
+  }
+]
+
+export const highFireRiskUnitRouters = [
+  {
+    path: 'ownerunit',
+    component: ParentView,
+    name: 'HighFireRisk',
+    meta: { title: '业主单元', icon: 'row'},
+    children: [
+      {
+        path: 'HighFireRisk/RentalHouse',
+        component: () => import('@/views/project/HighFireRisk/RentalHouse/index'),
+        name: 'RentalHouse',
+        meta: { title: '出租屋', icon: 'logininfor'}
+      },
+      {
+        path: 'HighFireRisk/Small',
+        component: () => import('@/views/project/HighFireRisk/Small/index'),
+        name: 'Small',
+        meta: { title: '三小场所', icon: 'date-range'}
+      },
+      {
+        path: 'HighFireRisk/Residential',
+        component: () => import('@/views/project/HighFireRisk/Residential/index'),
+        name: 'Residential',
+        meta: { title: '住宅小区', icon: 'number'}
+      },
+      {
+        path: 'HighFireRisk/Industrial',
+        component: () => import('@/views/project/HighFireRisk/Industrial/index'),
+        name: 'Industrial',
+        meta: { title: '工业企业', icon: 'checkbox'}
+      },
+      {
+        path: 'HighFireRisk/PublicPlaces',
+        component: () => import('@/views/project/HighFireRisk/PublicPlaces/index'),
+        name: 'PublicPlaces',
+        meta: { title: '公共场所', icon: 'drag'}
+      },
+      {
+        path: 'HighFireRisk/Complex',
+        component: () => import('@/views/project/HighFireRisk/Complex/index'),
+        name: 'Complex',
+        meta: { title: '大型综合体', icon: 'international'}
+      }
+    ]
+  }
+]
+
+export const chargingStationRouters = [
+  {
+    path: 'ownerunit',
+    component: () => import('@/views/project/ChargingStation/index'),
+    name: 'ChargingStation',
+    meta: { title: '业主单元', icon: 'row'}
   }
 ]
 

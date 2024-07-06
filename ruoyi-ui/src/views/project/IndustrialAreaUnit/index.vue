@@ -9,6 +9,26 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="区" prop="district">
+        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable>
+          <el-option
+            v-for="dict in districtOptions"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="街道" prop="street">
+        <el-select v-model="queryParams.street" placeholder="请选择街道"  filterable clearable>
+          <el-option
+            v-for="dict in streetOptions"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -250,8 +270,9 @@
 import { listOwnerUnit, getOwnerUnit, delOwnerUnit, addOwnerUnit, updateOwnerUnit } from "@/api/project/OwnerUnit";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
-import { getProjectAreaDict, getProjectAreaDictByProjectId } from "@/api/project/ProjectArea";
+import { getProjectAreaDict, getProjectAreaDictByProjectId, getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import { getDetectUnitUserDictByTypeAndProjectId, getDetectUnitUserDict } from "@/api/projectrole/detectUnitUser";
+import DictMeta from '@/utils/dict/DictMeta'
 
 export default {
   name: "OwnerUnit",
@@ -272,6 +293,10 @@ export default {
       total: 0,
       // 工业园电检表格数据
       OwnerUnitList: [],
+      districtOptions: [],
+      streetOptions: [],
+      communityOptions: [],
+      hamletOptions: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -290,6 +315,10 @@ export default {
         projectId: this.$store.state.settings.projectId,
         projectName: null,
         area: null,
+        district: null,
+        street: null,
+        community: null,
+        hamlet: null,
         entrust: null,
         manager: null,
         gridman: null,
@@ -367,6 +396,17 @@ export default {
         this.gridmanDict = response.data;
       });
 
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+        this.districtList = response.data;
+        const dictMeta = DictMeta.parse("districtOptions");
+        this.districtOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'street').then(response => {
+        const dictMeta = DictMeta.parse("streetOptions");
+        this.streetOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
       listOwnerUnit(this.queryParams).then(response => {
         this.OwnerUnitList = response.rows;
         this.total = response.total;
@@ -426,18 +466,29 @@ export default {
       this.resetForm("form");
     },
     detectFormat(row){
-      return this.selectDictLabel(this.detectUnitDict, row.detectId);
+      return this.selectDictVoLabel(this.detectUnitDict, row.detectId);
     },
     managerFormat(row){
-      return this.selectDictLabel(this.ownerUnitUserDict, row.manager);
+      return this.selectDictVoLabel(this.ownerUnitUserDict, row.manager);
     },
     gridmanFormat(row){
-      return this.selectDictLabel(this.gridmanDict, row.gridman);
+      return this.selectDictVoLabel(this.gridmanDict, row.gridman);
     },
     areaFormat(row) {
-      return this.selectDictLabel(this.projectAreaDict, row.area);
+      var area = [];
+      var districtName = this.selectDictLabel(this.districtOptions, row.district);
+      var streetName = this.selectDictLabel(this.streetOptions, row.street);
+      //var communityName = this.selectDictLabel(this.communityOptions, row.community);
+      //var hamletName = this.selectDictLabel(this.hamletOptions, row.hamlet);
+
+      area.push(districtName);
+      area.push(streetName);
+      //area.push(communityName);
+      //area.push(hamletName);
+
+      return area.join('/');
     },
-    selectDictLabel(datas, value) {
+    selectDictVoLabel(datas, value) {
       if (value === undefined) {
         return "";
       }

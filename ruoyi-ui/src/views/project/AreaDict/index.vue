@@ -4,7 +4,7 @@
       <el-form-item label="区域类型" prop="dictType">
         <el-select v-model="queryParams.dictType" placeholder="请选择区域类型" filterable clearable>
           <el-option
-            v-for="dict in dict.type.area_type"
+            v-for="dict in areaOptions"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -69,7 +69,7 @@
       <el-table-column label="名称" align="center" prop="dictLabel" />
       <el-table-column label="类型" align="center" prop="dictType">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.area_type" :value="scope.row.dictType"/>
+          <dict-tag :options="areaOptions" :value="scope.row.dictType"/>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -106,7 +106,7 @@
         <el-form-item label="类型" prop="dictType">
           <el-select v-model="form.dictType" placeholder="请选择类型">
             <el-option
-              v-for="dict in dict.type.area_type"
+              v-for="dict in areaOptions"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
@@ -127,6 +127,9 @@
 
 <script>
 import { listAreaDict, getAreaDict, delAreaDict, addAreaDict, updateAreaDict } from "@/api/project/AreaDict";
+import { getProject } from "@/api/project/project";
+import DictMeta from '@/utils/dict/DictMeta'
+import { districtDictData,streetDictData,communityDictData,hamletDictData } from "@/api/project/AreaDict";
 
 export default {
   name: "AreaDict",
@@ -147,6 +150,7 @@ export default {
       total: 0,
       // 区域字典表格数据
       AreaDictList: [],
+      areaOptions: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -178,6 +182,21 @@ export default {
     /** 查询区域字典列表 */
     getList() {
       this.loading = true;
+      this.areaOptions = [];
+      getProject(this.queryParams.projectId).then(response => {
+        let type = response.data.type;
+        this.areaOptions.push(districtDictData);
+        this.areaOptions.push(streetDictData);
+        if(type === '1' || type === '3'){
+          this.areaOptions.push(communityDictData);
+        }
+        if(type === '1') {
+          this.areaOptions.push(hamletDictData);
+        }
+        const dictMeta = DictMeta.parse("areaOptions");
+        this.areaOptions = dictMeta.responseConverter(this.areaOptions, dictMeta);
+      });
+
       listAreaDict(this.queryParams).then(response => {
         this.AreaDictList = response.rows;
         this.total = response.total;

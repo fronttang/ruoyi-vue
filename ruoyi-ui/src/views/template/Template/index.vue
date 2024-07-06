@@ -104,10 +104,10 @@
                 <el-dropdown-item command="urbanVillageIntuitiveDatectData" icon="el-icon-edit" >直观内容</el-dropdown-item>
                 <el-dropdown-item command="urbanVillageDatectDevice" icon="el-icon-edit" >仪器模板</el-dropdown-item>
               </span>
-              <span v-if="scope.row.type === '3'">
+              <span v-if="scope.row.type === '4'">
                 <el-dropdown-item command="chargingStationIntuitiveDatectData" icon="el-icon-edit" >检测项</el-dropdown-item>
               </span>
-              <span v-if="scope.row.type === '4'">
+              <span v-if="scope.row.type === '3'">
                 <el-dropdown-item command="highFireRiskScore" icon="el-icon-edit" >记分模块</el-dropdown-item>
                 <el-dropdown-item command="highFireRiskView" icon="el-icon-edit" >展示模块</el-dropdown-item>
               </span>

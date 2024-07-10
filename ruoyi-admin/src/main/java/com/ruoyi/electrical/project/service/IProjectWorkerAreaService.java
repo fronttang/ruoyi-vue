@@ -65,4 +65,6 @@ public interface IProjectWorkerAreaService {
 	public int saveProjectWorkerArea(@Valid ProjectWorkerAreaDto data);
 
 	public List<ProjectWorkerArea> selectProjectWorkerAreaByWorkerId(Long workerId);
+
+	public int deleteProjectWorkerAreaByWorkerIds(Long[] workerIds);
 }

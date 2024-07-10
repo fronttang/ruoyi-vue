@@ -3,17 +3,15 @@ package com.ruoyi.electrical.project.service.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.Valid;
-
-import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ruoyi.electrical.project.mapper.ProjectWorkerAreaMapper;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.dto.ProjectWorkerAreaDto;
 import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.project.domain.ProjectWorkerArea;
+import com.ruoyi.electrical.project.mapper.ProjectWorkerAreaMapper;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.project.service.IProjectWorkerAreaService;
 
@@ -135,5 +133,11 @@ public class ProjectWorkerAreaServiceImpl implements IProjectWorkerAreaService {
 	@Override
 	public List<ProjectWorkerArea> selectProjectWorkerAreaByWorkerId(Long workerId) {
 		return projectWorkerAreaMapper.selectProjectWorkerAreaByWorkerId(workerId);
+	}
+
+	@Override
+	public int deleteProjectWorkerAreaByWorkerIds(Long[] workerIds) {
+
+		return projectWorkerAreaMapper.deleteProjectWorkerAreaByWorkerIds(workerIds);
 	}
 }

@@ -65,4 +65,6 @@ public interface ProjectWorkerAreaMapper {
 			@Param("type") String type);
 
 	public List<ProjectWorkerArea> selectProjectWorkerAreaByWorkerId(Long workerId);
+
+	public int deleteProjectWorkerAreaByWorkerIds(Long[] workerIds);
 }

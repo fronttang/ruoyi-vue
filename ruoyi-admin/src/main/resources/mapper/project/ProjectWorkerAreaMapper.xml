@@ -108,4 +108,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+    
+    <delete id="deleteProjectWorkerAreaByWorkerIds" >
+        delete from project_worker_area where worker_id in 
+        <foreach  item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

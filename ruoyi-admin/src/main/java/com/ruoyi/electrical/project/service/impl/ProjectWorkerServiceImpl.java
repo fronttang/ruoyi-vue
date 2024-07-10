@@ -145,7 +145,9 @@ public class ProjectWorkerServiceImpl implements IProjectWorkerService {
 	 * @return 结果
 	 */
 	@Override
+	@Transactional
 	public int deleteProjectWorkerByIds(Long[] ids) {
+		projectWorkerAreaService.deleteProjectWorkerAreaByWorkerIds(ids);
 		return projectWorkerMapper.deleteProjectWorkerByIds(ids);
 	}
 

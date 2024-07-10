@@ -66,12 +66,12 @@
     <el-table v-loading="loading" :data="TemplateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectId" :show-overflow-tooltip="true" >
+      <el-table-column label="检测单位" align="center" prop="detectId" min-width="300" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <span>{{ formatDetectName(scope.row.detectId) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="模板名称" align="center"  prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="模板名称" align="center"  prop="name" min-width="100" :show-overflow-tooltip="true" />
       <el-table-column label="场景类型" align="center" width="160" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
@@ -82,7 +82,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

@@ -83,20 +83,20 @@
 
     <el-table v-loading="loading" :data="projectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" width="50" />
-      <el-table-column label="项目名称" align="center" prop="name" :show-overflow-tooltip="true"/>
+      <el-table-column fixed label="ID" align="center" prop="id" width="50" />
+      <el-table-column fixed label="项目名称" align="center" min-width="200" prop="name" :show-overflow-tooltip="true"/>
       <el-table-column label="项目类型" align="center" prop="type" width="120">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.project_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
+      <el-table-column label="检测单位" align="center" prop="detectName"  min-width="300" :show-overflow-tooltip="true" />
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column  fixed="right"  label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

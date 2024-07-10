@@ -94,18 +94,18 @@
     <el-table v-loading="loading" :data="OwnerUnitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
-      <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
-      <el-table-column label="检测单位" align="center" prop="detectName" :formatter="detectFormat" :show-overflow-tooltip="true"/>
-      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat"  :show-overflow-tooltip="true"/>
+      <el-table-column label="名称" align="center" prop="name" min-width="200" :show-overflow-tooltip="true" />
+      <el-table-column label="检测单位" align="center" prop="detectName" min-width="300" :formatter="detectFormat" :show-overflow-tooltip="true"/>
+      <el-table-column label="区域" align="center" prop="area" min-width="200" :formatter="areaFormat"  :show-overflow-tooltip="true"/>
       <el-table-column label="管理员" align="center" prop="manager" width="100" :formatter="managerFormat" />
       <el-table-column label="网格员" align="center" prop="gridman" width="100" :formatter="gridmanFormat" />
-      <el-table-column label="检测地址" align="center" prop="address"  :show-overflow-tooltip="true"/>
+      <el-table-column label="检测地址" align="center" prop="address" min-width="200" :show-overflow-tooltip="true"/>
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center"  width="160" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" fixed="right" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

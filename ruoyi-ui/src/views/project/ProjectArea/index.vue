@@ -96,7 +96,7 @@
     <el-table v-loading="loading" :data="ProjectAreaList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
+      <el-table-column label="项目名称" align="center" min-width="200" prop="projectName" :show-overflow-tooltip="true" />
       <el-table-column label="区" align="center" prop="district" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="districtOptions" :value="scope.row.district"/>
@@ -122,7 +122,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -254,7 +254,10 @@ export default {
       // 表单校验
       rules: {
         district: [
-          { required: true, message: "一级区域不能为空", trigger: "change" }
+          { required: true, message: "区不能为空", trigger: "change" }
+        ],
+        street: [
+          { required: true, message: "街道不能为空", trigger: "change" }
         ],
       },
       projectDict: [],

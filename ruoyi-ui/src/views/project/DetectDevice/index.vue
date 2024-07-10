@@ -76,14 +76,14 @@
     <el-table v-loading="loading" :data="DetectDeviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
-      <el-table-column label="仪器编号" align="center" prop="deviceId" :show-overflow-tooltip="true" />
+      <el-table-column label="检测单位" align="center" prop="detectName" min-width="300" :show-overflow-tooltip="true" />
+      <el-table-column label="仪器编号" align="center" prop="deviceId" min-width="100" :show-overflow-tooltip="true" />
       <el-table-column label="类型" align="center" prop="type" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <dict-tag :options="dict.type.detect_device_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
-      <el-table-column label="仪器名称" align="center" prop="name" :show-overflow-tooltip="true"/>
+      <el-table-column label="仪器名称" align="center" prop="name" min-width="160" :show-overflow-tooltip="true"/>
       <el-table-column label="校准日期" align="center" prop="calibrationDate" width="120" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.calibrationDate, '{y}-{m}-{d}') }}</span>
@@ -94,7 +94,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column fixed="right" label="操作" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -149,18 +149,19 @@
           <el-input v-model="form.deviceId" placeholder="请输入仪器编号" />
         </el-form-item>
         <el-form-item label="仪器名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入仪器名称" />
+          <el-input v-model="form.name" placeholder="请输入仪器名称"  />
         </el-form-item>
         <el-form-item label="校准日期" prop="calibrationDate">
           <el-date-picker clearable
             v-model="form.calibrationDate"
             type="date"
+            @change="changeCalibrationDate"
             value-format="yyyy-MM-dd"
             placeholder="请选择校准日期">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="是否过期" prop="isExpired">
-          <el-radio-group v-model="form.isExpired">
+          <el-radio-group v-model="form.isExpired" disabled>
             <el-radio label="0">未过期</el-radio>
             <el-radio label="1">已过期</el-radio>
           </el-radio-group>
@@ -219,6 +220,15 @@ export default {
         ],
         type: [
           { required: true, message: "请选择仪器类型", trigger: "change" }
+        ],
+        deviceId: [
+          { required: true, message: "请输入仪器编号", trigger: "blur" }
+        ],
+        name: [
+          { required: true, message: "请输入仪器名称", trigger: "blur" }
+        ],
+        calibrationDate: [
+          { required: true, message: "请选择校准日期", trigger: "blur" }
         ],
       },
       // 检测单位字典选项
@@ -280,6 +290,11 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
+    changeCalibrationDate(value){
+      if(value != null && value != ''){
+        this.form.isExpired =  Date.parse(value) > new Date() ? '0' : '1';
+      }
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -298,6 +313,7 @@ export default {
       const id = row.id || this.ids
       getDetectDevice(id).then(response => {
         this.form = response.data;
+        this.changeCalibrationDate(this.form.calibrationDate);
         this.open = true;
         this.title = "修改检测仪器";
       });

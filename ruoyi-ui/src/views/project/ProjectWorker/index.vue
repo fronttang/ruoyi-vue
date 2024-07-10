@@ -81,7 +81,7 @@
     <el-table v-loading="loading" :data="ProjectWorkerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true" />
+      <el-table-column label="检测单位" align="center" prop="detectName" min-width="300" :show-overflow-tooltip="true" />
       <el-table-column label="姓名" align="center" width="120" prop="nickName" :show-overflow-tooltip="true"/>
       <el-table-column label="账号" align="center" width="120" prop="userName" :show-overflow-tooltip="true"/>
       <el-table-column label="绑定类型" align="center" width="80" prop="bindType" >
@@ -94,7 +94,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="220" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

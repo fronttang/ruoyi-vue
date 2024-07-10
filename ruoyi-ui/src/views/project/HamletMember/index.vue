@@ -104,11 +104,11 @@
     <el-table v-loading="loading" :data="HamletMemberList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
-      <el-table-column label="检测单位" align="center" prop="detectName" :show-overflow-tooltip="true"  />
-      <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
+      <el-table-column label="检测单位" align="center" prop="detectName" min-width="300" :show-overflow-tooltip="true"  />
+      <el-table-column label="项目名称" align="center" prop="projectName" min-width="200" :show-overflow-tooltip="true" />
       <el-table-column label="姓名" align="center" prop="name"  width="120"/>
       <el-table-column label="账号" align="center" prop="account"  width="120" />
-      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" :show-overflow-tooltip="true" />
+      <el-table-column label="区域" align="center" prop="area" :formatter="areaFormat" min-width="200" :show-overflow-tooltip="true" />
       <el-table-column label="状态" align="center"  width="60" prop="status">
       <template slot-scope="scope">
         <el-switch
@@ -124,7 +124,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -275,6 +275,9 @@ export default {
       rules: {
         district: [
           { required: true, message: "区不能为空", trigger: "change" }
+        ],
+        street: [
+          { required: true, message: "街道不能为空", trigger: "change" }
         ],
         name: [
           { required: true, message: "姓名不能为空", trigger: "blur" }

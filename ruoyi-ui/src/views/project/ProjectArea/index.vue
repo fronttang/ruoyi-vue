@@ -259,6 +259,12 @@ export default {
         street: [
           { required: true, message: "街道不能为空", trigger: "change" }
         ],
+        community: [
+          { required: true, message: "社区不能为空", trigger: "change" }
+        ],
+        hamlet: [
+          { required: true, message: "村不能为空", trigger: "change" }
+        ],
       },
       projectDict: [],
       projectType: null

@@ -204,6 +204,9 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" placeholder="请输入密码" type="password" maxlength="20" show-password/>
         </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword" v-if="this.form.password !== '********'">
+          <el-input v-model="form.confirmPassword" placeholder="请确认密码" type="password" maxlength="20" show-password/>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -226,6 +229,13 @@ export default {
   name: "HamletMember",
   dicts: ['hamlet', 'account_status', 'community', 'district', 'street'],
   data() {
+    const equalToPassword = (rule, value, callback) => {
+      if (this.form.password !== value) {
+        callback(new Error("两次输入的密码不一致"));
+      } else {
+        callback();
+      }
+    };
     return {
       // 遮罩层
       loading: true,
@@ -276,9 +286,6 @@ export default {
         district: [
           { required: true, message: "区不能为空", trigger: "change" }
         ],
-        street: [
-          { required: true, message: "街道不能为空", trigger: "change" }
-        ],
         name: [
           { required: true, message: "姓名不能为空", trigger: "blur" }
         ],
@@ -286,7 +293,13 @@ export default {
           { required: true, message: "账号不能为空", trigger: "blur" }
         ],
         password: [
-          { required: true, message: "密码不能为空", trigger: "blur" }
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+          { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
+        ],
+        confirmPassword: [
+          { required: true, message: '请确认密码', trigger: 'blur' },
+          { required: true, validator: equalToPassword, trigger: 'blur' }
         ],
       },
       // 检测单位字典选项
@@ -349,6 +362,7 @@ export default {
         account: null,
         name: null,
         password: null,
+        confirmPassword: null,
         status: null,
         createBy: null,
         createTime: null,

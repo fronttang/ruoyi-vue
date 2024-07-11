@@ -37,6 +37,9 @@ import com.ruoyi.system.service.ISysUserService;
 @RestController
 @RequestMapping("/electrical/user")
 public class UserController extends BaseController {
+
+	private static final String HIDE_PASSWORD = "********";
+
 	@Autowired
 	private IDetectUnitUserService detectUnitUserService;
 
@@ -72,7 +75,11 @@ public class UserController extends BaseController {
 	 */
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
-		return success(detectUnitUserService.selectDetectUnitUserById(id));
+
+		DetectUnitUser user = detectUnitUserService.selectDetectUnitUserById(id);
+		user.setPassword(HIDE_PASSWORD);
+
+		return success(user);
 	}
 
 	/**
@@ -106,14 +113,12 @@ public class UserController extends BaseController {
 		if (!userService.checkUserNameUnique(detectUnitUser.getId(), detectUnitUser.getAccount())) {
 			return error("修改失败,登录账号[" + detectUnitUser.getAccount() + "]已存在");
 		}
-		DetectUnitUser selectDetectUnitUser = detectUnitUserService.selectDetectUnitUserById(detectUnitUser.getId());
-		if (selectDetectUnitUser != null) {
-			if (selectDetectUnitUser.getPassword().equals(detectUnitUser.getPassword())) {
-				detectUnitUser.setPassword(null);
-			} else {
-				detectUnitUser.setPassword(SecurityUtils.encryptPassword(detectUnitUser.getPassword()));
-			}
+		if (HIDE_PASSWORD.equalsIgnoreCase(detectUnitUser.getPassword())) {
+			detectUnitUser.setPassword(null);
+		} else {
+			detectUnitUser.setPassword(SecurityUtils.encryptPassword(detectUnitUser.getPassword()));
 		}
+
 		return toAjax(detectUnitUserService.updateDetectUnitUser(detectUnitUser));
 	}
 

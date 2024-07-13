@@ -72,13 +72,13 @@
           <dict-tag :options="dict.type.detect_module" :value="scope.row.detectModule"/>
         </template>
       </el-table-column>
-      <el-table-column label="内容" align="center" prop="firstContent" :show-overflow-tooltip="true" />
+      <el-table-column label="内容" align="center" prop="firstContent" min-width="300" :show-overflow-tooltip="true" />
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -314,7 +314,7 @@ export default {
         id: null,
         detectTitle: 0,
         templateId: this.$route.params.templateId,
-        type: null,
+        type: '2',
         detectModule: null,
         firstCode: null,
         firstContent: null,

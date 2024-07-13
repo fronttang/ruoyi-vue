@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="检测表标题" label-width="100px" prop="detectTitle">
-        <el-select v-model="queryParams.detectTitle" placeholder="请选择检测表" @change="handleChangeDetectTitle" filterable clearable>
+        <el-select v-model="queryParams.detectTitle" fit-input-width placeholder="请选择检测表" @change="handleChangeDetectTitle" filterable clearable>
           <el-option
             v-for="item in IntuitiveDetectList"
             :key="item.id"
@@ -32,7 +32,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="一级展示模块" label-width="100px" prop="viewParentId">
-        <el-select v-model="queryParams.viewParentId" placeholder="请选择一级展示模块" filterable clearable>
+        <el-select v-model="queryParams.viewParentId" placeholder="请选择一级展示模块" fit-input-width filterable clearable>
           <el-option
             v-for="item in IntuitiveDetectDataDict"
             :key="item.id"
@@ -91,15 +91,15 @@
           <dict-tag :options="dict.type.high_risk_type" :value="scope.row.unitType"/>
         </template>
       </el-table-column>
-      <el-table-column label="上级检测表" align="center" prop="detectTitle" :show-overflow-tooltip="true" :formatter="detectTitleFormat"/>
-      <el-table-column label="一级展示模块" align="center" prop="viewParentId" :show-overflow-tooltip="true" :formatter="firstLevelFormat"/>
-      <el-table-column label="二级计分模块" align="center" prop="firstContent" :show-overflow-tooltip="true"/>
+      <el-table-column label="上级检测表" align="center" prop="detectTitle" min-width="300" :show-overflow-tooltip="true" :formatter="detectTitleFormat"/>
+      <el-table-column label="一级展示模块" align="center" prop="viewParentId" min-width="300" :show-overflow-tooltip="true" :formatter="firstLevelFormat"/>
+      <el-table-column label="二级计分模块" align="center" prop="firstContent" min-width="300" :show-overflow-tooltip="true"/>
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -128,7 +128,7 @@
     />
 
     <!-- 添加或修改直观检测表内容对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="业主单元类型" label-width="120px" prop="unitType">
           <el-select v-model="form.unitType" placeholder="请选择业主单元类型" @change="handleChangeUnitType" filterable clearable>
@@ -151,7 +151,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="一级展示模块" label-width="120px" prop="viewParentId">
-          <el-select v-model="form.viewParentId" placeholder="请选择一级展示模块" filterable clearable >
+          <el-select v-model="form.viewParentId" placeholder="请选择一级展示模块" fit-input-width filterable clearable >
             <el-option
               v-for="item in IntuitiveDetectDataDict"
               :key="item.id"
@@ -161,12 +161,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="二级计分模块" label-width="120px" prop="id">
-          <el-select v-model="form.id" placeholder="请选择二级计分模块" filterable clearable>
+          <el-select v-model="form.id" placeholder="请选择二级计分模块" fit-input-width filterable clearable>
             <el-option
               v-for="item in IntuitiveDetectDataScoreDict"
               :key="item.id"
               :label="item.name"
               :value="item.id"
+              :style="{width: selectOptionWidth, 'min-width': '350px'}"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -178,9 +179,15 @@
     </el-dialog>
   </div>
 </template>
+<style>
 
+.el-select-dropdown__wrap{
+  max-width: 300px;
+}
+
+</style>
 <script>
-import { listIntuitiveDetectData, listIntuitiveDetectViewData, getIntuitiveDetectDataView, getIntuitiveDetectData, delIntuitiveDetectData, delIntuitiveDetectDataView, addIntuitiveDetectData, updateIntuitiveDetectData, getIntuitiveDetectDataDict } from "@/api/template/IntuitiveDetectData";
+import { listIntuitiveDetectData, updateIntuitiveDetectDataView, listIntuitiveDetectViewData, getIntuitiveDetectDataView, getIntuitiveDetectData, delIntuitiveDetectData, delIntuitiveDetectDataView, addIntuitiveDetectData, updateIntuitiveDetectData, getIntuitiveDetectDataDict } from "@/api/template/IntuitiveDetectData";
 import { getIntuitiveDetectDict, listIntuitiveDetectDict } from "@/api/template/IntuitiveDetect";
 import { getTemplateDict } from "@/api/template/Template";
 
@@ -259,6 +266,13 @@ export default {
     this.getList();
   },
   methods: {
+    setOptionWidth(event) {
+      // 下拉框弹出时，设置弹框的宽度
+      this.$nextTick(() => {
+        this.selectOptionWidth = event.srcElement.offsetWidth + 'px'
+      })
+    },
+
     /** 查询直观检测表内容列表 */
     getList() {
       this.loading = true;
@@ -309,20 +323,7 @@ export default {
         detect_title: null,
         templateId: parseInt(this.$route.params.templateId),
         viewParentId: parseInt(this.$route.params.parentId),
-        unitType: this.$route.params.unitType,
-        type: null,
-        firstCode: null,
-        firstContent: null,
-        secondaryCode: null,
-        secondaryContent: null,
-        dangers : [],
-        weights: null,
-        output: null,
-        view: '2',
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null
+        unitType: this.$route.params.unitType
       };
       this.resetForm("form");
     },
@@ -410,11 +411,13 @@ export default {
       const id = row.id || this.ids
 
       getIntuitiveDetectDataView(id).then(response => {
-        this.form = response.data;
-        this.form.detect_title = this.form.detectTitle;
+        this.form.id = response.data.id;
+        this.form.viewParentId = response.data.viewParentId;
+        this.form.detect_title = response.data.detectTitle;
+        this.form.unitType = response.data.unitType;
 
         this.handleChangeUnitType(this.form.unitType);
-        this.handleChangeDetectTitle(this.form.detectTitle);
+        this.handleChangeDetectTitle(this.form.detect_title);
 
         this.open = true;
         this.title = "修改二级展示模块";
@@ -452,19 +455,11 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.id != null) {
-            updateIntuitiveDetectData(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            addIntuitiveDetectData(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
-          }
+          updateIntuitiveDetectDataView(this.form).then(response => {
+            this.$modal.msgSuccess("操作成功");
+            this.open = false;
+            this.getList();
+          });
         }
       });
     },

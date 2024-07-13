@@ -103,7 +103,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
       <el-table-column label="代号" align="center" width="60" prop="code" />
-      <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="名称" align="center" prop="name" min-width="300" :show-overflow-tooltip="true" />
       <el-table-column label="类型" align="center" width="60" prop="type">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.intuitive_detect_type" :value="scope.row.type"/>
@@ -119,7 +119,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="220" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

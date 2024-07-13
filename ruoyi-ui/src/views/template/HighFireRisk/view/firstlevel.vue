@@ -86,9 +86,9 @@
     <el-table v-loading="loading" :data="IntuitiveDetectDataList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
-      <el-table-column label="上级检测表" align="center" prop="detectTitle" :show-overflow-tooltip="true" :formatter="detectTitleFormat"/>
+      <el-table-column label="上级检测表" align="center" prop="detectTitle" min-width="300" :show-overflow-tooltip="true" :formatter="detectTitleFormat"/>
       <el-table-column label="编号" align="center"  width="60" prop="firstCode" />
-      <el-table-column label="内容" align="center" prop="firstContent" :show-overflow-tooltip="true" />
+      <el-table-column label="内容" align="center" prop="firstContent" min-width="300" :show-overflow-tooltip="true" />
       <el-table-column label="业主单元类型" align="center"  width="100"  prop="unitType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.high_risk_type" :value="scope.row.unitType"/>
@@ -99,7 +99,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="220" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

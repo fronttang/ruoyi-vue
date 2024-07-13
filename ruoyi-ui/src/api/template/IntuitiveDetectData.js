@@ -52,6 +52,15 @@ export function updateIntuitiveDetectData(data) {
   })
 }
 
+// 修改直观检测表内容
+export function updateIntuitiveDetectDataView(data) {
+  return request({
+    url: '/template/IntuitiveDetectData/view/edit',
+    method: 'put',
+    data: data
+  })
+}
+
 // 删除直观检测表内容
 export function delIntuitiveDetectData(id) {
   return request({

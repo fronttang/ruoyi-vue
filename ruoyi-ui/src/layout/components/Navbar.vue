@@ -126,12 +126,12 @@ export default {
         key: 'projectId',
         value: value
       })
-      this.$tab.closePage();
+      //this.$tab.closePage();
       this.$tab.closeAllPage();
-      this.$tab.closeOtherPage();
+      //this.$tab.closeOtherPage();
       this.$tab.openPage("首页", "/index");
       //this.$tab.closeOtherPage();
-      //this.$tab.refreshPage();
+      this.$tab.refreshPage();
     },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {

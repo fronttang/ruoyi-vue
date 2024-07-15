@@ -42,7 +42,7 @@ const permission = {
       state.sidebarRouters = state.sidebarRouters.filter(
         (item) => item.path !== routePath
       );
-    },
+    }
   },
   actions: {
     // 生成路由
@@ -110,6 +110,7 @@ const permission = {
           commit("UPDATE_SETTING_ROUTES", [settingRoutes, 12]);
           resolve(settingRoutes);
         });
+
       });
     },
   }

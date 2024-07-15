@@ -244,6 +244,20 @@ export const dynamicRoutes = [
         meta: { title: '二级展示模块', activeMenu: '/template/Template' }
       }
     ]
+  },
+  {
+    path: '/report/danger',
+    component: Layout,
+    hidden: true,
+    permissions: ['report:report:list'],
+    children: [
+      {
+        path: 'index/:unitId(\\d+)',
+        component: () => import('@/views/report/danger/index'),
+        name: 'OwnerUnitReportDanger',
+        meta: { title: '隐患数据汇总', activeMenu: '/report/Initial' }
+      }
+    ]
   }
 ]
 

@@ -6,18 +6,6 @@
     <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
 
     <div class="right-menu">
-      <template >
-        <div class="right-menu-item">
-          <el-select v-model="projectId" placeholder="请选择项目" filterable class="right-menu-item" @change="handleProjectChange">
-            <el-option class="right-menu-item"
-              v-for="item in projectDict"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </div>
-      </template>
       <template v-if="device!=='mobile'" >
         <!--<search id="header-search" class="right-menu-item" />
 
@@ -29,7 +17,7 @@
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
         </el-tooltip>
-        -->
+
 
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
 
@@ -37,7 +25,29 @@
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
 
+        -->
+
       </template>
+
+      <el-dropdown @command="handleChangeProject" class="avatar-container right-menu-item hover-effect" trigger="click">
+        <div class="avatar-wrapper" style="font-size: 14px;">
+          {{selectedProject}}
+          <i class="el-icon-arrow-down el-icon--right"></i>
+        </div>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item v-for="item in projectDict" :command="item" >{{item.name}}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+
+      <el-dropdown @command="handleChangeWorkerRole" class="avatar-container right-menu-item hover-effect" trigger="click">
+        <div class="avatar-wrapper" style="font-size: 14px;">
+          {{nickName}}
+          <i class="el-icon-arrow-down el-icon--right"></i>
+        </div>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item v-for="item in workerRoles" :command="item" >{{item.dictLabel}}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
@@ -70,18 +80,22 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import { getProjectWorkerRole } from "@/api/project/ProjectWorker";
 
 export default {
   data() {
     return {
+      selectedProject: "请选择项目",
       projectId: this.$store.state.settings.projectId,
-      projectDict: this.$store.state.user.projects
+      projectDict: this.$store.state.user.projects,
+      nickName: this.$store.state.user.nickName,
+      workerRoles: []
     };
   },
   created(){
     if(this.projectDict != null && this.projectDict.length > 0){
       this.projectId = this.projectDict[0].id;
-      this.handleProjectChange(this.projectId);
+      this.handleChangeProject(this.projectDict[0]);
     }
   },
   components: {
@@ -121,17 +135,25 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    handleProjectChange(value){
+    handleChangeProject(project){
       this.$store.dispatch('settings/changeSetting', {
         key: 'projectId',
-        value: value
+        value: project.id
       })
-      //this.$tab.closePage();
+
+      getProjectWorkerRole(project.id).then((res) => {
+        this.workerRoles = res.data;
+      });
+
+      this.selectedProject = project.name;
       this.$tab.closeAllPage();
       //this.$tab.closeOtherPage();
       this.$tab.openPage("首页", "/index");
       //this.$tab.closeOtherPage();
       this.$tab.refreshPage();
+    },
+    handleChangeWorkerRole(role){
+      console.log(role.dictLabel);
     },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {

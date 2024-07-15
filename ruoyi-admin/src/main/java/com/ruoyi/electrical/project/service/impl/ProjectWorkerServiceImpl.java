@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.domain.ProjectWorker;
@@ -160,5 +161,10 @@ public class ProjectWorkerServiceImpl implements IProjectWorkerService {
 	@Override
 	public int deleteProjectWorkerById(Long id) {
 		return projectWorkerMapper.deleteProjectWorkerById(id);
+	}
+
+	@Override
+	public List<SysDictData> selectProjectWorkerRoleDict(Long projectId, Long userId) {
+		return projectWorkerMapper.selectProjectWorkerRoleDict(projectId, userId);
 	}
 }

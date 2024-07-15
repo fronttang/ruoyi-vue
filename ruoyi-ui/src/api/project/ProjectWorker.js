@@ -51,3 +51,11 @@ export function saveProjectWorkerArea(data) {
     data: data
   })
 }
+
+// 查询项目工作人员角色
+export function getProjectWorkerRole(projectId) {
+  return request({
+    url: '/project/ProjectWorker/setting/' + projectId,
+    method: 'get'
+  })
+}

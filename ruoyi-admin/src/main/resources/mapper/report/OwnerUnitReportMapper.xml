@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.report.mapper.OwnerUnitReportMapper">
+    
+    <resultMap type="com.ruoyi.electrical.vo.OwnerUnitReportVo" id="OwnerUnitReportVo">
+        <result property="reportId"    column="report_id"    />
+        <result property="unitId"    column="unit_id"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="status"    column="status"    />
+        <result property="type"    column="type"    />
+        <result property="highRiskType"    column="high_risk_type"    />
+        <result property="name"    column="name"    />
+        <result property="district"    column="district"    />
+        <result property="street"    column="street"    />
+        <result property="community"    column="community"    />
+        <result property="hamlet"    column="hamlet"    />
+    </resultMap>
+    
+    <resultMap type="OwnerUnitReport" id="OwnerUnitReportResult">
+        <result property="id"    column="id"    />
+        <result property="unitId"    column="unit_id"    />
+        <result property="isDangerNotice"    column="is_danger_notice"    />
+        <result property="isComplete"    column="is_complete"    />
+        <result property="isTest"    column="is_test"    />
+        <result property="isTestReason"    column="is_test_reason"    />
+        <result property="type"    column="type"    />
+        <result property="code"    column="code"    />
+        <result property="detectData"    column="detect_data"    />
+        <result property="detectStatus"    column="detect_status"    />
+        <result property="inspector"    column="inspector"    />
+        <result property="inspectorId"    column="inspector_id"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+	<sql id="selectOwnerUnitReportVo">
+        select id, unit_id, is_danger_notice, is_complete, is_test, is_test_reason, type, code, detect_data, detect_status, inspector, inspector_id, status, create_by, create_time, update_by, update_time from owner_unit_report
+    </sql>
+
+    <select id="selectOwnerUnitReportList" parameterType="com.ruoyi.electrical.dto.OwnerUnitReportDto" resultMap="OwnerUnitReportVo">
+    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,
+    	u.district, u.street, u.community, u.hamlet,
+    	CASE WHEN r.status is null THEN 0 ELSE r.status END as status 
+        from owner_unit u left join owner_unit_report r on (r.unit_id = u.id and r.type = #{type})
+        where u.project_id = #{projectId} ) t where 1=1
+        <if test="name != null and name != '' "> and t.name like concat('%', #{name}, '%')</if>
+         <if test="status != null  and status != ''"> and t.status = #{status}</if>
+         <if test="highRiskType != null  and highRiskType != ''"> and t.high_risk_type = #{highRiskType}</if>
+         <if test="district != null  and district != ''"> and t.district = #{district}</if>
+         <if test="street != null  and street != ''"> and t.street = #{street}</if>
+         <if test="community != null  and community != ''"> and t.community = #{community}</if>
+         <if test="hamlet != null  and hamlet != ''"> and t.hamlet = #{hamlet}</if>
+    </select>
+    
+    <select id="selectOwnerUnitReportByUnitIdAndType" resultMap="OwnerUnitReportResult">
+        <include refid="selectOwnerUnitReportVo"/>
+        where unit_id = #{unitId} and type = #{type} limit 1
+    </select>
+    
+    <insert id="insertOwnerUnitReport" parameterType="OwnerUnitReport">
+        insert into owner_unit_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="unitId != null">unit_id,</if>
+            <if test="isDangerNotice != null">is_danger_notice,</if>
+            <if test="isComplete != null">is_complete,</if>
+            <if test="isTest != null">is_test,</if>
+            <if test="isTestReason != null">is_test_reason,</if>
+            <if test="type != null">type,</if>
+            <if test="code != null">code,</if>
+            <if test="detectData != null">detect_data,</if>
+            <if test="detectStatus != null">detect_status,</if>
+            <if test="inspector != null">inspector,</if>
+            <if test="inspectorId != null">inspector_id,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="unitId != null">#{unitId},</if>
+            <if test="isDangerNotice != null">#{isDangerNotice},</if>
+            <if test="isComplete != null">#{isComplete},</if>
+            <if test="isTest != null">#{isTest},</if>
+            <if test="isTestReason != null">#{isTestReason},</if>
+            <if test="type != null">#{type},</if>
+            <if test="code != null">#{code},</if>
+            <if test="detectData != null">#{detectData},</if>
+            <if test="detectStatus != null">#{detectStatus},</if>
+            <if test="inspector != null">#{inspector},</if>
+            <if test="inspectorId != null">#{inspectorId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOwnerUnitReport" parameterType="OwnerUnitReport">
+        update owner_unit_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="unitId != null">unit_id = #{unitId},</if>
+            <if test="isDangerNotice != null">is_danger_notice = #{isDangerNotice},</if>
+            <if test="isComplete != null">is_complete = #{isComplete},</if>
+            <if test="isTest != null">is_test = #{isTest},</if>
+            <if test="isTestReason != null">is_test_reason = #{isTestReason},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="detectData != null">detect_data = #{detectData},</if>
+            <if test="detectStatus != null">detect_status = #{detectStatus},</if>
+            <if test="inspector != null">inspector = #{inspector},</if>
+            <if test="inspectorId != null">inspector_id = #{inspectorId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    
+</mapper>

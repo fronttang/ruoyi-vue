@@ -18,6 +18,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
+    
+    <resultMap type="SysDictData" id="SysDictDataResult">
+		<id     property="dictCode"   column="dict_code"   />
+		<result property="dictSort"   column="dict_sort"   />
+		<result property="dictLabel"  column="dict_label"  />
+		<result property="dictValue"  column="dict_value"  />
+		<result property="dictType"   column="dict_type"   />
+		<result property="cssClass"   column="css_class"   />
+		<result property="listClass"  column="list_class"  />
+		<result property="isDefault"  column="is_default"  />
+		<result property="status"     column="status"      />
+		<result property="createBy"   column="create_by"   />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy"   column="update_by"   />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
 
     <sql id="selectProjectWorkerVo">
         select w.id, w.project_id, w.detect_id, d.name as detect_name, w.user_id, u.user_name, u.nick_name, w.bind_type, w.create_by, w.create_time, w.update_by, w.update_time 
@@ -40,6 +56,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectProjectWorkerById" parameterType="Long" resultMap="ProjectWorkerResult">
         <include refid="selectProjectWorkerVo"/>
         where w.id = #{id}
+    </select>
+    
+    <select id="selectProjectWorkerRoleDict"  resultMap="SysDictDataResult">
+        select t.* from sys_dict_data t where t.dict_type = 'project_worker_bind_type' and t.dict_value in ( select bind_type from project_worker w where w.user_id = #{userId} and w.project_id = #{projectId})
     </select>
 
     <insert id="insertProjectWorker" parameterType="ProjectWorker">

@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.project.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.electrical.dto.ProjectWorkerAreaDto;
 import com.ruoyi.electrical.project.domain.ProjectWorker;
@@ -106,5 +109,19 @@ public class ProjectWorkerController extends BaseController {
 	@PostMapping("/area")
 	public AjaxResult saveProjectWorkerArea(@RequestBody @Valid ProjectWorkerAreaDto data) {
 		return toAjax(projectWorkerAreaService.saveProjectWorkerArea(data));
+	}
+
+	@GetMapping("/setting/{projectId}")
+	public AjaxResult changeProject(@PathVariable Long projectId) {
+
+		SysUser user = getLoginUser().getUser();
+
+		List<SysDictData> result = new ArrayList<SysDictData>();
+		// 工作人员
+		if ("02".equalsIgnoreCase(user.getUserType())) {
+			result = projectWorkerService.selectProjectWorkerRoleDict(projectId, user.getUserId());
+		}
+
+		return AjaxResult.success(result);
 	}
 }

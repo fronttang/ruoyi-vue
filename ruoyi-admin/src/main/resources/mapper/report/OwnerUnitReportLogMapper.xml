@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.report.mapper.OwnerUnitReportLogMapper">
+    
+    <resultMap type="OwnerUnitReportLog" id="OwnerUnitReportLogResult">
+        <result property="id"    column="id"    />
+        <result property="reportId"    column="report_id"    />
+        <result property="operator"    column="operator"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="operationType"    column="operation_type"    />
+        <result property="operatorRole"    column="operator_role"    />
+        <result property="operationPic"    column="operation_pic"    />
+        <result property="content"    column="content"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOwnerUnitReportLogVo">
+        select id, report_id, operator, operator_id, operation_type, operator_role, operation_pic, content, remark, create_by, create_time, update_by, update_time from owner_unit_report_log
+    </sql>
+
+    <select id="selectOwnerUnitReportLogList" parameterType="OwnerUnitReportLog" resultMap="OwnerUnitReportLogResult">
+        <include refid="selectOwnerUnitReportLogVo"/>
+        <where>  
+            <if test="reportId != null "> and report_id = #{reportId}</if>
+            <if test="operator != null  and operator != ''"> and operator = #{operator}</if>
+            <if test="operatorId != null "> and operator_id = #{operatorId}</if>
+            <if test="operationType != null  and operationType != ''"> and operation_type = #{operationType}</if>
+            <if test="operatorRole != null  and operatorRole != ''"> and operator_role = #{operatorRole}</if>
+            <if test="operationPic != null  and operationPic != ''"> and operation_pic = #{operationPic}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+        </where>
+    </select>
+    
+    <select id="selectOwnerUnitReportLogById" parameterType="Long" resultMap="OwnerUnitReportLogResult">
+        <include refid="selectOwnerUnitReportLogVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectOwnerUnitReportLogByReportId" parameterType="Long" resultMap="OwnerUnitReportLogResult">
+        <include refid="selectOwnerUnitReportLogVo"/>
+        where report_id = #{reportId}
+    </select>
+
+    <insert id="insertOwnerUnitReportLog" parameterType="OwnerUnitReportLog" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_unit_report_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">report_id,</if>
+            <if test="operator != null">operator,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="operationType != null">operation_type,</if>
+            <if test="operatorRole != null">operator_role,</if>
+            <if test="operationPic != null">operation_pic,</if>
+            <if test="content != null">content,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">#{reportId},</if>
+            <if test="operator != null">#{operator},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="operationType != null">#{operationType},</if>
+            <if test="operatorRole != null">#{operatorRole},</if>
+            <if test="operationPic != null">#{operationPic},</if>
+            <if test="content != null">#{content},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOwnerUnitReportLog" parameterType="OwnerUnitReportLog">
+        update owner_unit_report_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reportId != null">report_id = #{reportId},</if>
+            <if test="operator != null">operator = #{operator},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="operationType != null">operation_type = #{operationType},</if>
+            <if test="operatorRole != null">operator_role = #{operatorRole},</if>
+            <if test="operationPic != null">operation_pic = #{operationPic},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOwnerUnitReportLogById" parameterType="Long">
+        delete from owner_unit_report_log where id = #{id}
+    </delete>
+
+    <delete id="deleteOwnerUnitReportLogByIds" parameterType="String">
+        delete from owner_unit_report_log where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

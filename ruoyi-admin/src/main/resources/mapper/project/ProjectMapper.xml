@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
-
+    
     <sql id="selectProjectVo">
         select p.id, p.name, p.type, p.detect_id, d.name as detect_name, p.household_rate, p.template_id, p.create_by, p.create_time, p.update_by, p.update_time 
         from project p left join detect_unit d on p.detect_id=d.id 
@@ -42,7 +42,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectProjectDict"  resultType="com.ruoyi.electrical.vo.DictVO">
         select id, name from project
     </select>
-
+    
+    <select id="selectProjectDictByDetectId"  resultType="com.ruoyi.electrical.vo.DictVO">
+        select id, name from project where detect_id = #{detectId}
+    </select>
+    
+    <select id="selectProjectDictByWorkerId"  resultType="com.ruoyi.electrical.vo.DictVO">
+        select id, name from project p where  exists (select project_id from project_worker w where w.project_id = p.id and w.user_id = #{userId})
+    </select>
+    
     <insert id="insertProject" parameterType="Project" useGeneratedKeys="true" keyProperty="id">
         insert into project
         <trim prefix="(" suffix=")" suffixOverrides=",">

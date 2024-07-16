@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.mapper.ProjectMapper;
 import com.ruoyi.electrical.project.service.IProjectService;
@@ -54,6 +55,7 @@ public class ProjectServiceImpl implements IProjectService {
 	 */
 	@Override
 	public int insertProject(Project project) {
+		project.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 		project.setCreateTime(DateUtils.getNowDate());
 		project.setUpdateTime(DateUtils.getNowDate());
 		return projectMapper.insertProject(project);

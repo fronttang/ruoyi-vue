@@ -2,6 +2,8 @@ package com.ruoyi.electrical.project.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.electrical.project.mapper.OwnerUnitMapper;
@@ -49,6 +51,7 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 	 */
 	@Override
 	public int insertOwnerUnit(OwnerUnit ownerUnit) {
+		ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 		ownerUnit.setCreateTime(DateUtils.getNowDate());
 		ownerUnit.setUpdateTime(DateUtils.getNowDate());
 		return ownerUnitMapper.insertOwnerUnit(ownerUnit);

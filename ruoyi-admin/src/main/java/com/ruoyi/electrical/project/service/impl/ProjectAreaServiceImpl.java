@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.electrical.project.domain.AreaDict;
 import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.project.mapper.ProjectAreaMapper;
@@ -53,6 +54,7 @@ public class ProjectAreaServiceImpl implements IProjectAreaService {
 	 */
 	@Override
 	public int insertProjectArea(ProjectArea projectArea) {
+		projectArea.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 		projectArea.setCreateTime(DateUtils.getNowDate());
 		projectArea.setUpdateTime(DateUtils.getNowDate());
 		return projectAreaMapper.insertProjectArea(projectArea);

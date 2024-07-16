@@ -5,7 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -106,7 +105,6 @@ public class UserController extends BaseController {
 	/**
 	 * 修改账号
 	 */
-	@PreAuthorize("@ss.hasPermi('projectrole:detectUnitUser:edit')")
 	@Log(title = "账号", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody DetectUnitUser detectUnitUser) {
@@ -125,7 +123,6 @@ public class UserController extends BaseController {
 	/**
 	 * 删除账号
 	 */
-	@PreAuthorize("@ss.hasPermi('projectrole:detectUnitUser:remove')")
 	@Log(title = "账号", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
 	public AjaxResult remove(@PathVariable Long[] ids) {

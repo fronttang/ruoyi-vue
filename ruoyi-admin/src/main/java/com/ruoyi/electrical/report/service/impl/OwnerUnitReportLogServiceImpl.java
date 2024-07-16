@@ -2,6 +2,8 @@ package com.ruoyi.electrical.report.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.electrical.report.mapper.OwnerUnitReportLogMapper;
@@ -51,7 +53,9 @@ public class OwnerUnitReportLogServiceImpl implements IOwnerUnitReportLogService
 	 */
 	@Override
 	public int insertOwnerUnitReportLog(OwnerUnitReportLog ownerUnitReportLog) {
+		ownerUnitReportLog.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 		ownerUnitReportLog.setCreateTime(DateUtils.getNowDate());
+		ownerUnitReportLog.setUpdateTime(DateUtils.getNowDate());
 		return ownerUnitReportLogMapper.insertOwnerUnitReportLog(ownerUnitReportLog);
 	}
 

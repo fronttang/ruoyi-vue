@@ -3,6 +3,7 @@ package com.ruoyi.electrical.report.service;
 import java.util.List;
 
 import com.ruoyi.electrical.dto.OwnerUnitReportDto;
+import com.ruoyi.electrical.dto.OwnerUnitReportPassDto;
 import com.ruoyi.electrical.report.domain.OwnerUnitReport;
 import com.ruoyi.electrical.vo.OwnerUnitReportVo;
 
@@ -23,5 +24,9 @@ public interface IOwnerUnitReportService {
 	public List<OwnerUnitReportVo> selectOwnerUnitReportList(OwnerUnitReportDto ownerUnitReport);
 
 	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndType(Long unitId, String type);
+
+	public boolean pass(Long reportId);
+
+	public boolean notPass(OwnerUnitReportPassDto data);
 
 }

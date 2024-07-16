@@ -1,14 +1,20 @@
 package com.ruoyi.electrical.role.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
-import com.ruoyi.common.utils.DateUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.electrical.role.domain.DetectUnitUser;
 import com.ruoyi.electrical.role.mapper.DetectUnitUserMapper;
 import com.ruoyi.electrical.role.service.IDetectUnitUserService;
 import com.ruoyi.electrical.vo.DictVO;
+import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.mapper.SysUserRoleMapper;
 
 /**
  * 检测单位账号Service业务层处理
@@ -18,8 +24,12 @@ import com.ruoyi.electrical.vo.DictVO;
  */
 @Service
 public class DetectUnitUserServiceImpl implements IDetectUnitUserService {
+
 	@Autowired
 	private DetectUnitUserMapper detectUnitUserMapper;
+
+	@Autowired
+	private SysUserRoleMapper userRoleMapper;
 
 	/**
 	 * 查询检测单位账号
@@ -50,10 +60,21 @@ public class DetectUnitUserServiceImpl implements IDetectUnitUserService {
 	 * @return 结果
 	 */
 	@Override
+	@Transactional
 	public int insertDetectUnitUser(DetectUnitUser detectUnitUser) {
+
+		detectUnitUser.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 		detectUnitUser.setCreateTime(DateUtils.getNowDate());
 		detectUnitUser.setUpdateTime(DateUtils.getNowDate());
-		return detectUnitUserMapper.insertDetectUnitUser(detectUnitUser);
+
+		detectUnitUserMapper.insertDetectUnitUser(detectUnitUser);
+
+		SysUserRole role = new SysUserRole();
+		role.setUserId(detectUnitUser.getId());
+		role.setRoleId(Long.valueOf("1" + detectUnitUser.getType()));
+		userRoleMapper.batchUserRole(Arrays.asList(role));
+
+		return 1;
 	}
 
 	/**

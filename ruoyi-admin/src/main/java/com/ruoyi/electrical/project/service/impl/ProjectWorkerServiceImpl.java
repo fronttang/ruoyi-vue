@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.domain.ProjectWorker;
 import com.ruoyi.electrical.project.domain.ProjectWorkerArea;
@@ -119,6 +120,7 @@ public class ProjectWorkerServiceImpl implements IProjectWorkerService {
 			projectWorker.setUserId(userId);
 			List<ProjectWorker> workList = projectWorkerMapper.selectProjectWorkerList(projectWorker);
 			if (CollectionUtils.isEmpty(workList)) {
+				projectWorker.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 				projectWorker.setCreateTime(DateUtils.getNowDate());
 				projectWorker.setUpdateTime(DateUtils.getNowDate());
 				projectWorkerMapper.insertProjectWorker(projectWorker);

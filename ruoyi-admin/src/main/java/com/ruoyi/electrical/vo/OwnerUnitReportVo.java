@@ -38,7 +38,7 @@ public class OwnerUnitReportVo {
 	/**
 	 * 是否有驳回记录（前端需要显示是否驳回）
 	 */
-	private String isReject;
+	private String reject;
 
 	/**
 	 * 检测单位ID

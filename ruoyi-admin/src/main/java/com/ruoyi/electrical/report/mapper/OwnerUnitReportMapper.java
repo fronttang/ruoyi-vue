@@ -32,7 +32,17 @@ public interface OwnerUnitReportMapper {
 	 */
 	public int insertOwnerUnitReport(OwnerUnitReport ownerUnitReport);
 
+	/**
+	 * 更新报告
+	 * 
+	 * @param ownerUnitReport
+	 * @return
+	 */
+	public int updateOwnerUnitReport(OwnerUnitReport ownerUnitReport);
+
 	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndType(@Param("unitId") Long unitId,
 			@Param("type") String type);
+
+	public OwnerUnitReport selectOwnerUnitReportById(Long id);
 
 }

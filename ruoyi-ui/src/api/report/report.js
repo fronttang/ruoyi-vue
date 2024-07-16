@@ -23,3 +23,18 @@ export function getReportLogs(reportId) {
     method: 'get'
   })
 }
+
+export function passReport(reportId) {
+  return request({
+    url: '/report/pass/' + reportId,
+    method: 'get'
+  })
+}
+
+export function notPassReport(data) {
+  return request({
+    url: '/report/notpass/',
+    method: 'post',
+    params: data
+  })
+}

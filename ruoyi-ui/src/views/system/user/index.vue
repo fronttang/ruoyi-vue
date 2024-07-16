@@ -1,34 +1,5 @@
 <template>
   <div class="app-container">
-    <el-row :gutter="20">
-      <!--部门数据-->
-      <el-col :span="4" :xs="24">
-        <div class="head-container">
-          <el-input
-            v-model="deptName"
-            placeholder="请输入部门名称"
-            clearable
-            size="small"
-            prefix-icon="el-icon-search"
-            style="margin-bottom: 20px"
-          />
-        </div>
-        <div class="head-container">
-          <el-tree
-            :data="deptOptions"
-            :props="defaultProps"
-            :expand-on-click-node="false"
-            :filter-node-method="filterNode"
-            ref="tree"
-            node-key="id"
-            default-expand-all
-            highlight-current
-            @node-click="handleNodeClick"
-          />
-        </div>
-      </el-col>
-      <!--用户数据-->
-      <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
           <el-form-item label="用户名称" prop="userName">
             <el-input
@@ -113,7 +84,7 @@
               v-hasPermi="['system:user:remove']"
             >删除</el-button>
           </el-col>
-          <el-col :span="1.5">
+          <el-col :span="1.5" v-if="false">
             <el-button
               type="info"
               plain
@@ -184,7 +155,7 @@
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="handleResetPwd" icon="el-icon-key"
                     v-hasPermi="['system:user:resetPwd']">重置密码</el-dropdown-item>
-                  <el-dropdown-item command="handleAuthRole" icon="el-icon-circle-check"
+                  <el-dropdown-item command="handleAuthRole" icon="el-icon-circle-check" v-if="false"
                     v-hasPermi="['system:user:edit']">分配角色</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -199,8 +170,6 @@
           :limit.sync="queryParams.pageSize"
           @pagination="getList"
         />
-      </el-col>
-    </el-row>
 
     <!-- 添加或修改用户配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
@@ -263,34 +232,6 @@
                   :label="dict.value"
                 >{{dict.label}}</el-radio>
               </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="岗位">
-              <el-select v-model="form.postIds" multiple placeholder="请选择岗位">
-                <el-option
-                  v-for="item in postOptions"
-                  :key="item.postId"
-                  :label="item.postName"
-                  :value="item.postId"
-                  :disabled="item.status == 1"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择角色">
-                <el-option
-                  v-for="item in roleOptions"
-                  :key="item.roleId"
-                  :label="item.roleName"
-                  :value="item.roleId"
-                  :disabled="item.status == 1"
-                ></el-option>
-              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -407,6 +348,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        userType: '00',
         userName: undefined,
         phonenumber: undefined,
         status: undefined,
@@ -417,7 +359,7 @@ export default {
         { key: 0, label: `用户编号`, visible: true },
         { key: 1, label: `用户名称`, visible: true },
         { key: 2, label: `用户昵称`, visible: true },
-        { key: 3, label: `部门`, visible: true },
+        { key: 3, label: `部门`, visible: false },
         { key: 4, label: `手机号码`, visible: true },
         { key: 5, label: `状态`, visible: true },
         { key: 6, label: `创建时间`, visible: true }
@@ -523,7 +465,7 @@ export default {
         status: "0",
         remark: undefined,
         postIds: [],
-        roleIds: []
+        roleIds: [2]
       };
       this.resetForm("form");
     },
@@ -578,8 +520,8 @@ export default {
         this.form = response.data;
         this.postOptions = response.posts;
         this.roleOptions = response.roles;
-        this.$set(this.form, "postIds", response.postIds);
-        this.$set(this.form, "roleIds", response.roleIds);
+        //this.$set(this.form, "postIds", response.postIds);
+        //this.$set(this.form, "roleIds", response.roleIds);
         this.open = true;
         this.title = "修改用户";
         this.form.password = "";

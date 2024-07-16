@@ -59,3 +59,11 @@ export function getProjectWorkerRole(projectId) {
     method: 'get'
   })
 }
+
+export function setProjectWorkerRole(data) {
+  return request({
+    url: '/project/ProjectWorker/setting/role',
+    method: 'post',
+    data: data
+  })
+}

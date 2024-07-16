@@ -41,7 +41,7 @@
 
       <el-dropdown @command="handleChangeWorkerRole" class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper" style="font-size: 14px;">
-          {{nickName}}
+          {{nickName}}{{workerRoleName}}
           <i class="el-icon-arrow-down el-icon--right"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -80,7 +80,7 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
-import { getProjectWorkerRole } from "@/api/project/ProjectWorker";
+import { getProjectWorkerRole, setProjectWorkerRole } from "@/api/project/ProjectWorker";
 
 export default {
   data() {
@@ -89,7 +89,8 @@ export default {
       projectId: this.$store.state.settings.projectId,
       projectDict: this.$store.state.user.projects,
       nickName: this.$store.state.user.nickName,
-      workerRoles: []
+      workerRoles: [],
+      workerRoleName: ''
     };
   },
   created(){
@@ -143,6 +144,9 @@ export default {
 
       getProjectWorkerRole(project.id).then((res) => {
         this.workerRoles = res.data;
+        if(this.workerRoles != null && this.workerRoles.length > 0){
+          this.handleChangeWorkerRole(this.workerRoles[0]);
+        }
       });
 
       this.selectedProject = project.name;
@@ -153,7 +157,13 @@ export default {
       this.$tab.refreshPage();
     },
     handleChangeWorkerRole(role){
-      console.log(role.dictLabel);
+      var data = {
+        id: role.dictValue,
+        name: role.dictLabel
+      }
+      setProjectWorkerRole(data).then((res) => {
+        this.workerRoleName = '（' + role.dictLabel + '）';
+      });
     },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {

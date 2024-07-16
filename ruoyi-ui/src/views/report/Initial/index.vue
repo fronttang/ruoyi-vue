@@ -115,11 +115,7 @@
           <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" width="120" >
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.owner_unit_report_status" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="状态" align="center" prop="status" width="150" :formatter="statusFormat" />
       <el-table-column label="操作" align="center" fixed="right"  width="220" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -183,9 +179,9 @@
               <el-collapse accordion>
                 <el-collapse-item :title="item.content" :name="index">
                   <div>
-                    <h4 v-if="item.remark != null && item.remark != ''">驳回原因 {item.remark}</h4>
+                    <p v-if="item.remark != null && item.remark != ''">驳回原因：{{item.remark}}</p>
                     <p v-if="item.operationPic != null && item.operationPic != ''">
-
+                      相关图片：<image-preview :src="item.operationPic" :width="50" :height="50"/>
                     </p>
                   </div>
                 </el-collapse-item>
@@ -193,7 +189,7 @@
             </el-timeline-item>
           </el-timeline>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" v-if="form.status !== '3'">
           <el-form ref="form" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="驳回原因" label-width="100px" prop="remark">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入驳回原因" />
@@ -202,10 +198,9 @@
               <image-upload v-model="form.operationPic" />
             </el-form-item>
           </el-form>
-          <div >
-            <el-button type="primary" @click="submitForm">通过</el-button>
-            <el-button @click="cancel">驳回至检测员</el-button>
-            <el-button @click="cancel">驳回至项目经理</el-button>
+          <div>
+            <el-button type="primary" @click="handlePass">通过</el-button>
+            <el-button v-if="form.status !== '0'" @click="handleNotPass">驳回</el-button>
           </div>
         </el-col>
       </el-row>
@@ -215,13 +210,17 @@
 <style>
 .el-collapse-item__header{
 border-bottom:0px;
+height: 35px;
 }
 .el-collapse-item__arrow {
 display:none;
 }
+.el-timeline-item {
+padding-bottom: 0px;
+}
 </style>
 <script>
-import { listReport, getReport, getReportLogs} from "@/api/report/report";
+import { listReport, getReport, getReportLogs, passReport, notPassReport} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
@@ -329,17 +328,36 @@ export default {
       this.open = false;
       this.reset();
     },
-    submitForm(){
-
+    handleNotPass(){
+      notPassReport(this.form).then(response => {
+        this.$modal.msgSuccess("操作成功");
+        this.open = false;
+        this.getList();
+      });
+    },
+    handlePass(){
+      passReport(this.form.reportId).then(response => {
+        this.$modal.msgSuccess("操作成功");
+        this.open = false;
+        this.getList();
+      });
     },
     // 表单重置
     reset() {
       this.form = {
         reportId: null,
         remark: null,
-        operationPic: null
+        operationPic: null,
+        status: null
       };
       this.resetForm("form");
+    },
+    statusFormat(row){
+      var statusName =  this.selectDictLabel(this.dict.type.owner_unit_report_status, row.status);
+      if(row.reject === '1'){
+        statusName = statusName + "（被驳回）";
+      }
+      return statusName;
     },
     detectFormat(row){
       return this.selectDictVoLabel(this.detectUnitDict, row.detectId);
@@ -377,7 +395,9 @@ export default {
       this.multiple = !selection.length
     },
     handleAudit(row){
+      this.reset();
       this.form.reportId = row.unitId;
+      this.form.status = row.status;
       this.queryReportForm = {
         unitId: row.unitId,
         type: '1'

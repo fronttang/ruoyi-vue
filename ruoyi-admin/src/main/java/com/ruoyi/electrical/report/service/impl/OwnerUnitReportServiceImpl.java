@@ -80,7 +80,7 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 	}
 
 	/**
-	 * 操作类型 1初检 2提交初审 3初审驳回 4初审通过提交复审 5复审驳回 6完成复审
+	 * 操作类型 1初检 2提交初审 3初审驳回 4初审通过提交复审 5复审驳回 6完成复审 7重置为未初审核
 	 * 
 	 * 报告状态 0未审核，1待初审 2待复审 3完成
 	 */
@@ -221,6 +221,76 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 		reportLogMapper.insertOwnerUnitReportLog(reportLog);
 
 		return true;
+	}
+
+	/**
+	 * 7重置为未初审
+	 */
+	@Override
+	@Transactional
+	public boolean resetStatusOwnerUnitReportByUnitIdAndType(Long unitId, String type) {
+
+		LoginUser loginUser = SecurityUtils.getLoginUser();
+
+		OwnerUnitReport report = ownerUnitReportMapper.selectOwnerUnitReportByUnitIdAndType(unitId, type);
+		if (report == null) {
+			report = new OwnerUnitReport();
+			report.setId(IdUtil.getSnowflake().nextId());
+			report.setType(type);
+			report.setInspector(loginUser.getUser().getNickName());
+			report.setInspectorId(loginUser.getUserId());
+			report.setUnitId(unitId);
+			report.setDetectData(new Date());
+			report.setDetectStatus("0");
+			report.setStatus("0");
+			report.setCreateTime(DateUtils.getNowDate());
+			report.setUpdateTime(DateUtils.getNowDate());
+
+			ownerUnitReportMapper.insertOwnerUnitReport(report);
+		} else {
+
+			OwnerUnitReport update = new OwnerUnitReport();
+			update.setId(report.getId());
+			update.setStatus("0");
+			update.setUpdateBy(String.valueOf(SecurityUtils.getUserId()));
+			update.setUpdateTime(DateUtils.getNowDate());
+
+			SysUser user = SecurityUtils.getLoginUser().getUser();
+
+			WorkerRoleSettingDto workerRole = redisCache
+					.getCacheObject(CacheConstants.USER_PROJECT_ROLE_KEY + user.getUserId());
+
+			String workerRoleId = "";
+			String workerRoleName = "";
+
+			if (workerRole != null) {
+				workerRoleId = workerRole.getId();
+				workerRoleName = workerRole.getName();
+			}
+
+			OwnerUnitReportLog reportLog = new OwnerUnitReportLog();
+			reportLog.setReportId(report.getId());
+			reportLog.setOperator(user.getNickName());
+			reportLog.setOperatorId(user.getUserId());
+			reportLog.setOperatorRole(workerRoleId);
+			reportLog.setRemark(null);
+			reportLog.setOperationPic(null);
+			reportLog.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+			reportLog.setCreateTime(DateUtils.getNowDate());
+			reportLog.setOperationType("7");// 7重置为未初审
+			reportLog.setContent(StrUtil.format("由{}（{}）重置为未审核", workerRoleName, user.getNickName()));
+
+			ownerUnitReportMapper.updateOwnerUnitReport(update);
+			// 添加日志
+			reportLogMapper.insertOwnerUnitReportLog(reportLog);
+		}
+		return true;
+
+	}
+
+	@Override
+	public OwnerUnitReport selectOwnerUnitReportById(Long id) {
+		return ownerUnitReportMapper.selectOwnerUnitReportById(id);
 	}
 
 }

@@ -45,6 +45,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectIntuitiveDetectDangerVo"/>
         where data_id = #{dataId}
     </select>
+    
+    <select id="countDangersByDataId" parameterType="Long" resultType="Long">
+         select count(1) from owner_unit_danger d where exists (
+			select dd.id from intuitive_detect_danger dd left join intuitive_detect_data da on da.id = dd.data_id where dd.id = d.danger_id and da.id = #{dataId}
+		)
+    </select>
 
     <insert id="insertIntuitiveDetectDanger" parameterType="IntuitiveDetectDanger" useGeneratedKeys="true" keyProperty="id">
         insert into intuitive_detect_danger

@@ -164,6 +164,11 @@ export default {
       setProjectWorkerRole(data).then((res) => {
         this.workerRoleName = '（' + role.dictLabel + '）';
       });
+
+      this.$store.dispatch('settings/changeSetting', {
+        key: 'workerRoleId',
+        value: role.dictValue
+      })
     },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {

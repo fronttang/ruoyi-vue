@@ -151,13 +151,13 @@
             size="medium"
             type="text"
             icon="iconfont iconfont-download"
-            @click="handleDownloadOriginalRecords(scope.row)"
+            @click="handleUpdate(scope.row)"
           ></el-button>
-          <el-button v-if="scope.row.status !== '0' && workerRoleId === '2'"
+          <el-button
             size="medium"
             type="text"
             icon="iconfont iconfont-reload"
-            @click="handleResetStatus(scope.row)"
+            @click="handleUpdate(scope.row)"
           ></el-button>
         </template>
       </el-table-column>
@@ -173,7 +173,7 @@
 
     <el-dialog title="" :visible.sync="open" width="800px" append-to-body>
       <el-row>
-        <el-col :span="form.status !== '3'? 12 : 24">
+        <el-col :span="12">
           <el-timeline :data="reportLogs" v-for="(item,index) in reportLogs" >
             <el-timeline-item :timestamp="item.createTime" placement="top">
               <el-collapse accordion>
@@ -198,7 +198,7 @@
               <image-upload v-model="form.operationPic" />
             </el-form-item>
           </el-form>
-          <div style="padding-left: 100px;">
+          <div>
             <el-button type="primary" @click="handlePass">通过</el-button>
             <el-button v-if="form.status !== '0'" @click="handleNotPass">驳回</el-button>
           </div>
@@ -220,7 +220,7 @@ padding-bottom: 0px;
 }
 </style>
 <script>
-import { listReport, getReport, getReportLogs, passReport, notPassReport, resetReportStatus} from "@/api/report/report";
+import { listReport, getReport, getReportLogs, passReport, notPassReport} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
@@ -229,20 +229,6 @@ import DictMeta from '@/utils/dict/DictMeta'
 export default {
   name: "OwnerUnit",
   dicts: ['high_risk_type', 'owner_unit_report_status'],
-  computed: {
-    workerRole() {
-      return this.$store.state.settings.workerRoleId;
-    },
-  },
-  watch: {
-    workerRole: {
-      handler(newVal, oldVal) {
-        if (!newVal || newVal == oldVal) return;
-        this.workerRoleId = newVal;
-      },
-      immediate: true,
-    },
-  },
   data() {
     return {
       // 遮罩层
@@ -268,7 +254,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      workerRoleId: this.$store.state.settings.workerRoleId,
       projectInfo: {
 
       },
@@ -277,7 +262,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        type: '1',
+        type: '2',
         highRiskType: null,
         projectId: this.$store.state.settings.projectId,
         status: null,
@@ -419,55 +404,27 @@ export default {
     handleAudit(row){
       this.reset();
       this.form.status = row.status;
-      if(row.reportId != null){
-        this.form.reportId = row.reportId;
-        getReportLogs(row.reportId).then(response => {
+      this.queryReportForm = {
+        unitId: row.unitId,
+        type: '2'
+      }
+      getReport(this.queryReportForm).then(response => {
+        this.report = response.data;
+        this.form.reportId = this.report.id;
+        getReportLogs(this.report.id).then(response => {
           this.reportLogs = response.data;
           this.open = true;
         });
-      } else {
-        this.queryReportForm = {
-          unitId: row.unitId,
-          type: '1'
-        }
-        getReport(this.queryReportForm).then(response => {
-          this.report = response.data;
-          this.form.reportId = this.report.id;
-          getReportLogs(this.report.id).then(response => {
-            this.reportLogs = response.data;
-            this.open = true;
-          });
-        });
-      }
+      });
+
     },
     handleUpdate(row){
 
-    },
-    handleResetStatus(row){
-      this.$modal.confirm('确认重置业主单元"' + row.name + '"的初检报告状态为未审核吗？').then(function() {
-        return resetReportStatus(row.unitId, "1");
-      }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("重置成功");
-      }).catch(() => {});
     },
     handleChooseRow(row){
       const unitId = row.unitId;
       const params = {};
       this.$tab.openPage("隐患数据汇总", '/report/danger/index/' + unitId, params);
-    },
-    handleDownloadOriginalRecords(row){
-      if(row.reportId != null){
-        this.download('report/download/originalRecords/' + row.reportId, {}, `电检原始记录报告.docx`)
-      } else {
-        this.queryReportForm = {
-          unitId: row.unitId,
-          type: '1'
-        }
-        getReport(this.queryReportForm).then(response => {
-          this.download('report/download/originalRecords/' + this.report.id, {}, `电检原始记录报告.docx`)
-        });
-      }
     }
   }
 };

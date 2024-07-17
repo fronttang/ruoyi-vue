@@ -137,7 +137,6 @@
                   @click="handleAddDanger"
                 >新增</el-button>
               </el-col>
-              </el-col>
             </el-row>
 
             <el-table v-loading="loading" :data="IntuitiveDetectDangerList">

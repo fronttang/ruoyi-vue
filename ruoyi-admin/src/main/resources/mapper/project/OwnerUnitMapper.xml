@@ -56,6 +56,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="propertyName"    column="property_name"    />
         <result property="panoramaPic"    column="panorama_pic"    />
         <result property="stationPic"    column="station_pic"    />
+        <result property="temperature"    column="temperature"    />
+        <result property="humidity"    column="humidity"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -63,7 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, name, type, detect_id, detect_name, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
+        select id, name, type, detect_id, detect_name, temperature, humidity, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">

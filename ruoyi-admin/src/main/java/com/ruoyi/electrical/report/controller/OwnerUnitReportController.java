@@ -87,4 +87,13 @@ public class OwnerUnitReportController extends BaseController {
 
 		return AjaxResult.success();
 	}
+
+	@GetMapping("/reset/status/{unitId}/{type}")
+	public AjaxResult resetStatus(@PathVariable("unitId") Long unitId, @PathVariable("type") String type) {
+
+		ownerUnitReportService.resetStatusOwnerUnitReportByUnitIdAndType(unitId, type);
+
+		return AjaxResult.success();
+
+	}
 }

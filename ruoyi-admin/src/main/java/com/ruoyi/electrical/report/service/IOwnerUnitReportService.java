@@ -25,8 +25,12 @@ public interface IOwnerUnitReportService {
 
 	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndType(Long unitId, String type);
 
+	public OwnerUnitReport selectOwnerUnitReportById(Long id);
+
 	public boolean pass(Long reportId);
 
 	public boolean notPass(OwnerUnitReportPassDto data);
+
+	public boolean resetStatusOwnerUnitReportByUnitIdAndType(Long unitId, String type);
 
 }

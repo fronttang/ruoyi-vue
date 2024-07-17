@@ -66,6 +66,25 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+        
+        <!--
+        <dependency>
+		    <groupId>cn.afterturn</groupId>
+		    <artifactId>easypoi-spring-boot-starter</artifactId>
+		    <version>4.5.0</version>
+		</dependency> -->
+		
+		<dependency>
+		    <groupId>com.deepoove</groupId>
+		    <artifactId>poi-tl</artifactId>
+		    <version>1.12.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.2</version>
+		</dependency>
 
     </dependencies>
 

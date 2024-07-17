@@ -38,3 +38,10 @@ export function notPassReport(data) {
     params: data
   })
 }
+
+export function resetReportStatus(unitId, type) {
+  return request({
+    url: '/report/reset/status/' + unitId +'/' + type,
+    method: 'get'
+  })
+}

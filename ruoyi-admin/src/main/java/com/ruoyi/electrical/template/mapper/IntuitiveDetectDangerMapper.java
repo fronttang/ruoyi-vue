@@ -1,6 +1,9 @@
 package com.ruoyi.electrical.template.mapper;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 
 /**
@@ -64,5 +67,5 @@ public interface IntuitiveDetectDangerMapper {
 
 	public int deleteIntuitiveDetectDangerByDataIds(Long[] dataId);
 
-	public Long countDangersByDataId(Long dataId);
+	public Long countDangersByDataIdAndUnitId(@Param("dataId") Long dataId, @Param("unitId") Long unitId);
 }

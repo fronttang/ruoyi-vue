@@ -50,4 +50,14 @@ public class CacheConstants {
 	 * 用户选择的角色
 	 */
 	public static final String USER_PROJECT_ROLE_KEY = "user:project:role:";
+
+	/**
+	 * 业主单元轮次推进步骤
+	 */
+	public static final String UNIT_ROUND_STEP = "unit:round:step:";
+
+	/**
+	 * 推进状态
+	 */
+	public static final String UNIT_ROUND_STEP_STATUS = "unit:round:step:status:";
 }

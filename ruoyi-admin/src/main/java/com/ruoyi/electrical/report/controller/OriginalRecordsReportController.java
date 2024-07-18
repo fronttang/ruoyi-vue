@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.controller;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,30 +109,35 @@ public class OriginalRecordsReportController extends BaseController {
 		try {
 
 			Map<String, Object> dataMap = BeanUtil.beanToMap(originalRecords);
-			List<NiceXWPFDocument> documents = new ArrayList<NiceXWPFDocument>();
 
 			NiceXWPFDocument main;
 
-			File titleFile = new ClassPathResource("report/originalRecords/OriginalRecords_Title.docx").getFile();
-			XWPFTemplate titleTemplate = XWPFTemplate.compile(titleFile, config).render(dataMap);
+			InputStream titleInputStream = ClassPathResource.class.getClassLoader()
+					.getResourceAsStream("report/originalRecords/OriginalRecords_Title.docx");
+
+			XWPFTemplate titleTemplate = XWPFTemplate.compile(titleInputStream, config).render(dataMap);
 			main = titleTemplate.getXWPFDocument();
 
-			File infoFile = new ClassPathResource("report/originalRecords/OriginalRecords_Info.docx").getFile();
-			XWPFTemplate infoTemplate = XWPFTemplate.compile(infoFile, config).render(dataMap);
+			InputStream infoInputStream = ClassPathResource.class.getClassLoader()
+					.getResourceAsStream("report/originalRecords/OriginalRecords_Info.docx");
+			XWPFTemplate infoTemplate = XWPFTemplate.compile(infoInputStream, config).render(dataMap);
 			main = main.merge(infoTemplate.getXWPFDocument());
 
-			List<DetectForm> detectForm = getDetectForm(originalRecords.getProject());
+			List<DetectForm> detectForm = getDetectForm(originalRecords.getUnit(), originalRecords.getProject());
 
 			if (CollUtil.isNotEmpty(detectForm)) {
-				File formFile = new ClassPathResource("report/originalRecords/OriginalRecords_Form.docx").getFile();
+
 				for (DetectForm form : detectForm) {
+
+					InputStream formInputStream = ClassPathResource.class.getClassLoader()
+							.getResourceAsStream("report/originalRecords/OriginalRecords_Form.docx");
 					form.setDetect(originalRecords.getDetect());
 
 					Map<String, Object> formDataMap = BeanUtil.beanToMap(form);
 
 					log.info("formDataMap:" + formDataMap);
 
-					XWPFTemplate template = XWPFTemplate.compile(formFile, config).render(formDataMap);
+					XWPFTemplate template = XWPFTemplate.compile(formInputStream, config).render(formDataMap);
 					main = main.merge(template.getXWPFDocument());
 
 					// formTemplates.add(XWPFTemplate.compile(formFile,
@@ -192,7 +198,7 @@ public class OriginalRecordsReportController extends BaseController {
 
 		buildOwnerUnitDetecContentInfo(ownerUnit, unitInfo);
 
-		getDetectForm(project);
+		// getDetectForm(ownerUnit, project);
 
 		OriginalRecords records = new OriginalRecords();
 		records.setDetect(detectUnit);
@@ -204,7 +210,7 @@ public class OriginalRecordsReportController extends BaseController {
 		return records;
 	}
 
-	private List<DetectForm> getDetectForm(Project project) {
+	private List<DetectForm> getDetectForm(OwnerUnitInfo ownerUnit, Project project) {
 		// 直观检测表
 		IntuitiveDetect detectQuery = new IntuitiveDetect();
 		detectQuery.setTemplateId(project.getTemplateId());
@@ -247,7 +253,8 @@ public class OriginalRecordsReportController extends BaseController {
 								formData.setLevel(detectDangers.get(0).getLevel());
 							}
 
-							Long dangers = intuitiveDetectDangerService.countDangersByDataId(data.getId());
+							Long dangers = intuitiveDetectDangerService.countDangersByDataIdAndUnitId(data.getId(),
+									ownerUnit.getId());
 							formData.setResult(dangers != null && dangers > 0 ? "不符合" : "符合");
 						}
 

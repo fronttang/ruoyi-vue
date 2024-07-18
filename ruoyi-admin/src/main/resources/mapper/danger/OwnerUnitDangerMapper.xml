@@ -13,10 +13,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="buildingName"    column="building_name"    />
         <result property="unitAreaId"    column="unit_area_id"    />
         <result property="areaName"    column="area_name"    />
+        <result property="chargingPileId"    column="charging_pile_id"    />
+        <result property="rounds"    column="rounds"    />
         <result property="dangerId"    column="danger_id"    />
         <result property="formId"    column="form_id"    />
         <result property="formCode"    column="form_code"    />
         <result property="formType"    column="form_type"    />
+        <result property="formDataId"    column="form_data_id"    />
         <result property="level"    column="level"    />
         <result property="description"    column="description"    />
         <result property="suggestions"    column="suggestions"    />
@@ -41,7 +44,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitDangerVo">
-        select d.id, d.unit_id, u.name as unit_name, u.detect_id, a.name as area_name, b.name as building_name, d.building_id, d.unit_area_id, d.danger_id, d.form_id, d.form_code, d.form_type, 
+        select d.id, d.unit_id, u.name as unit_name, u.detect_id, a.name as area_name, b.name as building_name, 
+        d.charging_pile_id, d.rounds,
+        d.building_id, d.unit_area_id, d.danger_id, d.form_id, d.form_code, d.form_type, d.form_data_id,
         d.level, d.description, d.suggestions, d.location, d.danger_pic, d.status, d.inspector, d.inspector_id, d.initial_time, 
         d.rectification, d.rectification_date, d.reviewer, d.reviewer_date, d.rectification_pic, d.reason, d.detect_pic, 
         d.create_by, d.create_time, d.update_by, d.update_time 
@@ -50,8 +55,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join owner_unit_area a on a.id = d.unit_area_id
         left join owner_unit_building b on b.id = d.building_id
     </sql>
+    
+    <sql id="selectBasicOwnerUnitDangerVo">
+        select id, unit_id, building_id, unit_area_id, charging_pile_id, rounds, danger_id, form_id, form_code, form_type, form_data_id, level, description, suggestions, location, danger_pic, status, inspector, inspector_id, initial_time, formb, rectification, rectification_date, reviewer, reviewer_date, rectification_pic, reason, detect_pic, create_by, create_time, update_by, update_time from owner_unit_danger
+    </sql>
 
-    <select id="selectOwnerUnitDangerList" parameterType="OwnerUnitDanger" resultMap="OwnerUnitDangerResult">
+    <select id="ownerUnitDangerList" parameterType="OwnerUnitDanger" resultMap="OwnerUnitDangerResult">
         <include refid="selectOwnerUnitDangerVo"/>
         <where>  
             <if test="location != null  and location != ''"> 
@@ -71,7 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectOwnerUnitDangerById" parameterType="Long" resultMap="OwnerUnitDangerResult">
+    <select id="ownerUnitDangerById" parameterType="Long" resultMap="OwnerUnitDangerResult">
         <include refid="selectOwnerUnitDangerVo"/>
         where d.id = #{id}
     </select>
@@ -79,6 +88,163 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selecOwnerUnitBuildingDict" parameterType="Long" resultType="com.ruoyi.electrical.vo.DictVO">
         select b.id, b.name from owner_unit_building b where b.unit_id = #{unitId}
     </select>
+    
+    <select id="selectOwnerUnitDangerList" parameterType="OwnerUnitDanger" resultMap="OwnerUnitDangerResult">
+        <include refid="selectBasicOwnerUnitDangerVo"/>
+        <where>  
+            <if test="unitId != null "> and unit_id = #{unitId}</if>
+            <if test="buildingId != null "> and building_id = #{buildingId}</if>
+            <if test="unitAreaId != null "> and unit_area_id = #{unitAreaId}</if>
+            <if test="chargingPileId != null  and chargingPileId != ''"> and charging_pile_id = #{chargingPileId}</if>
+            <if test="rounds != null "> and rounds = #{rounds}</if>
+            <if test="dangerId != null "> and danger_id = #{dangerId}</if>
+            <if test="formId != null "> and form_id = #{formId}</if>
+            <if test="formCode != null  and formCode != ''"> and form_code = #{formCode}</if>
+            <if test="formType != null  and formType != ''"> and form_type = #{formType}</if>
+            <if test="formDataId != null "> and form_data_id = #{formDataId}</if>
+            <if test="level != null  and level != ''"> and level = #{level}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="suggestions != null  and suggestions != ''"> and suggestions = #{suggestions}</if>
+            <if test="location != null  and location != ''"> and location = #{location}</if>
+            <if test="dangerPic != null  and dangerPic != ''"> and danger_pic = #{dangerPic}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="inspector != null  and inspector != ''"> and inspector = #{inspector}</if>
+            <if test="inspectorId != null "> and inspector_id = #{inspectorId}</if>
+            <if test="initialTime != null "> and initial_time = #{initialTime}</if>
+            <if test="formb != null  and formb != ''"> and formb = #{formb}</if>
+            <if test="rectification != null  and rectification != ''"> and rectification = #{rectification}</if>
+            <if test="rectificationDate != null "> and rectification_date = #{rectificationDate}</if>
+            <if test="reviewer != null  and reviewer != ''"> and reviewer = #{reviewer}</if>
+            <if test="reviewerDate != null "> and reviewer_date = #{reviewerDate}</if>
+            <if test="rectificationPic != null  and rectificationPic != ''"> and rectification_pic = #{rectificationPic}</if>
+            <if test="reason != null  and reason != ''"> and reason = #{reason}</if>
+            <if test="detectPic != null  and detectPic != ''"> and detect_pic = #{detectPic}</if>
+        </where>
+    </select>
+    
+    <select id="selectOwnerUnitDangerById" parameterType="Long" resultMap="OwnerUnitDangerResult">
+        <include refid="selectBasicOwnerUnitDangerVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertOwnerUnitDanger" parameterType="OwnerUnitDanger" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_unit_danger
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">unit_id,</if>
+            <if test="buildingId != null">building_id,</if>
+            <if test="unitAreaId != null">unit_area_id,</if>
+            <if test="chargingPileId != null">charging_pile_id,</if>
+            <if test="rounds != null">rounds,</if>
+            <if test="dangerId != null">danger_id,</if>
+            <if test="formId != null">form_id,</if>
+            <if test="formCode != null">form_code,</if>
+            <if test="formType != null">form_type,</if>
+            <if test="formDataId != null">form_data_id,</if>
+            <if test="level != null">level,</if>
+            <if test="description != null">description,</if>
+            <if test="suggestions != null">suggestions,</if>
+            <if test="location != null">location,</if>
+            <if test="dangerPic != null">danger_pic,</if>
+            <if test="status != null">status,</if>
+            <if test="inspector != null">inspector,</if>
+            <if test="inspectorId != null">inspector_id,</if>
+            <if test="initialTime != null">initial_time,</if>
+            <if test="formb != null">formb,</if>
+            <if test="rectification != null">rectification,</if>
+            <if test="rectificationDate != null">rectification_date,</if>
+            <if test="reviewer != null">reviewer,</if>
+            <if test="reviewerDate != null">reviewer_date,</if>
+            <if test="rectificationPic != null">rectification_pic,</if>
+            <if test="reason != null">reason,</if>
+            <if test="detectPic != null">detect_pic,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">#{unitId},</if>
+            <if test="buildingId != null">#{buildingId},</if>
+            <if test="unitAreaId != null">#{unitAreaId},</if>
+            <if test="chargingPileId != null">#{chargingPileId},</if>
+            <if test="rounds != null">#{rounds},</if>
+            <if test="dangerId != null">#{dangerId},</if>
+            <if test="formId != null">#{formId},</if>
+            <if test="formCode != null">#{formCode},</if>
+            <if test="formType != null">#{formType},</if>
+            <if test="formDataId != null">#{formDataId},</if>
+            <if test="level != null">#{level},</if>
+            <if test="description != null">#{description},</if>
+            <if test="suggestions != null">#{suggestions},</if>
+            <if test="location != null">#{location},</if>
+            <if test="dangerPic != null">#{dangerPic},</if>
+            <if test="status != null">#{status},</if>
+            <if test="inspector != null">#{inspector},</if>
+            <if test="inspectorId != null">#{inspectorId},</if>
+            <if test="initialTime != null">#{initialTime},</if>
+            <if test="formb != null">#{formb},</if>
+            <if test="rectification != null">#{rectification},</if>
+            <if test="rectificationDate != null">#{rectificationDate},</if>
+            <if test="reviewer != null">#{reviewer},</if>
+            <if test="reviewerDate != null">#{reviewerDate},</if>
+            <if test="rectificationPic != null">#{rectificationPic},</if>
+            <if test="reason != null">#{reason},</if>
+            <if test="detectPic != null">#{detectPic},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOwnerUnitDanger" parameterType="OwnerUnitDanger">
+        update owner_unit_danger
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="unitId != null">unit_id = #{unitId},</if>
+            <if test="buildingId != null">building_id = #{buildingId},</if>
+            <if test="unitAreaId != null">unit_area_id = #{unitAreaId},</if>
+            <if test="chargingPileId != null">charging_pile_id = #{chargingPileId},</if>
+            <if test="rounds != null">rounds = #{rounds},</if>
+            <if test="dangerId != null">danger_id = #{dangerId},</if>
+            <if test="formId != null">form_id = #{formId},</if>
+            <if test="formCode != null">form_code = #{formCode},</if>
+            <if test="formType != null">form_type = #{formType},</if>
+            <if test="formDataId != null">form_data_id = #{formDataId},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="suggestions != null">suggestions = #{suggestions},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="dangerPic != null">danger_pic = #{dangerPic},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="inspector != null">inspector = #{inspector},</if>
+            <if test="inspectorId != null">inspector_id = #{inspectorId},</if>
+            <if test="initialTime != null">initial_time = #{initialTime},</if>
+            <if test="formb != null">formb = #{formb},</if>
+            <if test="rectification != null">rectification = #{rectification},</if>
+            <if test="rectificationDate != null">rectification_date = #{rectificationDate},</if>
+            <if test="reviewer != null">reviewer = #{reviewer},</if>
+            <if test="reviewerDate != null">reviewer_date = #{reviewerDate},</if>
+            <if test="rectificationPic != null">rectification_pic = #{rectificationPic},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="detectPic != null">detect_pic = #{detectPic},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOwnerUnitDangerById" parameterType="Long">
+        delete from owner_unit_danger where id = #{id}
+    </delete>
+
+    <delete id="deleteOwnerUnitDangerByIds" parameterType="String">
+        delete from owner_unit_danger where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     
 </mapper>

@@ -35,7 +35,7 @@ public class OwnerUnitDangerController extends BaseController {
 	@GetMapping("/list")
 	public TableDataInfo list(OwnerUnitDanger ownerUnitDanger) {
 		startPage();
-		List<OwnerUnitDanger> list = ownerUnitDangerService.selectOwnerUnitDangerList(ownerUnitDanger);
+		List<OwnerUnitDanger> list = ownerUnitDangerService.ownerUnitDangerList(ownerUnitDanger);
 		return getDataTable(list);
 	}
 

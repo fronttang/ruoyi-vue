@@ -42,3 +42,19 @@ export function delOwnerUnit(id) {
     method: 'delete'
   })
 }
+
+// 开始推进轮次
+export function startRounds(id) {
+  return request({
+    url: '/project/OwnerUnit/rounds/' + id,
+    method: 'get'
+  })
+}
+
+// 轮次推进步骤
+export function roundsStep(id) {
+  return request({
+    url: '/project/OwnerUnit/rounds/step/' + id,
+    method: 'get'
+  })
+}

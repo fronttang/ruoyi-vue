@@ -17,6 +17,24 @@ public interface IOwnerUnitDangerService {
 	 * @param id 隐患数据主键
 	 * @return 隐患数据
 	 */
+	public OwnerUnitDanger ownerUnitDangerById(Long id);
+
+	/**
+	 * 查询隐患数据列表
+	 * 
+	 * @param ownerUnitDanger 隐患数据
+	 * @return 隐患数据集合
+	 */
+	public List<OwnerUnitDanger> ownerUnitDangerList(OwnerUnitDanger ownerUnitDanger);
+
+	public List<DictVO> selecOwnerUnitBuildingDict(Long unitId);
+
+	/**
+	 * 查询隐患数据
+	 * 
+	 * @param id 隐患数据主键
+	 * @return 隐患数据
+	 */
 	public OwnerUnitDanger selectOwnerUnitDangerById(Long id);
 
 	/**
@@ -27,6 +45,36 @@ public interface IOwnerUnitDangerService {
 	 */
 	public List<OwnerUnitDanger> selectOwnerUnitDangerList(OwnerUnitDanger ownerUnitDanger);
 
-	public List<DictVO> selecOwnerUnitBuildingDict(Long unitId);
+	/**
+	 * 新增隐患数据
+	 * 
+	 * @param ownerUnitDanger 隐患数据
+	 * @return 结果
+	 */
+	public int insertOwnerUnitDanger(OwnerUnitDanger ownerUnitDanger);
+
+	/**
+	 * 修改隐患数据
+	 * 
+	 * @param ownerUnitDanger 隐患数据
+	 * @return 结果
+	 */
+	public int updateOwnerUnitDanger(OwnerUnitDanger ownerUnitDanger);
+
+	/**
+	 * 批量删除隐患数据
+	 * 
+	 * @param ids 需要删除的隐患数据主键集合
+	 * @return 结果
+	 */
+	public int deleteOwnerUnitDangerByIds(Long[] ids);
+
+	/**
+	 * 删除隐患数据信息
+	 * 
+	 * @param id 隐患数据主键
+	 * @return 结果
+	 */
+	public int deleteOwnerUnitDangerById(Long id);
 
 }

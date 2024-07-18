@@ -1,5 +1,8 @@
 package com.ruoyi.electrical.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import lombok.Data;
 
 @Data
@@ -8,11 +11,13 @@ public class OwnerUnitReportVo {
 	/**
 	 * 报告ID
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long reportId;
 
 	/**
 	 * 业主单元ID
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long unitId;
 
 	/**
@@ -43,6 +48,7 @@ public class OwnerUnitReportVo {
 	/**
 	 * 检测单位ID
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long detectId;
 
 	/**

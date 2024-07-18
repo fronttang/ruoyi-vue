@@ -93,7 +93,7 @@ public class IntuitiveDetectDangerServiceImpl implements IIntuitiveDetectDangerS
 	}
 
 	@Override
-	public Long countDangersByDataId(Long dataId) {
-		return intuitiveDetectDangerMapper.countDangersByDataId(dataId);
+	public Long countDangersByDataIdAndUnitId(Long dataId, Long unitId) {
+		return intuitiveDetectDangerMapper.countDangersByDataIdAndUnitId(dataId, unitId);
 	}
 }

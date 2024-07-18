@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.ChargingPileMapper">
+    
+    <resultMap type="ChargingPile" id="ChargingPileResult">
+        <result property="id"    column="id"    />
+        <result property="unitId"    column="unit_id"    />
+        <result property="name"    column="name"    />
+        <result property="code"    column="code"    />
+        <result property="rounds"    column="rounds"    />
+        <result property="type"    column="type"    />
+        <result property="brand"    column="brand"    />
+        <result property="model"    column="model"    />
+        <result property="power"    column="power"    />
+        <result property="serialNumber"    column="serial_number"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectChargingPileVo">
+        select id, unit_id, name, code, rounds, type, brand, model, power, serial_number, create_by, create_time, update_by, update_time from charging_pile
+    </sql>
+
+    <select id="selectChargingPileList" parameterType="ChargingPile" resultMap="ChargingPileResult">
+        <include refid="selectChargingPileVo"/>
+        <where>  
+            <if test="unitId != null "> and unit_id = #{unitId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="rounds != null "> and rounds = #{rounds}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="brand != null  and brand != ''"> and brand = #{brand}</if>
+            <if test="model != null  and model != ''"> and model = #{model}</if>
+            <if test="power != null  and power != ''"> and power = #{power}</if>
+            <if test="serialNumber != null  and serialNumber != ''"> and serial_number = #{serialNumber}</if>
+        </where>
+    </select>
+    
+    <select id="selectChargingPileById" parameterType="Long" resultMap="ChargingPileResult">
+        <include refid="selectChargingPileVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertChargingPile" parameterType="ChargingPile" useGeneratedKeys="true" keyProperty="id">
+        insert into charging_pile
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">unit_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null">code,</if>
+            <if test="rounds != null">rounds,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="brand != null">brand,</if>
+            <if test="model != null">model,</if>
+            <if test="power != null">power,</if>
+            <if test="serialNumber != null">serial_number,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">#{unitId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null">#{code},</if>
+            <if test="rounds != null">#{rounds},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="brand != null">#{brand},</if>
+            <if test="model != null">#{model},</if>
+            <if test="power != null">#{power},</if>
+            <if test="serialNumber != null">#{serialNumber},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateChargingPile" parameterType="ChargingPile">
+        update charging_pile
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="unitId != null">unit_id = #{unitId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="rounds != null">rounds = #{rounds},</if>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="brand != null">brand = #{brand},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="power != null">power = #{power},</if>
+            <if test="serialNumber != null">serial_number = #{serialNumber},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteChargingPileById" parameterType="Long">
+        delete from charging_pile where id = #{id}
+    </delete>
+
+    <delete id="deleteChargingPileByIds" parameterType="String">
+        delete from charging_pile where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

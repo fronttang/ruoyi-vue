@@ -66,5 +66,5 @@ public interface IIntuitiveDetectDangerService {
 	 */
 	public List<IntuitiveDetectDanger> selectIntuitiveDetectDangersByDataId(Long dataId);
 
-	public Long countDangersByDataId(Long dataId);
+	public Long countDangersByDataIdAndUnitId(Long dataId, Long unitId);
 }

@@ -111,15 +111,19 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['project:OwnerUnit:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['project:OwnerUnit:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-guide"
+            @click="handleRounds(scope.row)"
+          >轮次</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -131,6 +135,21 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <!-- 轮次对话框 -->
+    <el-dialog title="轮次" :visible.sync="openRounds" width="600px" append-to-body @close="handleCloseRoundsDialog">
+      <el-card class="box-card">
+        <div class="clearfix">
+          <span>当前轮次：{{this.rounds.current}}</span>
+          <el-button style="margin-left: 50px;" type="primary" @click="handleStartRounds()">推进</el-button>
+        </div>
+        <div v-if="this.rounds.start" class="text item" style="padding-top:20px;">
+          <el-steps :active="rounds.active" :finish-status="rounds.status" direction="vertical" >
+            <el-step v-for="item in rounds.steps" :title="item"></el-step>
+          </el-steps>
+        </div>
+      </el-card>
+    </el-dialog>
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
@@ -248,9 +267,13 @@
     </el-dialog>
   </div>
 </template>
-
+<style>
+.el-step__main{
+  height: 40px;
+}
+</style>
 <script>
-import { listOwnerUnit, getOwnerUnit, delOwnerUnit, addOwnerUnit, updateOwnerUnit } from "@/api/project/OwnerUnit";
+import { listOwnerUnit, getOwnerUnit, delOwnerUnit, addOwnerUnit, updateOwnerUnit, startRounds, roundsStep} from "@/api/project/OwnerUnit";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDict, getProjectAreaDictByProjectId, getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
@@ -285,9 +308,19 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      openRounds: false,
       projectInfo: {
 
       },
+      rounds: {
+        status: "success",
+        unitId: null,
+        start: false,
+        current: 1,
+        active: 0,
+        steps: []
+      },
+      timer: null,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -359,6 +392,10 @@ export default {
   },
   created() {
     this.getList();
+  },
+  beforeDestroy(){
+   clearInterval(this.timer);        
+   this.timer = null;
   },
   methods: {
     /** 查询充电场站检测列表 */
@@ -561,6 +598,59 @@ export default {
       this.download('project/OwnerUnit/export', {
         ...this.queryParams
       }, `OwnerUnit_${new Date().getTime()}.xlsx`)
+    },
+    createStepInterval(unitId) {
+      clearInterval(this.timer);
+      this.timer = window.setInterval(() => {
+        setTimeout(() => {
+            this.queryRoundsStep(unitId);
+        }, 1)
+      }, 1000)
+    },
+    queryRoundsStep(unitId) {
+      roundsStep(unitId).then(response => {
+          this.rounds.current = response.rounds;
+          this.rounds.steps = response.steps;
+          if(response.status != null){
+            this.rounds.status = response.status;
+          }
+
+          if(this.rounds.steps != null ) {
+            this.rounds.start = this.rounds.steps.length > 0;
+            this.rounds.active = this.rounds.steps.length - 1;
+            if(this.rounds.steps.length === 4 || this.rounds.status === 'error'){
+              this.rounds.active = this.rounds.steps.length;
+              clearInterval(this.timer);
+            } else {
+              this.createStepInterval(unitId);
+            }
+          }
+          
+      }).then(() => {});
+    },
+    handleRounds(row) {
+      this.rounds.current = row.rounds;
+      this.rounds.unitId = row.id;
+      this.rounds.steps = [];
+      this.rounds.active = 0;
+
+      this.queryRoundsStep(row.id);
+      this.openRounds = true;
+    },
+    handleStartRounds() {
+      startRounds(this.rounds.unitId).then(response => {
+        this.rounds.active = 0;
+        this.rounds.start = true;
+        this.rounds.steps = ["开始推进"];
+
+        this.createStepInterval(this.rounds.unitId);
+
+      });
+    },
+    handleCloseRoundsDialog(){
+      clearInterval(this.timer);
+      this.timer = null;
+      this.getList();
     }
   }
 };

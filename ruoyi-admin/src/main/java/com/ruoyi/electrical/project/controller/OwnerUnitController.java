@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
@@ -22,8 +25,12 @@ import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.project.service.IProjectService;
+
+import cn.hutool.core.collection.CollUtil;
+
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.redis.RedisCache;
 
 /**
  * 业主单元Controller
@@ -34,6 +41,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 @RestController
 @RequestMapping("/project/OwnerUnit")
 public class OwnerUnitController extends BaseController {
+
 	@Autowired
 	private IOwnerUnitService ownerUnitService;
 
@@ -42,6 +50,9 @@ public class OwnerUnitController extends BaseController {
 
 	@Autowired
 	private IProjectAreaService projectAreaService;
+
+	@Autowired
+	private RedisCache redisCache;
 
 	/**
 	 * 查询业主单元列表
@@ -130,5 +141,34 @@ public class OwnerUnitController extends BaseController {
 	@DeleteMapping("/{ids}")
 	public AjaxResult remove(@PathVariable Long[] ids) {
 		return toAjax(ownerUnitService.deleteOwnerUnitByIds(ids));
+	}
+
+	@GetMapping("/rounds/{unitId}")
+	public AjaxResult startRounds(@PathVariable Long unitId) {
+
+		List<String> steps = redisCache.getCacheObject(CacheConstants.UNIT_ROUND_STEP + unitId);
+
+		String status = redisCache.getCacheObject(CacheConstants.UNIT_ROUND_STEP_STATUS + unitId);
+
+		if (CollUtil.isNotEmpty(steps) && steps.size() < 4 && !"error".equalsIgnoreCase(status)) {
+			return AjaxResult.error("还有推进中的轮次，请稍后重试。");
+		}
+		boolean success = ownerUnitService.startRounds(unitId);
+		return toAjax(success);
+	}
+
+	@GetMapping("/rounds/step/{unitId}")
+	public AjaxResult roundsInfo(@PathVariable Long unitId) {
+
+		OwnerUnit unitUnit = ownerUnitService.selectOwnerUnitById(unitId);
+		AjaxResult ajax = AjaxResult.success();
+		if (unitUnit != null) {
+			ajax.put("rounds", unitUnit.getRounds());
+			List<String> steps = redisCache.getCacheObject(CacheConstants.UNIT_ROUND_STEP + unitId);
+			ajax.put("steps", steps);
+			String status = redisCache.getCacheObject(CacheConstants.UNIT_ROUND_STEP_STATUS + unitId);
+			ajax.put("status", status);
+		}
+		return ajax;
 	}
 }

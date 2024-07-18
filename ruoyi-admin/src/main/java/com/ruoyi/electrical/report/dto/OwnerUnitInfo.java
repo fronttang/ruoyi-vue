@@ -10,6 +10,11 @@ import lombok.Data;
 public class OwnerUnitInfo {
 
 	/**
+	 * 
+	 */
+	private Long id;
+
+	/**
 	 * 检测地址
 	 */
 	private String address;

@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,32 +22,40 @@ import org.springframework.web.bind.annotation.RestController;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
+import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.data.UrlPictureRenderData;
+import com.deepoove.poi.data.style.PictureStyle;
 import com.deepoove.poi.data.style.Style;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.deepoove.poi.util.PoitlIOUtils;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
+import com.deepoove.poi.xwpf.WidthScalePattern;
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.electrical.project.domain.DetectDevice;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.domain.Project;
+import com.ruoyi.electrical.project.service.IDetectDeviceService;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.project.service.IProjectService;
 import com.ruoyi.electrical.report.domain.OwnerUnitReport;
-import com.ruoyi.electrical.report.dto.DetectForm;
+import com.ruoyi.electrical.report.dto.DetectDeviceInfo;
 import com.ruoyi.electrical.report.dto.DetectFormData;
-import com.ruoyi.electrical.report.dto.OriginalRecords;
+import com.ruoyi.electrical.report.dto.DetectUnitInfo;
+import com.ruoyi.electrical.report.dto.InitialReport;
 import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
 import com.ruoyi.electrical.role.service.IDetectUnitService;
-import com.ruoyi.electrical.template.domain.IntuitiveDetect;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDangerService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
-import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
 import com.ruoyi.system.service.ISysDictDataService;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -57,10 +66,13 @@ import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 初检报告
+ */
 @Slf4j
 @RestController
-@RequestMapping("/report/download/originalRecords")
-public class OriginalRecordsReportController extends BaseController {
+@RequestMapping("/report/download/initial")
+public class InitialReportController extends BaseController {
 
 	@Autowired
 	private IOwnerUnitReportService unitReportService;
@@ -78,74 +90,50 @@ public class OriginalRecordsReportController extends BaseController {
 	private ISysDictDataService dictDataService;
 
 	@Autowired
-	private IIntuitiveDetectService intuitiveDetectService;
-
-	@Autowired
 	private IIntuitiveDetectDataService intuitiveDetectDataService;
 
 	@Autowired
 	private IIntuitiveDetectDangerService intuitiveDetectDangerService;
 
+	@Autowired
+	private IDetectDeviceService detectDeviceService;
+
 	/**
-	 * 原始记录 unit.nature=='1'?'':''
-	 * 
 	 * @param reportId
 	 */
 	@RequestMapping("/{reportId}")
-	public void originalRecords(@PathVariable Long reportId, HttpServletRequest request, HttpServletResponse response) {
+	public void initialReport(@PathVariable Long reportId, HttpServletRequest request, HttpServletResponse response) {
 
-		OriginalRecords originalRecords = getReportData(reportId);
-		if (originalRecords == null) {
+		InitialReport initialReport = getReportData(reportId);
+		if (initialReport == null) {
 			return;
 		}
 
-		// log.info("originalRecords : " + originalRecords);
+		log.info("initialReport : " + initialReport);
 
 		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
-		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("data", policy);
+		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("data", policy).bind("device",
+				policy);
 		Configure config = configureBuilder.build();
 		try {
 
-			Map<String, Object> dataMap = BeanUtil.beanToMap(originalRecords);
+			Map<String, Object> dataMap = BeanUtil.beanToMap(initialReport);
 
 			NiceXWPFDocument main;
 
-			InputStream titleInputStream = ClassPathResource.class.getClassLoader()
-					.getResourceAsStream("report/originalRecords/OriginalRecords_Title.docx");
+			// 标题
+			InputStream mainInputStream = ClassPathResource.class.getClassLoader()
+					.getResourceAsStream("report/initial/Initial_Report.docx");
+			XWPFTemplate mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
+			main = mainTemplate.getXWPFDocument();
 
-			XWPFTemplate titleTemplate = XWPFTemplate.compile(titleInputStream, config).render(dataMap);
-			main = titleTemplate.getXWPFDocument();
+			// 检测表
+			InputStream formInputStream = ClassPathResource.class.getClassLoader()
+					.getResourceAsStream("report/initial/Initial_Form.docx");
+			XWPFTemplate formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
+			main = main.merge(formTemplate.getXWPFDocument());
 
-			InputStream infoInputStream = ClassPathResource.class.getClassLoader()
-					.getResourceAsStream("report/originalRecords/OriginalRecords_Info.docx");
-			XWPFTemplate infoTemplate = XWPFTemplate.compile(infoInputStream, config).render(dataMap);
-			main = main.merge(infoTemplate.getXWPFDocument());
-
-			List<DetectForm> detectForm = getDetectForm(originalRecords.getUnit(), originalRecords.getProject());
-
-			if (CollUtil.isNotEmpty(detectForm)) {
-
-				for (DetectForm form : detectForm) {
-
-					InputStream formInputStream = ClassPathResource.class.getClassLoader()
-							.getResourceAsStream("report/originalRecords/OriginalRecords_Form.docx");
-					form.setDetect(originalRecords.getDetect());
-
-					Map<String, Object> formDataMap = BeanUtil.beanToMap(form);
-
-					log.info("formDataMap:" + formDataMap);
-
-					XWPFTemplate template = XWPFTemplate.compile(formInputStream, config).render(formDataMap);
-					main = main.merge(template.getXWPFDocument());
-
-					// formTemplates.add(XWPFTemplate.compile(formFile,
-					// config).render(formDataMap));
-				}
-			}
-
-			// main.merge(documents, main.createParagraph().createRun());
-
-			String fileName = URLEncodeUtil.encode("电检原始记录报告");
+			String fileName = URLEncodeUtil.encode("电气检测初检报告");
 			response.setContentType("application/octet-stream;charset=utf-8");
 			response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".docx");
 
@@ -158,13 +146,13 @@ public class OriginalRecordsReportController extends BaseController {
 			PoitlIOUtils.closeQuietlyMulti(main, bos, out); // 最后不要忘记关闭这些流。
 
 		} catch (Exception e) {
-			log.error("生成电检原始记录报告失败！", e);
+			log.error("生成电气检测初检报告失败！", e);
 		} finally {
 
 		}
 	}
 
-	private OriginalRecords getReportData(Long reportId) {
+	private InitialReport getReportData(Long reportId) {
 
 		OwnerUnitReport report = unitReportService.selectOwnerUnitReportById(reportId);
 		if (report == null) {
@@ -184,13 +172,74 @@ public class OriginalRecordsReportController extends BaseController {
 		}
 
 		DetectUnit detectUnit = detectUnitService.selectDetectUnitById(project.getDetectId());
+		if (detectUnit == null) {
+			return null;
+		}
+
+		InitialReport initialReport = new InitialReport();
+
+		DetectDevice queryDevice = new DetectDevice();
+		queryDevice.setDetectId(detectUnit.getId());
+
+		List<DetectDevice> detectDevices = detectDeviceService.selectDetectDeviceList(queryDevice);
+		if (CollUtil.isNotEmpty(detectDevices)) {
+			List<DetectDeviceInfo> deviceInfos = new ArrayList<DetectDeviceInfo>();
+
+			for (int i = 0; i < detectDevices.size(); i++) {
+				DetectDevice detectDevice = detectDevices.get(i);
+				DetectDeviceInfo deviceInfo = new DetectDeviceInfo();
+				deviceInfo.setId(String.valueOf(i + 1));
+				deviceInfo.setName(detectDevice.getName());
+				deviceInfo.setDeviceId(detectDevice.getDeviceId());
+				deviceInfo.setCalibrationDate(
+						DateUtil.format(detectDevice.getCalibrationDate(), DatePattern.CHINESE_DATE_FORMATTER));
+				deviceInfos.add(deviceInfo);
+			}
+			initialReport.setDevice(deviceInfos);
+		}
+
+		DetectUnitInfo detectUnitInfo = new DetectUnitInfo();
+		BeanUtils.copyProperties(detectUnit, detectUnitInfo, "qualification", "logo");
+
+		if (StrUtil.isNotBlank(detectUnit.getQualification())) {
+
+			// 本地资源路径
+			String localPath = RuoYiConfig.getProfile();
+			// 数据库资源地址
+			String filePath = localPath
+					+ StringUtils.substringAfter(detectUnit.getQualification(), Constants.RESOURCE_PREFIX);
+
+			FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+			PictureStyle pictureStyle = new PictureStyle();
+			pictureStyle.setScalePattern(WidthScalePattern.FIT);
+			qualification.setPictureStyle(pictureStyle);
+			detectUnitInfo.setQualification(qualification);
+		}
+
+		if (StrUtil.isNotBlank(detectUnit.getLogo())) {
+
+			// 本地资源路径
+			String localPath = RuoYiConfig.getProfile();
+			// 数据库资源地址
+			String filePath = localPath + StringUtils.substringAfter(detectUnit.getLogo(), Constants.RESOURCE_PREFIX);
+
+			FilePictureRenderData logo = new FilePictureRenderData(filePath);
+
+			PictureStyle pictureStyle = new PictureStyle();
+			pictureStyle.setWidth(50);
+			pictureStyle.setHeight(50);
+			logo.setPictureStyle(pictureStyle);
+			detectUnitInfo.setLogo(logo);
+		}
 
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
 		BeanUtils.copyProperties(report, reportInfo, "detectData");
 		reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
 
 		OwnerUnitInfo unitInfo = new OwnerUnitInfo();
-		BeanUtils.copyProperties(ownerUnit, unitInfo, "nature");
+		BeanUtils.copyProperties(ownerUnit, unitInfo, "nature", "testStartDate", "testEndDate");
+		unitInfo.setTestStartDate(DateUtil.format(ownerUnit.getTestStartDate(), DatePattern.CHINESE_DATE_FORMATTER));
+		unitInfo.setTestEndDate(DateUtil.format(ownerUnit.getTestEndDate(), DatePattern.CHINESE_DATE_FORMATTER));
 
 		buildOwnerUnitNatureInfo(ownerUnit, unitInfo);
 
@@ -198,74 +247,58 @@ public class OriginalRecordsReportController extends BaseController {
 
 		// getDetectForm(ownerUnit, project);
 
-		OriginalRecords records = new OriginalRecords();
-		records.setDetect(detectUnit);
-		records.setProject(project);
-		records.setUnit(unitInfo);
-		records.setReport(reportInfo);
+		initialReport.setCreateDate(DateUtil.format(new Date(), DatePattern.CHINESE_DATE_FORMATTER));
+		initialReport.setDetect(detectUnitInfo);
+		initialReport.setProject(project);
+		initialReport.setUnit(unitInfo);
+		initialReport.setReport(reportInfo);
+		initialReport.setData(getDetectForm(initialReport.getUnit(), initialReport.getProject()));
 
 		// Map<String, Object> dataMap = BeanUtil.beanToMap(records);
-		return records;
+		return initialReport;
 	}
 
-	private List<DetectForm> getDetectForm(OwnerUnitInfo ownerUnit, Project project) {
+	private List<DetectFormData> getDetectForm(OwnerUnitInfo ownerUnit, Project project) {
 		// 直观检测表
-		IntuitiveDetect detectQuery = new IntuitiveDetect();
-		detectQuery.setTemplateId(project.getTemplateId());
 
-		List<IntuitiveDetect> intuitiveDetect = intuitiveDetectService.selectIntuitiveDetectList(detectQuery);
+		List<DetectFormData> formDatas = new ArrayList<DetectFormData>();
 
-		List<DetectForm> forms = new ArrayList<DetectForm>();
+		IntuitiveDetectData dataQuery = new IntuitiveDetectData();
+		dataQuery.setTemplateId(project.getTemplateId());
 
-		if (intuitiveDetect != null) {
-			intuitiveDetect.forEach((detect) -> {
-				DetectForm form = new DetectForm();
-				form.setName(detect.getName());
+		List<IntuitiveDetectData> detectData = intuitiveDetectDataService.selectIntuitiveDetectDataList(dataQuery);
+		if (detectData != null) {
 
-				IntuitiveDetectData dataQuery = new IntuitiveDetectData();
-				dataQuery.setDetectTitle(detect.getId());
+			detectData.forEach((data) -> {
 
-				List<DetectFormData> formDatas = new ArrayList<DetectFormData>();
+				DetectFormData formData = new DetectFormData();
+				formData.setFirstCode(data.getFirstCode());
+				formData.setFirstContent(data.getFirstContent());
 
-				List<IntuitiveDetectData> detectData = intuitiveDetectDataService
-						.selectIntuitiveDetectDataList(dataQuery);
-				if (detectData != null) {
-
-					detectData.forEach((data) -> {
-
-						DetectFormData formData = new DetectFormData();
-						formData.setFirstCode(data.getFirstCode());
-						formData.setFirstContent(data.getFirstContent());
-
-						if ("1".equalsIgnoreCase(data.getType())) {
-							Style style = Style.builder().buildBold().build();
-							formData.setFirstContent(new TextRenderData(data.getFirstContent(), style));
-						}
-
-						if ("2".equalsIgnoreCase(data.getType())) {
-
-							List<IntuitiveDetectDanger> detectDangers = intuitiveDetectDangerService
-									.selectIntuitiveDetectDangersByDataId(data.getId());
-
-							if (CollUtil.isNotEmpty(detectDangers)) {
-								formData.setLevel(detectDangers.get(0).getLevel());
-							}
-
-							Long dangers = intuitiveDetectDangerService.countDangersByDataIdAndUnitId(data.getId(),
-									ownerUnit.getId());
-							formData.setResult(dangers != null && dangers > 0 ? "不符合" : "符合");
-						}
-
-						formDatas.add(formData);
-
-					});
+				if ("1".equalsIgnoreCase(data.getType())) {
+					Style style = Style.builder().buildBold().build();
+					formData.setFirstContent(new TextRenderData(data.getFirstContent(), style));
 				}
-				form.setData(formDatas);
-				forms.add(form);
+
+				if ("2".equalsIgnoreCase(data.getType())) {
+
+					List<IntuitiveDetectDanger> detectDangers = intuitiveDetectDangerService
+							.selectIntuitiveDetectDangersByDataId(data.getId());
+
+					if (CollUtil.isNotEmpty(detectDangers)) {
+						formData.setLevel(detectDangers.get(0).getLevel());
+					}
+
+					Long dangers = intuitiveDetectDangerService.countDangersByDataIdAndUnitId(data.getId(),
+							ownerUnit.getId());
+					formData.setDecide(dangers != null && dangers > 0 ? "不符合" : "符合");
+					formData.setResult("√");
+				}
+				formDatas.add(formData);
 			});
 		}
 
-		return forms;
+		return formDatas;
 	}
 
 	private void buildOwnerUnitNatureInfo(OwnerUnit ownerUnit, OwnerUnitInfo unitInfo) {

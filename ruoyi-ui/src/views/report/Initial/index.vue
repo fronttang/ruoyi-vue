@@ -127,7 +127,7 @@
           <el-button v-if="scope.row.status === '0' || scope.row.status === '1'"
             size="medium"
             type="text"
-            @click="handleUpdate(scope.row)"
+            @click="handleOpenInitialReport(scope.row)"
           ><i class="iconfont iconfont-word"></i></el-button>
           <el-button v-if="scope.row.status === '3'"
             size="medium"
@@ -468,7 +468,22 @@ export default {
           this.download('report/download/originalRecords/' + this.report.id, {}, `电检原始记录报告.docx`)
         });
       }
+    },
+    handleOpenInitialReport(row){
+      // 打开初检报告
+      if(row.reportId != null){
+        this.download('report/download/initial/' + row.reportId, {}, `电气检测初检报告.docx`)
+      } else {
+        this.queryReportForm = {
+          unitId: row.unitId,
+          type: '1'
+        }
+        getReport(this.queryReportForm).then(response => {
+          this.download('report/download/initial/' + this.report.id, {}, `电气检测初检报告.docx`)
+        });
+      }
     }
+
   }
 };
 </script>

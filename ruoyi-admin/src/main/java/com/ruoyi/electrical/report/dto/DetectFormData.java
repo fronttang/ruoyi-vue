@@ -21,7 +21,12 @@ public class DetectFormData {
 	private String level;
 
 	/**
-	 * 
+	 * 结果
 	 */
 	private String result;
+
+	/**
+	 * 单项判定
+	 */
+	private String decide;
 }

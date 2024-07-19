@@ -15,6 +15,11 @@ public class OwnerUnitInfo {
 	private Long id;
 
 	/**
+	 * 业主单元名称
+	 */
+	private String name;
+
+	/**
 	 * 检测地址
 	 */
 	private String address;
@@ -40,6 +45,21 @@ public class OwnerUnitInfo {
 	private Long layers;
 
 	/**
+	 * 委托单位
+	 */
+	private String entrust;
+
+	/**
+	 * 检测开始时间
+	 */
+	private String testStartDate;
+
+	/**
+	 * 检测结束时间
+	 */
+	private String testEndDate;
+
+	/**
 	 * 建筑使用性质
 	 */
 	private Map<String, TextRenderData> nature;
@@ -58,4 +78,9 @@ public class OwnerUnitInfo {
 	 * 湿度
 	 */
 	private String humidity;
+
+	/**
+	 * A级隐患数
+	 */
+	private Integer dangers;
 }

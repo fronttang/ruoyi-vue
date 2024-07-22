@@ -258,6 +258,40 @@ export const dynamicRoutes = [
         meta: { title: '隐患数据汇总', activeMenu: '/report/Initial' }
       }
     ]
+  },
+  {
+    path: '/report/onlyoffice',
+    component: Layout,
+    hidden: true,
+    permissions: ['*:*:*'],
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/report/onlyoffice/index'),
+        name: 'onlyoffice',
+        meta: { title: '报告编辑', activeMenu: '/report/Initial' }
+      }
+    ]
+  },
+  {
+    path: '/report/weboffice',
+    component: Layout,
+    hidden: true,
+    permissions: ['*:*:*'],
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/report/weboffice/index'),
+        name: 'weboffice',
+        meta: { title: '报告编辑', activeMenu: '/report/Initial' }
+      },
+      {
+        path: 'weboffice/:reportId(\\d+)/:type(\\d+)',
+        component: () => import('@/views/report/weboffice/weboffice'),
+        name: 'webOfficeContent',
+        meta: { title: '报告编辑', activeMenu: '/report/Initial' }
+      }
+    ]
   }
 ]
 

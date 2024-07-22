@@ -1,8 +1,9 @@
 package com.ruoyi.electrical.report.controller;
 
-import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,12 +20,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
 import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
-import com.deepoove.poi.data.UrlPictureRenderData;
 import com.deepoove.poi.data.style.PictureStyle;
 import com.deepoove.poi.data.style.Style;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
@@ -34,8 +35,11 @@ import com.deepoove.poi.xwpf.WidthScalePattern;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.electrical.project.domain.DetectDevice;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.domain.Project;
@@ -62,7 +66,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -102,11 +105,12 @@ public class InitialReportController extends BaseController {
 	 * @param reportId
 	 */
 	@RequestMapping("/{reportId}")
-	public void initialReport(@PathVariable Long reportId, HttpServletRequest request, HttpServletResponse response) {
+	public AjaxResult initialReport(@PathVariable Long reportId, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		InitialReport initialReport = getReportData(reportId);
 		if (initialReport == null) {
-			return;
+			return AjaxResult.error();
 		}
 
 		log.info("initialReport : " + initialReport);
@@ -133,20 +137,39 @@ public class InitialReportController extends BaseController {
 			XWPFTemplate formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
 			main = main.merge(formTemplate.getXWPFDocument());
 
-			String fileName = URLEncodeUtil.encode("电气检测初检报告");
-			response.setContentType("application/octet-stream;charset=utf-8");
-			response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".docx");
+			LocalDateTime now = LocalDateTime.now();
+			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+			String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
+			String datePath = DateUtil.format(now, "yyyy/MM/dd");
 
-			OutputStream out = response.getOutputStream();
-			BufferedOutputStream bos = new BufferedOutputStream(out);
-			main.write(bos);
-			bos.flush();
-			out.flush();
+			String filePath = StrUtil.format("{}/{}", datePath, fileName);
 
-			PoitlIOUtils.closeQuietlyMulti(main, bos, out); // 最后不要忘记关闭这些流。
+			String baseDir = RuoYiConfig.getUploadPath();
+			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
 
+			main.write(new FileOutputStream(saveFile));
+
+			PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
+
+			JSONObject data = new JSONObject();
+			data.put("fileType", "docx");
+			data.put("key", IdUtils.fastSimpleUUID());
+			data.put("title", "电气检测初检报告.docx");
+			data.put("url", FileUploadUtils.getPathFileName(baseDir, filePath));
+
+			FileUploadUtils.getPathFileName(baseDir, filePath);
+
+			OwnerUnitReport report = new OwnerUnitReport();
+			report.setId(reportId);
+			report.setWordFileVersion(1);
+			report.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
+
+			return toAjax(unitReportService.updateOwnerUnitReport(report));
+
+			// return AjaxResult.success(data);
 		} catch (Exception e) {
 			log.error("生成电气检测初检报告失败！", e);
+			return AjaxResult.error();
 		} finally {
 
 		}

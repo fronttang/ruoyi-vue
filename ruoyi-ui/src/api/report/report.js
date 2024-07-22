@@ -16,6 +16,14 @@ export function getReport(query) {
     params: query
   })
 }
+
+// 查询报告日志
+export function getWordReport(reportId) {
+  return request({
+    url: '/report/download/initial/' + reportId,
+    method: 'get'
+  })
+}
 // 查询报告日志
 export function getReportLogs(reportId) {
   return request({

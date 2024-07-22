@@ -40,6 +40,8 @@ import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
 
+import OnlyofficeEditor from '@/components/onlyoffice-editor'
+
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
@@ -59,6 +61,7 @@ Vue.component('Editor', Editor)
 Vue.component('FileUpload', FileUpload)
 Vue.component('ImageUpload', ImageUpload)
 Vue.component('ImagePreview', ImagePreview)
+Vue.component('OnlyofficeEditor', OnlyofficeEditor)
 
 Vue.use(directive)
 Vue.use(plugins)

@@ -14,6 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="unitAreaId"    column="unit_area_id"    />
         <result property="areaName"    column="area_name"    />
         <result property="chargingPileId"    column="charging_pile_id"    />
+        <result property="chargingPileName"    column="charging_pile_name"    />
         <result property="rounds"    column="rounds"    />
         <result property="dangerId"    column="danger_id"    />
         <result property="formId"    column="form_id"    />
@@ -29,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="inspector"    column="inspector"    />
         <result property="inspectorId"    column="inspector_id"    />
         <result property="initialTime"    column="initial_time"    />
-        <result property="formb"    column="formb"    />
+        <result property="formb"    column="formb"  typeHandler="com.ruoyi.electrical.danger.type.JsonObjectTypeHandler"  />
         <result property="rectification"    column="rectification"    />
         <result property="rectificationDate"    column="rectification_date"    />
         <result property="reviewer"    column="reviewer"    />
@@ -46,10 +47,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectOwnerUnitDangerVo">
         select d.id, d.unit_id, u.name as unit_name, u.detect_id, a.name as area_name, b.name as building_name, 
         d.charging_pile_id, d.rounds,
-        d.building_id, d.unit_area_id, d.danger_id, d.form_id, d.form_code, d.form_type, d.form_data_id,
+        d.building_id, d.unit_area_id, d.danger_id, d.form_id, d.form_code, d.form_type, d.form_data_id, d.formb,
         d.level, d.description, d.suggestions, d.location, d.danger_pic, d.status, d.inspector, d.inspector_id, d.initial_time, 
         d.rectification, d.rectification_date, d.reviewer, d.reviewer_date, d.rectification_pic, d.reason, d.detect_pic, 
-        d.create_by, d.create_time, d.update_by, d.update_time 
+        d.create_by, d.create_time, d.update_by, d.update_time, 
+        ( select GROUP_CONCAT(cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name  
         from owner_unit_danger d 
         left join owner_unit u on u.id = d.unit_id
         left join owner_unit_area a on a.id = d.unit_area_id
@@ -70,6 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             or b.name like concat('%', #{location}, '%')
             )
             </if>
+            <if test="rounds != null  and rounds != ''"> and d.rounds = #{rounds}</if>
             <if test="status != null  and status != ''"> and d.status = #{status}</if>
             <if test="projectId != null  and projectId != ''"> and u.project_id = #{projectId}</if>
             <if test="level != null  and level != ''"> and d.level = #{level}</if>

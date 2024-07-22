@@ -14,6 +14,8 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
+import com.ruoyi.electrical.project.domain.OwnerUnit;
+import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.vo.DictVO;
 
 /**
@@ -25,8 +27,12 @@ import com.ruoyi.electrical.vo.DictVO;
 @RestController
 @RequestMapping("/danger")
 public class OwnerUnitDangerController extends BaseController {
+
 	@Autowired
 	private IOwnerUnitDangerService ownerUnitDangerService;
+
+	@Autowired
+	private IOwnerUnitService ownerUnitService;
 
 	/**
 	 * 查询隐患数据列表
@@ -35,8 +41,25 @@ public class OwnerUnitDangerController extends BaseController {
 	@GetMapping("/list")
 	public TableDataInfo list(OwnerUnitDanger ownerUnitDanger) {
 		startPage();
+
+		if (ownerUnitDanger.getUnitId() != null) {
+			OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(ownerUnitDanger.getUnitId());
+			if (ownerUnit != null) {
+				ownerUnitDanger.setRounds(ownerUnit.getRounds());
+			}
+		}
+
 		List<OwnerUnitDanger> list = ownerUnitDangerService.ownerUnitDangerList(ownerUnitDanger);
 		return getDataTable(list);
+	}
+
+	/**
+	 * 获取隐患数据详细信息
+	 */
+	@PreAuthorize("@ss.hasPermi('danger:danger:query')")
+	@GetMapping(value = "/{id}")
+	public AjaxResult getInfo(@PathVariable("id") Long id) {
+		return success(ownerUnitDangerService.ownerUnitDangerById(id));
 	}
 
 	/**

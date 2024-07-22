@@ -1,0 +1,45 @@
+<template>
+    <div id="weboffice" :style="'height:' + height"></div>
+</template>
+<script>
+import WebOfficeSDK from './web-office-sdk-solution-v2.0.6.es.js'
+import InnerLink from "@/layout/components/InnerLink/index"
+
+
+export default{
+    components: { InnerLink },
+    name: 'weboffice',
+    data() {
+        return {
+          height: document.documentElement.clientHeight - 94.5 + "px;",
+          instance: null,
+          reportId: this.$route.params.reportId,
+          type: this.$route.params.type,
+          fileId: null,
+        }
+    },
+    mounted() {
+
+      this.fileId = this.reportId + '_' + this.type;
+
+      this.instance = WebOfficeSDK.init({
+        officeType: WebOfficeSDK.OfficeType.Writer,
+        appId: 'SX20240722BGJGZR',
+        fileId: this.fileId,
+        mount: "#weboffice",
+        commonOptions: {
+          isBrowserViewFullscreen: true,
+          isIframeViewFullscreen: false
+        }
+      });
+      
+    },
+    methods: {
+    },
+    beforeDestroy(){
+      if(this.instance != null){
+        this.instance.destroy();
+      }
+    },
+};
+</script>

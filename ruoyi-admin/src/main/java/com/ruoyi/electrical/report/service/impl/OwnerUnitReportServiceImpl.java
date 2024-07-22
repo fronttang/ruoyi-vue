@@ -293,4 +293,9 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 		return ownerUnitReportMapper.selectOwnerUnitReportById(id);
 	}
 
+	@Override
+	public int updateOwnerUnitReport(OwnerUnitReport ownerUnitReport) {
+		return ownerUnitReportMapper.updateOwnerUnitReport(ownerUnitReport);
+	}
+
 }

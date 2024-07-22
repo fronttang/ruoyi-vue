@@ -63,7 +63,7 @@
       <el-table-column label="业主单元" align="center" prop="unitName" min-width="120" :show-overflow-tooltip="true"/>
       <el-table-column label="楼栋" v-if="projectType === '2'" align="center" prop="buildingName" min-width="120" :show-overflow-tooltip="true"/>
       <el-table-column label="公共区域/户" v-if="projectType === '1' || projectType === '2'" align="center" prop="areaName" min-width="120" :show-overflow-tooltip="true"/>
-      <el-table-column label="充电桩" v-if="projectType === '4'" align="center" prop="stationName" min-width="120" :show-overflow-tooltip="true"/>
+      <el-table-column label="充电桩" v-if="projectType === '4'" align="center" prop="chargingPileName" min-width="120" :show-overflow-tooltip="true"/>
       <el-table-column label="隐患位置" align="center" prop="location" min-width="200" :show-overflow-tooltip="true" />
       <el-table-column label="隐患描述" align="center" prop="description" min-width="200" :show-overflow-tooltip="true" />
       <el-table-column label="整改建议" align="center" prop="suggestions" min-width="200" :show-overflow-tooltip="true"  />
@@ -100,11 +100,13 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+
   </div>
 </template>
 
 <script>
-import { listDanger, getBuildingDict} from "@/api/danger/danger";
+import { listDanger, getDanger, getBuildingDict} from "@/api/danger/danger";
 import { getProject } from "@/api/project/project";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 
@@ -261,8 +263,7 @@ export default {
       } else{
         return this.selectDictLabel(this.dict.type.again_test_status, row.status);
       }
-
-    }
+    },
   }
 };
 </script>

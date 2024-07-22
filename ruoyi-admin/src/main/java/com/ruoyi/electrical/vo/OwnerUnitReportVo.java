@@ -71,4 +71,19 @@ public class OwnerUnitReportVo {
 	 */
 	private String hamlet;
 
+	/**
+	 * 制式WORD报告
+	 */
+	private String wordFile;
+
+	/**
+	 * 归档PDF报告地址
+	 */
+	private String archivedPdf;
+
+	/**
+	 * 归档word报告地址
+	 */
+	private String archivedWord;
+
 }

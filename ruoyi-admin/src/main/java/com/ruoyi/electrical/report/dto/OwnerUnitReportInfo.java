@@ -10,6 +10,11 @@ import lombok.NoArgsConstructor;
 public class OwnerUnitReportInfo {
 
 	/**
+	 * 报告ID
+	 */
+	private Long id;
+
+	/**
 	 * 检测时间
 	 */
 	private String detectData;

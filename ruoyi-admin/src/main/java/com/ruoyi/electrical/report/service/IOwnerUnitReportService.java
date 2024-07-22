@@ -27,6 +27,14 @@ public interface IOwnerUnitReportService {
 
 	public OwnerUnitReport selectOwnerUnitReportById(Long id);
 
+	/**
+	 * 更新报告
+	 * 
+	 * @param ownerUnitReport
+	 * @return
+	 */
+	public int updateOwnerUnitReport(OwnerUnitReport ownerUnitReport);
+
 	public boolean pass(Long reportId);
 
 	public boolean notPass(OwnerUnitReportPassDto data);

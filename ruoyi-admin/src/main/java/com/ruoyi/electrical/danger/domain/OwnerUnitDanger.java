@@ -2,6 +2,7 @@ package com.ruoyi.electrical.danger.domain;
 
 import java.util.Date;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -37,6 +38,11 @@ public class OwnerUnitDanger extends BaseEntity {
 	 * 公共区域/户名称
 	 */
 	private String areaName;
+
+	/**
+	 * 充电桩名称
+	 */
+	private String chargingPileName;
 
 	/**
 	 * 项目ID
@@ -130,7 +136,7 @@ public class OwnerUnitDanger extends BaseEntity {
 
 	/** B类表数据 */
 	@Excel(name = "B类表数据")
-	private String formb;
+	private JSONObject formb;
 
 	/** 整改员 */
 	@Excel(name = "整改员")

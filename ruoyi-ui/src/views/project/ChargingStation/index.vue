@@ -638,14 +638,22 @@ export default {
       this.openRounds = true;
     },
     handleStartRounds() {
-      startRounds(this.rounds.unitId).then(response => {
-        this.rounds.active = 0;
-        this.rounds.start = true;
-        this.rounds.steps = ["开始推进"];
 
-        this.createStepInterval(this.rounds.unitId);
+      this.$modal.confirm('确认开始推进新的轮次？').then(function() {
+        return true;
+      }).then(() => {
+        console.log("startrounds");
+        return startRounds(this.rounds.unitId).then(response => {
+          this.rounds.active = 0;
+          this.rounds.start = true;
+          this.rounds.steps = ["开始推进"];
 
-      });
+          this.createStepInterval(this.rounds.unitId);
+
+        });
+      }).catch(() => {});
+
+     
     },
     handleCloseRoundsDialog(){
       clearInterval(this.timer);

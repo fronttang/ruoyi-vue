@@ -185,7 +185,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="inspector != null">#{inspector},</if>
             <if test="inspectorId != null">#{inspectorId},</if>
             <if test="initialTime != null">#{initialTime},</if>
-            <if test="formb != null">#{formb},</if>
+            <if test="formb != null">#{formb,typeHandler=com.ruoyi.electrical.danger.type.JsonObjectTypeHandler},</if>
             <if test="rectification != null">#{rectification},</if>
             <if test="rectificationDate != null">#{rectificationDate},</if>
             <if test="reviewer != null">#{reviewer},</if>
@@ -222,7 +222,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="inspector != null">inspector = #{inspector},</if>
             <if test="inspectorId != null">inspector_id = #{inspectorId},</if>
             <if test="initialTime != null">initial_time = #{initialTime},</if>
-            <if test="formb != null">formb = #{formb},</if>
+            <if test="formb != null">formb = #{formb,typeHandler=com.ruoyi.electrical.danger.type.JsonObjectTypeHandler},</if>
             <if test="rectification != null">rectification = #{rectification},</if>
             <if test="rectificationDate != null">rectification_date = #{rectificationDate},</if>
             <if test="reviewer != null">reviewer = #{reviewer},</if>

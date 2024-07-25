@@ -1,9 +1,12 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.ruoyi.electrical.report.annotation.Formb;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
+@Formb("B5")
 public class FormB5 {
 
 	/**

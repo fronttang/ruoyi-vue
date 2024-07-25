@@ -124,6 +124,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectOwnerUnitVo"/>
         where id = #{id}
     </select>
+    
+    
+    <select id="getOwnerUnitById" parameterType="Long" resultMap="OwnerUnitResult">
+         select o.id, o.name, o.type, o.detect_id, o.detect_name, o.temperature, o.humidity, o.project_id, o.project_name, o.area, 
+         o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
+         o.entrust, o.manager, o.gridman, o.address, o.contact, o.phone, o.acreage, o.layers, 
+         o.nature, o.test_start_date, o.test_end_date, o.test_date, o.test_content, o.door_number, o.buildman, o.unit_type, 
+         o.incharge, o.venue_type, o.business_scope, o.safety_incharge, o.safety_incharge_phone, o.safety_manager, 
+         o.safety_manager_phone, o.high_risk_type, o.staffs, o.licence, o.safety_key_unit, o.station_type, o.rounds, 
+         o.detect_module, o.operating, o.property_type, o.property_name, o.panorama_pic, o.station_pic, 
+         o.create_by, o.create_time, o.update_by, o.update_time 
+         from owner_unit o  
+         left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
+		 left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
+		 left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)
+		 left join sys_dict_data d on (o.hamlet = d.dict_value and d.dict_type='hamlet' and d.project_id = o.project_id)
+         where o.id = #{id}
+    </select>
 
     <insert id="insertOwnerUnit" parameterType="OwnerUnit">
         insert into owner_unit

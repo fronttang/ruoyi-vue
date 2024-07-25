@@ -4,6 +4,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.electrical.danger.mapper.OwnerUnitDangerMapper">
     
+    <resultMap type="com.ruoyi.electrical.report.dto.high.HighDangerInfo" id="HighReportDanger">
+    	<result property="firstContent"    column="first_content"    />
+    	<result property="score"    column="score"    />
+    	<result property="description"    column="description"    />
+    	<result property="suggestions"    column="suggestions"    />
+    </resultMap>
+    
     <resultMap type="OwnerUnitDanger" id="OwnerUnitDangerResult">
         <result property="id"    column="id"    />
         <result property="unitId"    column="unit_id"    />
@@ -248,6 +255,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+    
+    <select id="selectOwnerDangerHighReportByUnitId" parameterType="Long" resultMap="HighReportDanger">
+    	select da.first_content,dd.score,dd.id,dd.description,dd.suggestions from owner_unit_danger d 
+		left join intuitive_detect_danger dd on dd.id = d.danger_id
+		left join intuitive_detect_data da on da.id = dd.data_id
+		where d.unit_id = #{unitId}
+    </select>
 
     
 </mapper>

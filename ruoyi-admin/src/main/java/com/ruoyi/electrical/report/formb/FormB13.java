@@ -1,9 +1,12 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.ruoyi.electrical.report.annotation.Formb;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
+@Formb("B13")
 public class FormB13 {
 
 	/**
@@ -64,19 +67,19 @@ public class FormB13 {
 	 * A-B
 	 */
 	@ApiModelProperty("A-B")
-	private ABCData ab;
+	private ABCData ab = new ABCData();
 
 	/**
 	 * A-C
 	 */
 	@ApiModelProperty("A-C")
-	private ABCData ac;
+	private ABCData ac = new ABCData();
 
 	/**
 	 * B-C
 	 */
 	@ApiModelProperty("B-C")
-	private ABCData bc;
+	private ABCData bc = new ABCData();
 
 	@Data
 	public static class ABCData {

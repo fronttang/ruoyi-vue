@@ -1,22 +1,25 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.ruoyi.electrical.report.annotation.Formb;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
+@Formb("B14")
 public class FormB14 {
 
 	/**
 	 * 剩余电流值检测
 	 */
 	@ApiModelProperty("剩余电流值检测")
-	private ResidualCurrent residualCurrent;
+	private ResidualCurrent residualCurrent = new ResidualCurrent();
 
 	/**
 	 * 报警时间检测
 	 */
 	@ApiModelProperty("报警时间检测")
-	private AlarmTime alarmTime;
+	private AlarmTime alarmTime = new AlarmTime();
 
 	/**
 	 * 报警时间检测

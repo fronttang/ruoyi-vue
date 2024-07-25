@@ -58,20 +58,28 @@ public class OwnerUnit extends BaseEntity {
 	 */
 	private String district;
 
+	private String districtName;
+
 	/**
 	 * 街道
 	 */
 	private String street;
+
+	private String streetName;
 
 	/**
 	 * 社区
 	 */
 	private String community;
 
+	private String communityName;
+
 	/**
 	 * 村
 	 */
 	private String hamlet;
+
+	private String hamletName;
 
 	/** 委托单位 */
 	@Excel(name = "委托单位")

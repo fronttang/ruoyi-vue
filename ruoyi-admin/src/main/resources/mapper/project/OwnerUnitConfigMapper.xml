@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.OwnerUnitConfigMapper">
+    
+    <resultMap type="OwnerUnitConfig" id="OwnerUnitConfigResult">
+        <result property="unitId"    column="unit_id"    />
+        <result property="config"    column="config"   typeHandler="com.ruoyi.electrical.danger.type.JsonObjectTypeHandler"  />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOwnerUnitConfigVo">
+        select unit_id, config, create_by, create_time, update_by, update_time from owner_unit_config
+    </sql>
+
+    <select id="selectOwnerUnitConfigList" parameterType="OwnerUnitConfig" resultMap="OwnerUnitConfigResult">
+        <include refid="selectOwnerUnitConfigVo"/>
+        <where>  
+            <if test="config != null  and config != ''"> and config = #{config}</if>
+        </where>
+    </select>
+    
+    <select id="selectOwnerUnitConfigByUnitId" parameterType="Long" resultMap="OwnerUnitConfigResult">
+        <include refid="selectOwnerUnitConfigVo"/>
+        where unit_id = #{unitId}
+    </select>
+
+    <insert id="insertOwnerUnitConfig" parameterType="OwnerUnitConfig">
+        insert into owner_unit_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">unit_id,</if>
+            <if test="config != null and config != ''">config,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">#{unitId},</if>
+            <if test="config != null and config != ''">#{config},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOwnerUnitConfig" parameterType="OwnerUnitConfig">
+        update owner_unit_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="config != null and config != ''">config = #{config},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where unit_id = #{unitId}
+    </update>
+
+    <delete id="deleteOwnerUnitConfigByUnitId" parameterType="Long">
+        delete from owner_unit_config where unit_id = #{unitId}
+    </delete>
+
+    <delete id="deleteOwnerUnitConfigByUnitIds" parameterType="String">
+        delete from owner_unit_config where unit_id in 
+        <foreach item="unitId" collection="array" open="(" separator="," close=")">
+            #{unitId}
+        </foreach>
+    </delete>
+</mapper>

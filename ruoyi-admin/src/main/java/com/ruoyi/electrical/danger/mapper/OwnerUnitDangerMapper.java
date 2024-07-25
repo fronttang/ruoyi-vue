@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
+import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
 import com.ruoyi.electrical.vo.DictVO;
 
 /**
@@ -79,5 +80,7 @@ public interface OwnerUnitDangerMapper {
 	 * @return 结果
 	 */
 	public int deleteOwnerUnitDangerByIds(Long[] ids);
+
+	public List<HighDangerInfo> selectOwnerDangerHighReportByUnitId(@Param("unitId") Long unitId);
 
 }

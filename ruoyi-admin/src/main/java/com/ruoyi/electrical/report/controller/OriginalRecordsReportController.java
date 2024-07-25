@@ -4,13 +4,20 @@ import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.reflections.Reflections;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -18,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
@@ -28,10 +36,13 @@ import com.deepoove.poi.util.PoitlIOUtils;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
+import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.project.service.IProjectService;
+import com.ruoyi.electrical.report.annotation.Formb;
 import com.ruoyi.electrical.report.domain.OwnerUnitReport;
 import com.ruoyi.electrical.report.dto.DetectForm;
 import com.ruoyi.electrical.report.dto.DetectFormData;
@@ -86,6 +97,9 @@ public class OriginalRecordsReportController extends BaseController {
 	@Autowired
 	private IIntuitiveDetectDangerService intuitiveDetectDangerService;
 
+	@Autowired
+	private IOwnerUnitDangerService ownerUnitDangerService;
+
 	/**
 	 * 原始记录 unit.nature=='1'?'':''
 	 * 
@@ -99,10 +113,15 @@ public class OriginalRecordsReportController extends BaseController {
 			return;
 		}
 
-		// log.info("originalRecords : " + originalRecords);
+		log.info("originalRecords : " + originalRecords);
 
 		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
-		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("data", policy);
+		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("data", policy)
+				.bind("formb.B1", policy).bind("formb.BB1", policy).bind("formb.B2", policy).bind("formb.B3", policy)
+				.bind("formb.B4", policy).bind("formb.B5", policy).bind("formb.B6", policy).bind("formb.B7", policy)
+				.bind("formb.B8", policy).bind("formb.B9", policy).bind("formb.B10", policy).bind("formb.B11", policy)
+				.bind("formb.B12", policy).bind("formb.B13", policy).bind("formb.B14", policy)
+				.bind("formb.B15", policy);
 		Configure config = configureBuilder.build();
 		try {
 
@@ -120,6 +139,11 @@ public class OriginalRecordsReportController extends BaseController {
 					.getResourceAsStream("report/originalRecords/OriginalRecords_Info.docx");
 			XWPFTemplate infoTemplate = XWPFTemplate.compile(infoInputStream, config).render(dataMap);
 			main = main.merge(infoTemplate.getXWPFDocument());
+
+			InputStream formbInputStream = ClassPathResource.class.getClassLoader()
+					.getResourceAsStream("report/originalRecords/OriginalRecords_Formb.docx");
+			XWPFTemplate formbTemplate = XWPFTemplate.compile(formbInputStream, config).render(dataMap);
+			main = main.merge(formbTemplate.getXWPFDocument());
 
 			List<DetectForm> detectForm = getDetectForm(originalRecords.getUnit(), originalRecords.getProject());
 
@@ -196,6 +220,8 @@ public class OriginalRecordsReportController extends BaseController {
 
 		buildOwnerUnitDetecContentInfo(ownerUnit, unitInfo);
 
+		Map<String, List<Object>> formb = queryFormb(ownerUnit);
+
 		// getDetectForm(ownerUnit, project);
 
 		OriginalRecords records = new OriginalRecords();
@@ -203,9 +229,68 @@ public class OriginalRecordsReportController extends BaseController {
 		records.setProject(project);
 		records.setUnit(unitInfo);
 		records.setReport(reportInfo);
+		records.setFormb(formb);
 
 		// Map<String, Object> dataMap = BeanUtil.beanToMap(records);
 		return records;
+	}
+
+	private Map<String, List<Object>> queryFormb(OwnerUnit ownerUnit) {
+
+		Map<String, List<Object>> formb = new HashMap<String, List<Object>>();
+
+		SysDictData query = new SysDictData();
+		query.setDictType("detect_table_b");
+
+		List<SysDictData> formbDict = dictDataService.selectDictDataList(query);
+
+		Reflections reflections = new Reflections("com.ruoyi.electrical.report.formb");
+		Set<Class<?>> allFormbBeans = reflections.getTypesAnnotatedWith(Formb.class);
+
+		Map<String, Class<?>> frombMap = allFormbBeans.stream().collect(Collectors.toMap((clazz) -> {
+
+			Formb annotation = clazz.getAnnotation(Formb.class);
+			return annotation.value();
+
+		}, Function.identity()));
+
+		formbDict.forEach((dict) -> {
+			Class<?> formbClass = frombMap.get(dict.getDictValue());
+
+			try {
+				formb.put(dict.getDictValue(), Arrays.asList(formbClass.newInstance()));
+			} catch (InstantiationException | IllegalAccessException e) {
+				log.error("", e);
+			}
+		});
+
+		// 查所有formb的隐患数据
+		OwnerUnitDanger danger = new OwnerUnitDanger();
+		danger.setUnitId(ownerUnit.getId());
+		danger.setFormType("B");
+		List<OwnerUnitDanger> dangers = ownerUnitDangerService.selectOwnerUnitDangerList(danger);
+
+		if (CollUtil.isNotEmpty(dangers)) {
+			dangers.sort(Comparator.comparing(OwnerUnitDanger::getFormCode));
+
+			Map<String, List<Object>> collect = dangers.stream()
+					.collect(Collectors.groupingBy(OwnerUnitDanger::getFormCode, Collectors.mapping((dang) -> {
+						JSONObject formbJson = dang.getFormb();
+						if (frombMap.get(dang.getFormCode()) != null) {
+							if (Objects.nonNull(formb)) {
+								JSONObject formbData = formbJson.getJSONObject("data");
+								if (Objects.nonNull(formbData)) {
+									return formbData.toJavaObject(frombMap.get(dang.getFormCode()));
+								}
+							}
+						}
+						return formbJson;
+					}, Collectors.toList())));
+
+			formb.putAll(collect);
+
+		}
+		return formb;
 	}
 
 	private List<DetectForm> getDetectForm(OwnerUnitInfo ownerUnit, Project project) {

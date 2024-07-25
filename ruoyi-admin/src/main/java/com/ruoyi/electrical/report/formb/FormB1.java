@@ -1,9 +1,12 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.ruoyi.electrical.report.annotation.Formb;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
+@Formb("B1")
 public class FormB1 {
 
 	/**
@@ -82,13 +85,13 @@ public class FormB1 {
 	 * 三相检测
 	 */
 	@ApiModelProperty("三相检测")
-	private ThreePhase threePhase;
+	private ThreePhase threePhase = new ThreePhase();
 
 	/**
 	 * 单相检测
 	 */
 	@ApiModelProperty("单相检测")
-	private SinglePhase singlePhase;
+	private SinglePhase singlePhase = new SinglePhase();
 
 	/**
 	 * 单相检测
@@ -99,13 +102,13 @@ public class FormB1 {
 		 * L
 		 */
 		@ApiModelProperty("L")
-		private ABNCLData L;
+		private ABNCLData L = new ABNCLData();
 
 		/**
 		 * N
 		 */
 		@ApiModelProperty("N")
-		private ABNCLData N;
+		private ABNCLData N = new ABNCLData();
 	}
 
 	/**
@@ -118,31 +121,31 @@ public class FormB1 {
 		 * A
 		 */
 		@ApiModelProperty("A")
-		private ABNCLData A;
+		private ABNCLData A = new ABNCLData();
 
 		/**
 		 * B
 		 */
 		@ApiModelProperty("B")
-		private ABNCLData B;
+		private ABNCLData B = new ABNCLData();
 
 		/**
 		 * N
 		 */
 		@ApiModelProperty("N")
-		private ABNCLData N;
+		private ABNCLData N = new ABNCLData();
 
 		/**
 		 * C
 		 */
 		@ApiModelProperty("C")
-		private ABNCLData C;
+		private ABNCLData C = new ABNCLData();
 
 		/**
 		 * 电压（V）
 		 */
 		@ApiModelProperty("电压（V）")
-		private VoltageData voltage;
+		private VoltageData voltage = new VoltageData();
 	}
 
 	@Data

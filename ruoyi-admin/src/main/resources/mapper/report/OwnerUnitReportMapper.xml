@@ -36,8 +36,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status"    column="status"    />
         <result property="reject"    column="reject"    />
         <result property="wordFile"    column="word_file"    />
+        <result property="wordFileVersion"    column="word_file_version"    />
         <result property="archivedPdf"    column="archived_pdf"    />
         <result property="archivedWord"    column="archived_word"    />
+        <result property="archivedWordVersion"    column="archived_word_version"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -45,11 +47,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
 	<sql id="selectOwnerUnitReportVo">
-        select id, unit_id, is_danger_notice, is_complete, is_test, is_test_reason, type, code, archived_pdf, archived_word, word_file, detect_data, detect_status, inspector, inspector_id, status, reject, create_by, create_time, update_by, update_time from owner_unit_report
+        select id, unit_id, is_danger_notice, is_complete, is_test, is_test_reason, type, code, archived_pdf, archived_word, word_file, word_file_version, archived_word_version, detect_data, detect_status, inspector, inspector_id, status, reject, create_by, create_time, update_by, update_time from owner_unit_report
     </sql>
 
     <select id="selectOwnerUnitReportList" parameterType="com.ruoyi.electrical.dto.OwnerUnitReportDto" resultMap="OwnerUnitReportVo">
-    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,  r.archived_pdf, r.archived_word, r.word_file,
+    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,  r.archived_pdf, r.archived_word, r.word_file, r.word_file_version, r.archived_word_version,
     	u.district, u.street, u.community, u.hamlet,
     	CASE WHEN r.status is null THEN 0 ELSE r.status END as status, 
     	CASE WHEN r.reject is null THEN 0 ELSE r.reject END as reject
@@ -94,6 +96,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="wordFile != null">word_file,</if>
             <if test="archivedPdf != null">archived_pdf,</if>
             <if test="archivedWord != null">archived_word,</if>
+            <if test="archivedWordVersion != null">archived_word_version,</if>
+            <if test="wordFileVersion != null">word_file_version,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -117,6 +121,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="wordFile != null">#{wordFile},</if>
             <if test="archivedPdf != null">#{archivedPdf},</if>
             <if test="archivedWord != null">#{archivedWord},</if>
+            <if test="archivedWordVersion != null">#{archivedWordVersion},</if>
+            <if test="wordFileVersion != null">#{wordFileVersion},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>

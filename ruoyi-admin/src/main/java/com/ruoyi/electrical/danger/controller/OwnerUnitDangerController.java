@@ -14,9 +14,11 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
+import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.vo.DictVO;
+import com.ruoyi.electrical.vo.OwnerUnitDangerGroupDetailVo;
 
 /**
  * 隐患数据Controller
@@ -37,7 +39,6 @@ public class OwnerUnitDangerController extends BaseController {
 	/**
 	 * 查询隐患数据列表
 	 */
-	@PreAuthorize("@ss.hasPermi('danger:danger:list')")
 	@GetMapping("/list")
 	public TableDataInfo list(OwnerUnitDanger ownerUnitDanger) {
 		startPage();
@@ -50,6 +51,20 @@ public class OwnerUnitDangerController extends BaseController {
 		}
 
 		List<OwnerUnitDanger> list = ownerUnitDangerService.ownerUnitDangerList(ownerUnitDanger);
+		return getDataTable(list);
+	}
+
+	@GetMapping("/unit/list")
+	public TableDataInfo unitList(OwnerUnitDangerGroupDetailDto data) {
+		startPage();
+		List<OwnerUnitDangerGroupDetailVo> list = ownerUnitDangerService.ownerUnitDangerGroupList(data);
+		return getDataTable(list);
+	}
+
+	@GetMapping("/unit/building/list")
+	public TableDataInfo unitBuildingList(OwnerUnitDangerGroupDetailDto data) {
+		startPage();
+		List<OwnerUnitDangerGroupDetailVo> list = ownerUnitDangerService.ownerUnitBuildingDangerGroupList(data);
 		return getDataTable(list);
 	}
 

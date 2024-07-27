@@ -113,8 +113,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 	static {
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
 				.forPackages("com.ruoyi.electrical.report.formb")
-				.filterInputsBy(
-						new FilterBuilder().includePackage("BOOT-INF.classes.com.ruoyi.electrical.report.formb"))
+				.filterInputsBy(new FilterBuilder().includePackage("BOOT-INF.classes.com.ruoyi.electrical.report.formb")
+						.includePackage("com.ruoyi.electrical.report.formb"))
 				.setScanners(Scanners.TypesAnnotated));
 
 		allFormbBeans = reflections.getTypesAnnotatedWith(Formb.class);
@@ -176,17 +176,17 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 			PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
 
-			JSONObject data = new JSONObject();
-			data.put("fileType", "docx");
-			data.put("key", IdUtils.fastSimpleUUID());
-			data.put("title", "电气检测初检报告.docx");
-			data.put("url", FileUploadUtils.getPathFileName(baseDir, filePath));
+			Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
 
-			FileUploadUtils.getPathFileName(baseDir, filePath);
+			if (wordFileVersion == null) {
+				wordFileVersion = 1;
+			} else {
+				wordFileVersion = wordFileVersion + 1;
+			}
 
 			OwnerUnitReport report = new OwnerUnitReport();
 			report.setId(reportId);
-			report.setWordFileVersion(1);
+			report.setWordFileVersion(wordFileVersion);
 			report.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
 
 			return unitReportService.updateOwnerUnitReport(report);

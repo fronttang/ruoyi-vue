@@ -84,7 +84,7 @@
       <el-table-column label="ID" align="center" width="60" prop="unitId" />
       <el-table-column label="名称" align="center" prop="name" min-width="200" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
-          <router-link :to="'/report/danger/index/' + scope.row.unitId" class="link-type">
+          <router-link :to="'/danger/list/index/' + scope.row.unitId" class="link-type">
             <span>{{ scope.row.name }}</span>
           </router-link>
         </template>
@@ -470,7 +470,7 @@ export default {
     handleChooseRow(row){
       const unitId = row.unitId;
       const params = {};
-      this.$tab.openPage("隐患数据汇总", '/report/danger/index/' + unitId, params);
+      this.$tab.openPage("隐患数据汇总", '/danger/list/index/' + unitId, params);
     },
     handleDownloadOriginalRecords(row){
       if(row.reportId != null){

@@ -262,6 +262,62 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		left join intuitive_detect_data da on da.id = dd.data_id
 		where d.unit_id = #{unitId}
     </select>
+    
+     <resultMap type="com.ruoyi.electrical.vo.OwnerUnitDangerGroupDetailVo" id="OwnerUnitDangerGroupDetail">
+    	<result property="initialStatus"    column="initial_status"    />
+    	<result property="reviewStatus"    column="review_status"    />
+    	<result property="highRiskType"    column="high_risk_type"    />
+    	<result property="unitId"    column="unit_id"    />
+    </resultMap>
+    
+    <select id="ownerUnitDangerGroupList" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="OwnerUnitDangerGroupDetail">
+    	select t.* from (select o.id, o.name, o.district, o.street, o.community, o.hamlet, o.high_risk_type,
+		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
+		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
+		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
+		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date,
+		(select count(1) as dangers from owner_unit_danger ud1 where ud1.unit_id = o.id and ud1.status = 0 and ud1.rounds = o.rounds ) as rectifications,
+		(select count(1) as dangers from owner_unit_danger ud2 where ud2.unit_id = o.id and ud2.status = 1 and ud2.rounds = o.rounds ) as reexaminations,
+		(select count(1) as dangers from owner_unit_danger ud3 where ud3.unit_id = o.id and ud3.status = 2 and ud3.rounds = o.rounds ) as finishs,
+		(select count(1) from owner_unit_danger t where t.unit_id = o.id and t.rounds = o.rounds ) as dangers
+		from owner_unit o 
+		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		where o.project_id = #{projectId}) t
+		<where>  
+            <if test="name != null and name !='' "> and t.name like concat('%', #{name}, '%')</if>
+            <if test="district != null and district !='' "> and t.district = #{district}</if>
+            <if test="street != null and street !='' "> and t.street = #{street}</if>
+            <if test="community != null and community !='' "> and t.community = #{community}</if>
+            <if test="hamlet != null and hamlet !='' "> and t.hamlet = #{hamlet}</if>
+            <if test="highRiskType != null and highRiskType !='' "> and t.high_risk_type = #{highRiskType}</if>
+            <if test="initialStatus != null and initialStatus !='' "> and t.initial_status = #{initialStatus}</if>
+            <if test="reviewStatus != null and reviewStatus !='' "> and t.review_status = #{reviewStatus}</if>
+            <if test="startInitialDate != null and startInitialDate !='' "> and date(t.initial_date) &gt;= #{startInitialDate}</if>
+            <if test="endInitialDate != null and endInitialDate !='' "> and date(t.initial_date) &lt;= #{endInitialDate}</if>
+            <if test="startReviewDate != null and startReviewDate !='' "> and date(t.review_date) &gt;= #{startReviewDate}</if>
+            <if test="endReivewDate != null and endReivewDate !='' "> and date(t.review_date) &lt;= #{endReivewDate}</if>
+        </where>
+    	
+    </select>
+    
+     <select id="ownerUnitBuildingDangerGroupList" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="OwnerUnitDangerGroupDetail">
+    	select t.* from (select o.id, o.unit_id, o.name, 
+		CASE WHEN o.status is null THEN 0 ELSE o.status END as initial_status,
+		CASE WHEN o.review_status is null THEN 0 ELSE o.review_status END as review_status,
+		(select count(1) as dangers from owner_unit_danger ud1 where ud1.building_id = o.id and ud1.status = 0 ) as rectifications,
+		(select count(1) as dangers from owner_unit_danger ud2 where ud2.building_id = o.id and ud2.status = 1 ) as reexaminations,
+		(select count(1) as dangers from owner_unit_danger ud3 where ud3.building_id = o.id and ud3.status = 2 ) as finishs,
+		(select count(1) from owner_unit_danger t where t.building_id = o.id ) as dangers
+		from owner_unit_building o 
+		where o.unit_id = #{unitId}) t
+		<where>  
+            <if test="name != null and name !='' "> and t.name like concat('%', #{name}, '%')</if>
+            <if test="initialStatus != null and initialStatus !='' "> and t.initial_status = #{initialStatus}</if>
+            <if test="reviewStatus != null and reviewStatus !='' "> and t.review_status = #{reviewStatus}</if>
+        </where>
+    	
+    </select>
 
     
 </mapper>

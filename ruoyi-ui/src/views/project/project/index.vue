@@ -131,7 +131,7 @@
           <el-input v-model="form.name" placeholder="请输入项目名称" />
         </el-form-item>
         <el-form-item label="项目类型" label-width="130px" prop="type">
-          <el-select v-model="form.type" placeholder="请选择项目类型" filterable clearable @change="handleChangeProjectType" >
+          <el-select v-model="form.type" placeholder="请选择项目类型" :disabled="this.form.id != null" filterable clearable @change="handleChangeProjectType" >
             <el-option
               v-for="dict in dict.type.project_type"
               :key="dict.value"
@@ -141,7 +141,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="检测单位" label-width="130px" prop="detectId">
-          <el-select v-model="form.detectId" placeholder="请选择检测单位" filterable clearable @change="handleChangeDetectUnit" >
+          <el-select v-model="form.detectId" placeholder="请选择检测单位"  :disabled="this.form.id != null" filterable clearable @change="handleChangeDetectUnit" >
             <el-option
               v-for="item in detectUnitDict"
               :key="item.id"
@@ -155,8 +155,8 @@
               <el-input v-model="form.householdRate" placeholder="请输入入户率要求" />
           </el-form-item>
         </template>
-        <el-form-item label="直观检测模板" label-width="130px" prop="templateId" filterable clearable>
-          <el-select v-model="form.templateId" placeholder="请选择直观检测模板">
+        <el-form-item label="直观检测模板" label-width="130px" prop="templateId"  >
+          <el-select v-model="form.templateId" placeholder="请选择直观检测模板"  :disabled="this.form.id != null" filterable clearable>
             <el-option
               v-for="item in templateDict"
               :key="item.id"

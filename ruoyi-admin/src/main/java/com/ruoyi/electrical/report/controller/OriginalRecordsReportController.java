@@ -55,6 +55,7 @@ import com.ruoyi.electrical.role.service.IDetectUnitService;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
+import com.ruoyi.electrical.template.dto.IntuitiveDetectQuery;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDangerService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
@@ -295,7 +296,7 @@ public class OriginalRecordsReportController extends BaseController {
 
 	private List<DetectForm> getDetectForm(OwnerUnitInfo ownerUnit, Project project) {
 		// 直观检测表
-		IntuitiveDetect detectQuery = new IntuitiveDetect();
+		IntuitiveDetectQuery detectQuery = new IntuitiveDetectQuery();
 		detectQuery.setTemplateId(project.getTemplateId());
 
 		List<IntuitiveDetect> intuitiveDetect = intuitiveDetectService.selectIntuitiveDetectList(detectQuery);

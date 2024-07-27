@@ -46,6 +46,11 @@ public class DetectUnitServiceImpl implements IDetectUnitService {
 		return detectUnitMapper.selectDetectUnitList(detectUnit);
 	}
 
+	@Override
+	public Integer checkDetectUnitName(DetectUnit detectUnit) {
+		return detectUnitMapper.checkDetectUnitName(detectUnit);
+	}
+
 	/**
 	 * 新增检测单位
 	 * 

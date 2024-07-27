@@ -246,16 +246,36 @@ export const dynamicRoutes = [
     ]
   },
   {
-    path: '/report/danger',
+    path: '/danger/list',
     component: Layout,
     hidden: true,
-    permissions: ['report:report:list'],
+    permissions: ['*:*:*'],
     children: [
       {
         path: 'index/:unitId(\\d+)',
-        component: () => import('@/views/report/danger/index'),
-        name: 'OwnerUnitReportDanger',
-        meta: { title: '隐患数据汇总', activeMenu: '/report/Initial' }
+        component: () => import('@/views/danger/danger/index'),
+        name: 'OwnerUnitDanger',
+        meta: { title: '隐患数据汇总', activeMenu: '/danger/group' }
+      },
+      {
+        path: 'index/:unitId(\\d+)/:buildingId(\\d+)',
+        component: () => import('@/views/danger/danger/index'),
+        name: 'OwnerUnitDanger',
+        meta: { title: '隐患数据汇总', activeMenu: '/danger/group' }
+      }
+    ]
+  },
+  {
+    path: '/danger/building',
+    component: Layout,
+    hidden: true,
+    permissions: ['*:*:*'],
+    children: [
+      {
+        path: 'index/:unitId(\\d+)',
+        component: () => import('@/views/danger/building/index'),
+        name: 'OwnerUnitBuildingDanger',
+        meta: { title: '楼栋隐患数据汇总', activeMenu: '/danger/group' }
       }
     ]
   },

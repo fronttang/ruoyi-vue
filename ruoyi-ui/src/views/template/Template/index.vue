@@ -159,30 +159,87 @@
     </el-dialog>
 
     <!-- 仪器检测列表对话框 -->
-    <el-dialog :title="titleb" :visible.sync="openb" width="600px" append-to-body>
+    <el-dialog :title="titleb" :visible.sync="openb" :width="this.formb.type === '2'? '1200px' : '900px'" append-to-body>
       <el-form ref="formb" :model="formb" :rules="rules" label-width="80px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item prop="views" label-width="0px">
-              <label>检测员端显示检测表</label>
-              <el-checkbox-group type="" v-model="formb.views">
-                <el-checkbox v-for="dict in dict.type.detect_table_b"
-                  :key="dict.value"
-                  :label="dict.value"
-                  :value="dict.value">{{dict.label}}</el-checkbox>
-              </el-checkbox-group>
-            </el-form-item>
+        <el-row :gutter="12">
+          <el-col :span="this.formb.type === '2'? 18 : 16">
+            <el-card class="box-card" shadow="always">
+              <div slot="header" class="clearfix">
+                <span>检测员端显示检测表</span>
+              </div>
+              <div class="text item">
+                <el-row>
+                  <el-col :span="this.formb.type === '2'? 8 : 12">
+                    <el-card class="box-card" shadow="always" style="margin-right: 10px;">
+                      <div slot="header" class="clearfix">
+                        <span>公共区域</span>
+                      </div>
+                      <div class="text item">
+                        <el-form-item prop="views1" label-width="0px">
+                          <el-checkbox-group type="" v-model="formb.views1">
+                            <el-checkbox v-for="dict in dict.type.detect_table_b"
+                              :key="dict.value"
+                              :label="dict.value"
+                              :value="dict.value">{{dict.label}}</el-checkbox>
+                          </el-checkbox-group>
+                        </el-form-item>
+                      </div>
+                    </el-card>
+                  </el-col>
+                  <el-col :span="this.formb.type === '2'? 8 : 12">
+                    <el-card class="box-card" shadow="always" style="margin-right: 10px;">
+                      <div slot="header" class="clearfix">
+                        <span>户</span>
+                      </div>
+                      <div class="text item">
+                        <el-form-item prop="views2" label-width="0px">
+                          <el-checkbox-group type="" v-model="formb.views2">
+                            <el-checkbox v-for="dict in dict.type.detect_table_b"
+                              :key="dict.value"
+                              :label="dict.value"
+                              :value="dict.value">{{dict.label}}</el-checkbox>
+                          </el-checkbox-group>
+                        </el-form-item>
+                      </div>
+                    </el-card>
+                  </el-col>
+                  <el-col :span="8" v-if="this.formb.type === '2'">
+                    <el-card class="box-card" shadow="always">
+                      <div slot="header" class="clearfix">
+                        <span>配电房</span>
+                      </div>
+                      <div class="text item">
+                        <el-form-item prop="views3" label-width="0px">
+                          <el-checkbox-group type="" v-model="formb.views3">
+                            <el-checkbox v-for="dict in dict.type.detect_table_b"
+                              :key="dict.value"
+                              :label="dict.value"
+                              :value="dict.value">{{dict.label}}</el-checkbox>
+                          </el-checkbox-group>
+                        </el-form-item>
+                      </div>
+                    </el-card>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-card>
           </el-col>
-          <el-col :span="12">
-            <el-form-item prop="reports"  label-width="0px">
-              <label>初检报告显示检测模块</label>
-              <el-checkbox-group type="" v-model="formb.reports">
-                <el-checkbox v-for="dict in dict.type.detect_table_b"
-                  :key="dict.value"
-                  :label="dict.value"
-                  :value="dict.value" >{{dict.label}}</el-checkbox>
-              </el-checkbox-group>
-            </el-form-item>
+          <el-col :span="this.formb.type === '2'? 6 : 8">
+            <el-card class="box-card" shadow="always">
+              <div slot="header" class="clearfix">
+                <span>初检报告显示检测模块</span>
+              </div>
+              <div class="text item">
+                <el-form-item prop="reports"  label-width="0px">
+                  <el-checkbox-group type="" v-model="formb.reports">
+                    <el-checkbox v-for="dict in dict.type.detect_table_b"
+                      :key="dict.value"
+                      :label="dict.value"
+                      :value="dict.value" >{{dict.label}}</el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+              </div>
+            </el-card>
           </el-col>
         </el-row>
       </el-form>
@@ -193,7 +250,11 @@
     </el-dialog>
   </div>
 </template>
-
+<style>
+.el-card__body{
+  padding:10px;
+}
+</style>
 <script>
 import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate, getTemplateDetectB, saveTemplateDetectB } from "@/api/template/Template";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
@@ -240,7 +301,10 @@ export default {
       form: {},
       formb: {
         templateId: null,
-        views: [],
+        type: null,
+        views1: [],
+        views2: [],
+        views3: [],
         reports: []
       },
       // 表单校验
@@ -301,7 +365,10 @@ export default {
     resetb() {
       this.formb = {
         templateId: null,
-        views: [],
+        type: null,
+        views1: [],
+        views2: [],
+        views3: [],
         reports: []
       };
       this.resetForm("formb");
@@ -364,10 +431,11 @@ export default {
     },
     /** 打开仪器模板 */
     handleUrbanVillageDatectDevice(row){
-      const templateId = row.id || this.ids[0];
+      const templateId = row.id;
       this.formb.templateId = templateId;
       getTemplateDetectB(this.formb.templateId).then(response => {
         this.formb = response.data;
+        this.formb.type = row.type;
         this.openb = true;
       });
     },

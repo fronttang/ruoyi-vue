@@ -30,6 +30,8 @@ import com.ruoyi.electrical.template.service.IDetectTemplateBService;
 import com.ruoyi.electrical.template.service.IDetectTemplateService;
 import com.ruoyi.electrical.vo.DetectTemplateBVo;
 
+import cn.hutool.core.util.StrUtil;
+
 /**
  * 模板列表Controller
  * 
@@ -84,6 +86,14 @@ public class DetectTemplateController extends BaseController {
 	@Log(title = "模板列表", businessType = BusinessType.INSERT)
 	@PostMapping
 	public AjaxResult add(@RequestBody DetectTemplate detectTemplate) {
+
+		DetectTemplate query = new DetectTemplate();
+		query.setName(detectTemplate.getName());
+
+		if (detectTemplateService.checkDetectTemplateName(query) > 0) {
+			return error(StrUtil.format("已经存在名为[{}]的模板", query.getName()));
+		}
+
 		return toAjax(detectTemplateService.insertDetectTemplate(detectTemplate));
 	}
 
@@ -94,6 +104,13 @@ public class DetectTemplateController extends BaseController {
 	@Log(title = "模板列表", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody DetectTemplate detectTemplate) {
+		DetectTemplate query = new DetectTemplate();
+		query.setName(detectTemplate.getName());
+		query.setId(detectTemplate.getId());
+
+		if (detectTemplateService.checkDetectTemplateName(query) > 0) {
+			return error(StrUtil.format("已经存在名为[{}]的模板", query.getName()));
+		}
 		return toAjax(detectTemplateService.updateDetectTemplate(detectTemplate));
 	}
 
@@ -126,11 +143,25 @@ public class DetectTemplateController extends BaseController {
 		result.setTemplateId(templateId);
 		List<DetectTemplateB> detectTemplateB = templateBService.selectDetectTemplateBByTemplateId(templateId);
 		if (!CollectionUtils.isEmpty(detectTemplateB)) {
-			List<String> views = detectTemplateB.stream().filter((data) -> {
-				return "1".equalsIgnoreCase(data.getType());
+			List<String> views1 = detectTemplateB.stream().filter((data) -> {
+				return "11".equalsIgnoreCase(data.getType());
 			}).map(DetectTemplateB::getBid).collect(Collectors.toList());
-			if (!CollectionUtils.isEmpty(views)) {
-				result.setViews(views);
+			if (!CollectionUtils.isEmpty(views1)) {
+				result.setViews1(views1);
+			}
+
+			List<String> views2 = detectTemplateB.stream().filter((data) -> {
+				return "12".equalsIgnoreCase(data.getType());
+			}).map(DetectTemplateB::getBid).collect(Collectors.toList());
+			if (!CollectionUtils.isEmpty(views2)) {
+				result.setViews2(views2);
+			}
+
+			List<String> views3 = detectTemplateB.stream().filter((data) -> {
+				return "13".equalsIgnoreCase(data.getType());
+			}).map(DetectTemplateB::getBid).collect(Collectors.toList());
+			if (!CollectionUtils.isEmpty(views3)) {
+				result.setViews3(views3);
 			}
 
 			List<String> reports = detectTemplateB.stream().filter((data) -> {

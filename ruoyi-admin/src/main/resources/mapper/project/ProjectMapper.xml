@@ -34,6 +34,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
+    <select id="checkProjectName" parameterType="Project" resultType="Integer">
+        select count(1) from project p 
+        <where>   
+            <if test="name != null  and name != ''"> and p.name = #{name}</if>
+            <if test="id != null  and id != ''"> and p.id != #{id}</if>
+        </where>
+    </select>
+    
     <select id="selectProjectById" parameterType="Long" resultMap="ProjectResult">
         <include refid="selectProjectVo"/>
         where p.id = #{id}

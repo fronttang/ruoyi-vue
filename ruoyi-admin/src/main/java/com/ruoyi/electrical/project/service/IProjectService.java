@@ -30,6 +30,8 @@ public interface IProjectService {
 	 */
 	public List<Project> selectProjectList(Project project);
 
+	public Integer checkProjectName(Project project);
+
 	/**
 	 * 项目下拉字典
 	 * 

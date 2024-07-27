@@ -29,6 +29,16 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item label="归属" prop="attribution">
+        <el-select v-model="queryParams.attribution" placeholder="请选择归属" clearable>
+          <el-option
+            v-for="dict in dict.type.intuitive_detect_attribution"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="代号" prop="code">
         <el-input
           v-model="queryParams.code"
@@ -98,6 +108,11 @@
           <dict-tag :options="dict.type.intuitive_detect_type" :value="scope.row.type"/>
         </template>
       </el-table-column>
+      <el-table-column label="归属" align="center" min-width="120"  :show-overflow-tooltip="true" prop="attribution">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.intuitive_detect_attribution" :value="scope.row.attribution"/>
+        </template>
+      </el-table-column>
       <el-table-column label="名称" align="center" prop="name" min-width="300" :show-overflow-tooltip="true" />
       <el-table-column label="最后修改时间" align="center" prop="updateTime" width="160">
         <template slot-scope="scope">
@@ -151,6 +166,14 @@
         <el-form-item label="代号" prop="code">
           <el-input v-model="form.code" placeholder="请输入代号" />
         </el-form-item>
+        <el-form-item label="归属" prop="attribution">
+          <el-checkbox-group type="attribution" v-model="form.attribution">
+            <el-checkbox v-for="dict in dict.type.intuitive_detect_attribution"
+              :key="dict.value"
+              :label="dict.value"
+              :value="dict.value">{{dict.label}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -166,7 +189,7 @@ import { getTemplateDict } from "@/api/template/Template";
 
 export default {
   name: "IntuitiveDetect",
-  dicts: ['intuitive_detect_type'],
+  dicts: ['intuitive_detect_type', 'intuitive_detect_attribution'],
   data() {
     return {
       // 遮罩层
@@ -195,6 +218,7 @@ export default {
         name: null,
         type: null,
         code: null,
+        attribution: null,
         templateId: parseInt(this.$route.params.templateId)
       },
       // 表单参数
@@ -206,6 +230,12 @@ export default {
         ],
         type: [
           { required: true, message: "请选择类型", trigger: "change" }
+        ],
+        code: [
+          { required: true, message: "CODE不能为空", trigger: "blur" }
+        ],
+        attribution: [
+          { required: true, message: "归属不能为空", trigger: "blur" }
         ],
       },
       templateId: null
@@ -239,6 +269,7 @@ export default {
         name: null,
         type: null,
         code: null,
+        attribution: [],
         templateId: this.$route.params.templateId,
         createBy: null,
         createTime: null,

@@ -18,8 +18,6 @@ import com.ruoyi.electrical.report.service.IHighFireRiskInitialReportService;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * 初检报告
  */

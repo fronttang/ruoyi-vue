@@ -47,6 +47,11 @@ public class ProjectServiceImpl implements IProjectService {
 		return projectMapper.selectProjectList(project);
 	}
 
+	@Override
+	public Integer checkProjectName(Project project) {
+		return projectMapper.checkProjectName(project);
+	}
+
 	/**
 	 * 新增项目
 	 * 

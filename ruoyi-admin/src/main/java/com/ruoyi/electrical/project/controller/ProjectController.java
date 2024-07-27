@@ -24,6 +24,8 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.service.IProjectService;
 
+import cn.hutool.core.util.StrUtil;
+
 /**
  * 项目Controller
  * 
@@ -75,6 +77,14 @@ public class ProjectController extends BaseController {
 	@Log(title = "项目", businessType = BusinessType.INSERT)
 	@PostMapping
 	public AjaxResult add(@RequestBody Project project) {
+
+		Project query = new Project();
+		query.setName(project.getName());
+
+		if (projectService.checkProjectName(query) > 0) {
+			return error(StrUtil.format("已经存在名为[{}]的项目", project.getName()));
+		}
+
 		return toAjax(projectService.insertProject(project));
 	}
 
@@ -85,6 +95,13 @@ public class ProjectController extends BaseController {
 	@Log(title = "项目", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody Project project) {
+		Project query = new Project();
+		query.setName(project.getName());
+		query.setId(project.getId());
+
+		if (projectService.checkProjectName(query) > 0) {
+			return error(StrUtil.format("已经存在名为[{}]的项目", project.getName()));
+		}
 		return toAjax(projectService.updateProject(project));
 	}
 

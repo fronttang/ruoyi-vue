@@ -30,6 +30,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
+    <select id="checkDetectTemplateName" parameterType="DetectTemplate" resultType="Integer">
+        select count(1) from detect_template
+        <where>  
+            <if test="name != null  and name != ''"> and name = #{name}</if>
+            <if test="id != null  and id != ''"> and id != #{id}</if>
+        </where>
+    </select>
+    
     <select id="selectDetectTemplateById" parameterType="Long" resultMap="DetectTemplateResult">
         <include refid="selectDetectTemplateVo"/>
         where id = #{id}

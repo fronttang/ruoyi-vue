@@ -12,7 +12,7 @@
         <el-tag
           v-else
           :disable-transitions="true"
-          :key="item.value"
+          :key="item.value" 
           :index="index"
           :type="item.raw.listClass == 'primary' ? '' : item.raw.listClass"
           :class="item.raw.cssClass"
@@ -76,7 +76,7 @@ export default {
     handleArray(array) {
       if (array.length === 0) return '';
       return array.reduce((pre, cur) => {
-        return pre + ' ' + cur;
+        return pre + '/' + cur;
       })
     },
   }

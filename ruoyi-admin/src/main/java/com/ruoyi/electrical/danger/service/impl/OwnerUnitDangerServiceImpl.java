@@ -9,7 +9,9 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.mapper.OwnerUnitDangerMapper;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
+import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.vo.DictVO;
+import com.ruoyi.electrical.vo.OwnerUnitDangerGroupDetailVo;
 
 /**
  * 隐患数据Service业务层处理
@@ -116,6 +118,16 @@ public class OwnerUnitDangerServiceImpl implements IOwnerUnitDangerService {
 	@Override
 	public int deleteOwnerUnitDangerById(Long id) {
 		return ownerUnitDangerMapper.deleteOwnerUnitDangerById(id);
+	}
+
+	@Override
+	public List<OwnerUnitDangerGroupDetailVo> ownerUnitDangerGroupList(OwnerUnitDangerGroupDetailDto data) {
+		return ownerUnitDangerMapper.ownerUnitDangerGroupList(data);
+	}
+
+	@Override
+	public List<OwnerUnitDangerGroupDetailVo> ownerUnitBuildingDangerGroupList(OwnerUnitDangerGroupDetailDto data) {
+		return ownerUnitDangerMapper.ownerUnitBuildingDangerGroupList(data);
 	}
 
 }

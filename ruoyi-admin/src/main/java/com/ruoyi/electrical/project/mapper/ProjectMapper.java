@@ -30,6 +30,8 @@ public interface ProjectMapper {
 	 */
 	public List<Project> selectProjectList(Project project);
 
+	public Integer checkProjectName(Project project);
+
 	/**
 	 * 查询项目列表-字典
 	 * 

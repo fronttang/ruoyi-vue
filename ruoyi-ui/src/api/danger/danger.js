@@ -9,6 +9,23 @@ export function listDanger(query) {
   })
 }
 
+// 查询隐患数据列表
+export function listUnitDanger(query) {
+  return request({
+    url: '/danger/unit/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function listUnitBuildingDanger(query) {
+  return request({
+    url: '/danger/unit/building/list',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询隐患数据详细
 export function getDanger(id) {
   return request({

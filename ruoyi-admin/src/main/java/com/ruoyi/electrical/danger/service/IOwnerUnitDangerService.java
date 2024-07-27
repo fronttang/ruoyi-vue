@@ -2,7 +2,9 @@ package com.ruoyi.electrical.danger.service;
 
 import java.util.List;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
+import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.vo.DictVO;
+import com.ruoyi.electrical.vo.OwnerUnitDangerGroupDetailVo;
 
 /**
  * 隐患数据Service接口
@@ -76,5 +78,9 @@ public interface IOwnerUnitDangerService {
 	 * @return 结果
 	 */
 	public int deleteOwnerUnitDangerById(Long id);
+
+	public List<OwnerUnitDangerGroupDetailVo> ownerUnitDangerGroupList(OwnerUnitDangerGroupDetailDto data);
+
+	public List<OwnerUnitDangerGroupDetailVo> ownerUnitBuildingDangerGroupList(OwnerUnitDangerGroupDetailDto data);
 
 }

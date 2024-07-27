@@ -23,4 +23,9 @@ public class OwnerUnitReportInfo {
 	 * 检测员
 	 */
 	private String inspector;
+
+	/**
+	 * 制式WORD报告版本号
+	 */
+	private Integer wordFileVersion;
 }

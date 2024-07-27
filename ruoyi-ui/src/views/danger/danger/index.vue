@@ -916,7 +916,9 @@ export default {
         location: null,
         highRiskType: null,
         projectId: this.$store.state.settings.projectId,
-        status: null
+        status: null,
+        unitId: null,
+        buildingId: null
       },
       // 表单参数
       form: {},
@@ -936,6 +938,13 @@ export default {
     getList() {
 
       this.loading = true;
+
+      if(this.$route.params.unitId && this.$route.params.unitId != null && this.$route.params.unitId != ''){
+        this.queryParams.unitId = parseInt(this.$route.params.unitId)
+      }
+      if(this.$route.params.buildingId && this.$route.params.buildingId != null && this.$route.params.buildingId != ''){
+        this.queryParams.buildingId = parseInt(this.$route.params.buildingId)
+      }
 
       detectUnitDict().then(response => {
         this.detectUnitDict = response.data;

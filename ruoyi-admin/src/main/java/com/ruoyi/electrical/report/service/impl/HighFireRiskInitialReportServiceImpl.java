@@ -77,11 +77,12 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 		HIGH_TYPE_NAME_MAP.put("5", "公共场所");
 		HIGH_TYPE_NAME_MAP.put("6", "大型综合体");
 
-		Reflections reflections = new Reflections(new ConfigurationBuilder()
-				.forPackages("com.ruoyi.electrical.report.config")
-				.filterInputsBy(
-						new FilterBuilder().includePackage("BOOT-INF.classes.com.ruoyi.electrical.report.config"))
-				.setScanners(Scanners.TypesAnnotated));
+		Reflections reflections = new Reflections(
+				new ConfigurationBuilder().forPackages("com.ruoyi.electrical.report.config")
+						.filterInputsBy(new FilterBuilder()
+								.includePackage("BOOT-INF.classes.com.ruoyi.electrical.report.config")
+								.includePackage("com.ruoyi.electrical.report.config"))
+						.setScanners(Scanners.TypesAnnotated));
 
 		allConfigBeans = reflections.getTypesAnnotatedWith(HighConfig.class);
 	}
@@ -151,9 +152,17 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 
 			FileUploadUtils.getPathFileName(baseDir, filePath);
 
+			Integer wordFileVersion = report.getWordFileVersion();
+
+			if (wordFileVersion == null) {
+				wordFileVersion = 1;
+			} else {
+				wordFileVersion = wordFileVersion + 1;
+			}
+
 			OwnerUnitReport result = new OwnerUnitReport();
 			result.setId(reportId);
-			result.setWordFileVersion(1);
+			result.setWordFileVersion(wordFileVersion);
 			result.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
 
 			return unitReportService.updateOwnerUnitReport(result);

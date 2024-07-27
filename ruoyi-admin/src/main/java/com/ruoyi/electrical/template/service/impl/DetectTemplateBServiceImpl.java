@@ -2,16 +2,14 @@ package com.ruoyi.electrical.template.service.impl;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
-import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.ruoyi.electrical.template.mapper.DetectTemplateBMapper;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.template.domain.DetectTemplateB;
+import com.ruoyi.electrical.template.mapper.DetectTemplateBMapper;
 import com.ruoyi.electrical.template.service.IDetectTemplateBService;
 import com.ruoyi.electrical.vo.DetectTemplateBVo;
 
@@ -106,13 +104,35 @@ public class DetectTemplateBServiceImpl implements IDetectTemplateBService {
 		// 先删除全部
 		detectTemplateBMapper.deleteDetectTemplateBByTemplateId(data.getTemplateId());
 
-		List<String> views = data.getViews();
-		if (!CollectionUtils.isEmpty(views)) {
-			views.forEach((view) -> {
+		List<String> views1 = data.getViews1();
+		if (!CollectionUtils.isEmpty(views1)) {
+			views1.forEach((view) -> {
 				DetectTemplateB save = new DetectTemplateB();
 				save.setBid(view);
 				save.setTemplateId(data.getTemplateId());
-				save.setType("1");
+				save.setType("11");
+				this.insertDetectTemplateB(save);
+			});
+		}
+
+		List<String> views2 = data.getViews2();
+		if (!CollectionUtils.isEmpty(views2)) {
+			views2.forEach((view) -> {
+				DetectTemplateB save = new DetectTemplateB();
+				save.setBid(view);
+				save.setTemplateId(data.getTemplateId());
+				save.setType("12");
+				this.insertDetectTemplateB(save);
+			});
+		}
+
+		List<String> views3 = data.getViews3();
+		if (!CollectionUtils.isEmpty(views3)) {
+			views3.forEach((view) -> {
+				DetectTemplateB save = new DetectTemplateB();
+				save.setBid(view);
+				save.setTemplateId(data.getTemplateId());
+				save.setType("13");
 				this.insertDetectTemplateB(save);
 			});
 		}

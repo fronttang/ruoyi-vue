@@ -1,11 +1,14 @@
 package com.ruoyi.electrical.template.service.impl;
 
 import java.util.List;
-import com.ruoyi.common.utils.DateUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.electrical.template.mapper.IntuitiveDetectMapper;
+
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
+import com.ruoyi.electrical.template.dto.IntuitiveDetectQuery;
+import com.ruoyi.electrical.template.mapper.IntuitiveDetectMapper;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
 import com.ruoyi.electrical.vo.DictVO;
 
@@ -38,7 +41,7 @@ public class IntuitiveDetectServiceImpl implements IIntuitiveDetectService {
 	 * @return 直观检测标题
 	 */
 	@Override
-	public List<IntuitiveDetect> selectIntuitiveDetectList(IntuitiveDetect intuitiveDetect) {
+	public List<IntuitiveDetect> selectIntuitiveDetectList(IntuitiveDetectQuery intuitiveDetect) {
 		return intuitiveDetectMapper.selectIntuitiveDetectList(intuitiveDetect);
 	}
 

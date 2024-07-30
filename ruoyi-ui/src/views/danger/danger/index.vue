@@ -43,6 +43,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" width="60" prop="id" />
       <el-table-column label="业主单元" align="center" prop="unitName" min-width="120" :show-overflow-tooltip="true"/>
+      <el-table-column label="轮次" v-if="projectType === '4'" align="center" prop="rounds" width="50" />
       <el-table-column label="楼栋" v-if="projectType === '2'" align="center" prop="buildingName" min-width="120" :show-overflow-tooltip="true"/>
       <el-table-column label="公共区域/户" v-if="projectType === '1' || projectType === '2'" align="center" prop="areaName" min-width="120" :show-overflow-tooltip="true"/>
       <el-table-column label="充电桩" v-if="projectType === '4'" align="center" prop="chargingPileName" min-width="120" :show-overflow-tooltip="true"/>
@@ -58,17 +59,27 @@
           <span>{{ parseTime(scope.row.initialTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="初检照片" align="center" prop="dangerPic" width="100">
+      <el-table-column label="外观图" align="center" prop="dangerPic" width="100" v-if="this.projectType === '1' || this.projectType === '2'">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.formType === 'B' ? scope.row.overallPic : scope.row.dangerPic" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="检测图" align="center" prop="dangerPic" width="100"  v-if="this.projectType === '1' || this.projectType === '2' ">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.inspectionPic" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="隐患图" align="center" prop="dangerPic" width="100" v-if="this.projectType === '3' || this.projectType === '4'">
         <template slot-scope="scope">
           <image-preview :src="scope.row.dangerPic" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="整改照片" align="center" prop="rectificationPic" width="100">
+      <el-table-column label="整改图" align="center" prop="rectificationPic" width="100" >
         <template slot-scope="scope">
           <image-preview :src="scope.row.rectificationPic" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="复检照片" align="center" prop="detectPic" width="100">
+      <el-table-column label="复检照片" align="center" prop="detectPic" width="100" v-if="false">
         <template slot-scope="scope">
           <image-preview :src="scope.row.detectPic" :width="50" :height="50"/>
         </template>

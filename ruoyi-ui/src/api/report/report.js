@@ -24,6 +24,13 @@ export function getWordReport(reportId) {
     method: 'get'
   })
 }
+
+export function archivedPdf(reportId) {
+  return request({
+    url: '/report/download/initial/archived/pdf/' + reportId,
+    method: 'get'
+  })
+}
 // 查询报告日志
 export function getReportLogs(reportId) {
   return request({

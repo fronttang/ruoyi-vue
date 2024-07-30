@@ -32,6 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitType != null  and unitType != ''"> and unit_type = #{unitType}</if>
             <if test="attribution != null  and attribution != ''"> and #{attribution} member of(attribution)</if>
         </where>
+        order by id asc
     </select>
     
     <select id="selectIntuitiveDetectById" parameterType="Long" resultMap="IntuitiveDetectResult">
@@ -102,6 +103,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <delete id="deleteIntuitiveDetectById" parameterType="Long">
         delete from intuitive_detect where id = #{id}
+    </delete>
+    
+    <delete id="deleteIntuitiveDetectByTemplateIdAndUnitType" >
+        delete from intuitive_detect where template_id = #{templateId} and unit_type = #{unitType}
     </delete>
 
     <delete id="deleteIntuitiveDetectByIds" parameterType="String">

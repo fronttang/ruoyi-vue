@@ -34,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="accMethod != null  and accMethod != ''"> and acc_method = #{accMethod}</if>
             <if test="score != null "> and score = #{score}</if>
         </where>
+        order by id asc
     </select>
     
     <select id="selectIntuitiveDetectDangerById" parameterType="Long" resultMap="IntuitiveDetectDangerResult">

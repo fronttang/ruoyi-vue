@@ -249,7 +249,7 @@ export const dynamicRoutes = [
     path: '/danger/list',
     component: Layout,
     hidden: true,
-    permissions: ['*:*:*'],
+    permissions: ['danger:danger:list'],
     children: [
       {
         path: 'index/:unitId(\\d+)',
@@ -269,7 +269,7 @@ export const dynamicRoutes = [
     path: '/danger/building',
     component: Layout,
     hidden: true,
-    permissions: ['*:*:*'],
+    permissions: ['danger:danger:list'],
     children: [
       {
         path: 'index/:unitId(\\d+)',
@@ -283,7 +283,7 @@ export const dynamicRoutes = [
     path: '/report/onlyoffice',
     component: Layout,
     hidden: true,
-    permissions: ['*:*:*'],
+    permissions: ['report:report:list'],
     children: [
       {
         path: 'index',
@@ -297,7 +297,7 @@ export const dynamicRoutes = [
     path: '/report/weboffice',
     component: Layout,
     hidden: true,
-    permissions: ['*:*:*'],
+    permissions: ['report:report:list'],
     children: [
       {
         path: 'index',

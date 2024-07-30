@@ -45,6 +45,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="rectificationPic"    column="rectification_pic"    />
         <result property="reason"    column="reason"    />
         <result property="detectPic"    column="detect_pic"    />
+        <result property="overallPic"    column="overall_pic"    />
+        <result property="inspectionPic"    column="inspection_pic"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -58,7 +60,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         d.level, d.description, d.suggestions, d.location, d.danger_pic, d.status, d.inspector, d.inspector_id, d.initial_time, 
         d.rectification, d.rectification_date, d.reviewer, d.reviewer_date, d.rectification_pic, d.reason, d.detect_pic, 
         d.create_by, d.create_time, d.update_by, d.update_time, 
-        ( select GROUP_CONCAT(cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name  
+        ( select GROUP_CONCAT(cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name,
+        JSON_UNQUOTE(d.formb->'$.data.overallPic') as overall_pic,  JSON_UNQUOTE(d.formb->'$.data.inspectionPic') as inspection_pic  
         from owner_unit_danger d 
         left join owner_unit u on u.id = d.unit_id
         left join owner_unit_area a on a.id = d.unit_area_id

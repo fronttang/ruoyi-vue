@@ -209,6 +209,10 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+	        <id>com.e-iceblue</id>
+	        <url>https://repo.e-iceblue.cn/repository/maven-public/</url>
+	    </repository>
     </repositories>
 
     <pluginRepositories>

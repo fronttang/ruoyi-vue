@@ -3,7 +3,6 @@ package com.ruoyi.electrical.danger.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +40,6 @@ public class OwnerUnitDangerController extends BaseController {
 	 */
 	@GetMapping("/list")
 	public TableDataInfo list(OwnerUnitDanger ownerUnitDanger) {
-		startPage();
 
 		if (ownerUnitDanger.getUnitId() != null) {
 			OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(ownerUnitDanger.getUnitId());
@@ -50,6 +48,7 @@ public class OwnerUnitDangerController extends BaseController {
 			}
 		}
 
+		startPage();
 		List<OwnerUnitDanger> list = ownerUnitDangerService.ownerUnitDangerList(ownerUnitDanger);
 		return getDataTable(list);
 	}
@@ -71,7 +70,7 @@ public class OwnerUnitDangerController extends BaseController {
 	/**
 	 * 获取隐患数据详细信息
 	 */
-	@PreAuthorize("@ss.hasPermi('danger:danger:query')")
+	// @PreAuthorize("@ss.hasPermi('danger:danger:query')")
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
 		return success(ownerUnitDangerService.ownerUnitDangerById(id));

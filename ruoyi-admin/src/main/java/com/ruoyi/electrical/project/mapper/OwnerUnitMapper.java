@@ -59,4 +59,6 @@ public interface OwnerUnitMapper {
 	 * @return 结果
 	 */
 	public int deleteOwnerUnitByIds(Long[] ids);
+
+	public int checkOwnerUnitName(OwnerUnit ownerUnit);
 }

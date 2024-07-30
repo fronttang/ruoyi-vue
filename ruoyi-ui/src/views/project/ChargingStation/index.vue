@@ -175,8 +175,8 @@
         </el-row>
         <el-row>
             <el-col :span="12">
-              <el-form-item label="检测模块" label-width="100px"  prop="detectModule">
-                <el-select v-model="form.detectModule" placeholder="请选择检测模块" multiple filterable>
+              <el-form-item label="检测模块" label-width="100px"  prop="detectModuleArr">
+                <el-select v-model="form.detectModuleArr" placeholder="请选择检测模块" multiple filterable>
                   <el-option
                     v-for="dict in dict.type.detect_module"
                     :key="dict.value"
@@ -379,7 +379,7 @@ export default {
         stationType: [
           { required: true, message: "请选择类型", trigger: "change" }
         ],
-        detectModule: [
+        detectModuleArr: [
           { required: true, message: "请选择检测模块", trigger: "change" }
         ],
       },
@@ -483,6 +483,7 @@ export default {
         stationType: null,
         rounds: null,
         detectModule: null,
+        detectModuleArr: [],
         operating: null,
         propertyType: null,
         propertyName: null,
@@ -556,7 +557,7 @@ export default {
       const id = row.id || this.ids
       getOwnerUnit(id).then(response => {
         this.form = response.data;
-        this.form.detectModule = this.form.detectModule.split(',')
+        this.form.detectModuleArr = this.form.detectModule.split(',')
         this.open = true;
         this.title = "修改充电场站";
       });
@@ -565,7 +566,7 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          this.form.detectModule = this.form.detectModule.join(",");
+          this.form.detectModule = this.form.detectModuleArr.join(",");
           if (this.form.id != null) {
             updateOwnerUnit(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");

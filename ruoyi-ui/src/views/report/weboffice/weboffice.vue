@@ -16,14 +16,19 @@ export default{
           reportId: this.$route.params.reportId,
           type: this.$route.params.type,
           fileId: null,
+          officeType: WebOfficeSDK.OfficeType.Writer
         }
     },
     mounted() {
 
       this.fileId = this.reportId + '_' + this.type;
+      
+      if(this.type === '3'){
+        this.officeType = WebOfficeSDK.OfficeType.Pdf;
+      }
 
       this.instance = WebOfficeSDK.init({
-        officeType: WebOfficeSDK.OfficeType.Writer,
+        officeType: this.officeType,
         appId: 'SX20240722BGJGZR',
         fileId: this.fileId,
         mount: "#weboffice",

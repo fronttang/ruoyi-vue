@@ -31,6 +31,7 @@ import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.project.service.IProjectService;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 业主单元Controller
@@ -104,6 +105,11 @@ public class OwnerUnitController extends BaseController {
 			ownerUnit.setStreet(projectArea.getStreet());
 			ownerUnit.setCommunity(projectArea.getCommunity());
 			ownerUnit.setHamlet(projectArea.getHamlet());
+		}
+
+		// 同名检查
+		if (ownerUnitService.checkOwnerUnitName(ownerUnit) > 0) {
+			return AjaxResult.error(StrUtil.format("该项目区域下已存在名为[{}]的业主单元", ownerUnit.getName()));
 		}
 
 		return toAjax(ownerUnitService.insertOwnerUnit(ownerUnit));

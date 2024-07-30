@@ -214,4 +214,9 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 		redisCache.setCacheObject(CacheConstants.UNIT_ROUND_STEP_STATUS + unitId, "success", 1, TimeUnit.DAYS);
 	}
 
+	@Override
+	public int checkOwnerUnitName(OwnerUnit ownerUnit) {
+		return ownerUnitMapper.checkOwnerUnitName(ownerUnit);
+	}
+
 }

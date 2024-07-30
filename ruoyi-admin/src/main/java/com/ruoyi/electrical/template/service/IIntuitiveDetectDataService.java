@@ -68,4 +68,6 @@ public interface IIntuitiveDetectDataService {
 	public IntuitiveDetectData selectIntuitiveDetectDataViewById(Long id);
 
 	public int deleteIntuitiveDetectDataViewByIds(Long[] ids);
+
+	public int deleteIntuitiveDetectDataByTemplateIdAndUnitType(Long templateId, String unitType);
 }

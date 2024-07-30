@@ -148,6 +148,14 @@
               @click="handleArchivedWordReportToPdf(scope.row)"
             ></el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="打开归档PDF报告" placement="top">
+            <el-button  v-if="scope.row.status === '3'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-pdf1"
+              @click="handleOpenArchivedPdf(scope.row)"
+            ></el-button>
+          </el-tooltip>
           <el-tooltip class="item" effect="dark" content="下载归档PDF报告" placement="top">
             <el-button  v-if="scope.row.status === '3'"
               size="medium"
@@ -233,7 +241,7 @@ padding-bottom: 0px;
 }
 </style>
 <script>
-import { listReport, getReport, getWordReport, getReportLogs, passReport, notPassReport, resetReportStatus} from "@/api/report/report";
+import { listReport, getReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
@@ -521,11 +529,19 @@ export default {
         });
       }
     },
+    handleOpenArchivedPdf(row){
+      if(row.archivedPdf == null){
+        this.$modal.msgError("请先归档Word报告为PDF");
+      } else {
+        this.$tab.openPage("查看归档PDF报告", '/report/weboffice/weboffice/' + row.reportId + "/3");
+      }
+    },
     handleDownloadArchivedPDFReport(row) {
       if(row.archivedPdf == null){
         this.$modal.msgError("请先归档Word报告为PDF");
       } else {
-        this.download('common/download/resource?resource=' + row.archivedPdf, {})
+        this.$download.resource(row.archivedPdf, "归档PDF报告.pdf");
+        //this.$download.resource(row.archivedPdf);
       }
     },
     handleOpenArchivedWordReport(row) {
@@ -536,8 +552,15 @@ export default {
       }
     },
     handleArchivedWordReportToPdf(row){
+      this.loading = true;
       // word报告归档为pdf
-      this.$modal.msgSuccess('归档成功')
+      archivedPdf(row.reportId).then(response => {
+        this.$modal.msgSuccess('归档成功')
+        this.loading = false;
+      }).catch((r) => {
+        //this.$modal.msgError("无归档Word报告");
+        this.loading = false;
+      });
     }
   }
 };

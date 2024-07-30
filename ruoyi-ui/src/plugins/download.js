@@ -26,7 +26,7 @@ export default {
       }
     })
   },
-  resource(resource) {
+  resource(resource, filename) {
     var url = baseURL + "/common/download/resource?resource=" + encodeURIComponent(resource);
     axios({
       method: 'get',
@@ -37,7 +37,11 @@ export default {
       const isBlob = blobValidate(res.data);
       if (isBlob) {
         const blob = new Blob([res.data])
+        if(filename != null){
+          this.saveAs(blob, filename)
+        } else {
         this.saveAs(blob, decodeURIComponent(res.headers['download-filename']))
+        }
       } else {
         this.printErrMsg(res.data);
       }

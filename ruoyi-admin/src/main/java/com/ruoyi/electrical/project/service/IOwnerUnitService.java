@@ -59,4 +59,6 @@ public interface IOwnerUnitService {
 	public int deleteOwnerUnitById(Long id);
 
 	public boolean startRounds(Long unitId);
+
+	public int checkOwnerUnitName(OwnerUnit ownerUnit);
 }

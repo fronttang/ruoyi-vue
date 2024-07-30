@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.role.mapper.BrandDictMapper">
+    
+    <resultMap type="BrandDict" id="BrandDictResult">
+        <result property="dictCode"    column="dict_code"    />
+        <result property="dictSort"    column="dict_sort"    />
+        <result property="dictLabel"    column="dict_label"    />
+        <result property="dictValue"    column="dict_value"    />
+        <result property="dictType"    column="dict_type"    />
+        <result property="cssClass"    column="css_class"    />
+        <result property="listClass"    column="list_class"    />
+        <result property="isDefault"    column="is_default"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="projectId"    column="project_id"    />
+    </resultMap>
+
+    <sql id="selectBrandDictVo">
+        select dict_code, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, update_by, update_time, remark, detect_id, project_id from sys_dict_data
+    </sql>
+
+    <select id="selectBrandDictList" parameterType="BrandDict" resultMap="BrandDictResult">
+        <include refid="selectBrandDictVo"/>
+        <where>  
+            <if test="dictLabel != null  and dictLabel != ''"> and dict_label like concat('%', #{dictLabel}, '%') </if>
+            <if test="dictType != null  and dictType != ''"> and dict_type = #{dictType}</if>
+            <if test="cssClass != null  and cssClass != ''"> and css_class = #{cssClass}</if>
+            <if test="listClass != null  and listClass != ''"> and list_class = #{listClass}</if>
+            <if test="isDefault != null  and isDefault != ''"> and is_default = #{isDefault}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="detectId != null "> and detect_id = #{detectId}</if>
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+        </where>
+    </select>
+    
+    <select id="selectBrandDictByDictCode" parameterType="Long" resultMap="BrandDictResult">
+        <include refid="selectBrandDictVo"/>
+        where dict_code = #{dictCode}
+    </select>
+
+    <insert id="insertBrandDict" parameterType="BrandDict" useGeneratedKeys="true" keyProperty="dictCode">
+        insert into sys_dict_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dictSort != null">dict_sort,</if>
+            <if test="dictLabel != null">dict_label,</if>
+            <if test="dictValue != null">dict_value,</if>
+            <if test="dictType != null">dict_type,</if>
+            <if test="cssClass != null">css_class,</if>
+            <if test="listClass != null">list_class,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="detectId != null">detect_id,</if>
+            <if test="projectId != null">project_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dictSort != null">#{dictSort},</if>
+            <if test="dictLabel != null">#{dictLabel},</if>
+            <if test="dictValue != null">#{dictValue},</if>
+            <if test="dictType != null">#{dictType},</if>
+            <if test="cssClass != null">#{cssClass},</if>
+            <if test="listClass != null">#{listClass},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="detectId != null">#{detectId},</if>
+            <if test="projectId != null">#{projectId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBrandDict" parameterType="BrandDict">
+        update sys_dict_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dictSort != null">dict_sort = #{dictSort},</if>
+            <if test="dictLabel != null">dict_label = #{dictLabel},</if>
+            <if test="dictValue != null">dict_value = #{dictValue},</if>
+            <if test="dictType != null">dict_type = #{dictType},</if>
+            <if test="cssClass != null">css_class = #{cssClass},</if>
+            <if test="listClass != null">list_class = #{listClass},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="detectId != null">detect_id = #{detectId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+        </trim>
+        where dict_code = #{dictCode}
+    </update>
+
+    <delete id="deleteBrandDictByDictCode" parameterType="Long">
+        delete from sys_dict_data where dict_code = #{dictCode}
+    </delete>
+
+    <delete id="deleteBrandDictByDictCodes" parameterType="String">
+        delete from sys_dict_data where dict_code in 
+        <foreach item="dictCode" collection="array" open="(" separator="," close=")">
+            #{dictCode}
+        </foreach>
+    </delete>
+</mapper>

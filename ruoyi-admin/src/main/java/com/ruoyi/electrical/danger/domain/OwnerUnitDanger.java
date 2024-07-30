@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -167,5 +168,15 @@ public class OwnerUnitDanger extends BaseEntity {
 	/** 检测图 */
 	@Excel(name = "检测图")
 	private String detectPic;
+
+	/**
+	 * 整体外观图
+	 */
+	private String overallPic;
+
+	/**
+	 * 现场检测图
+	 */
+	private String inspectionPic;
 
 }

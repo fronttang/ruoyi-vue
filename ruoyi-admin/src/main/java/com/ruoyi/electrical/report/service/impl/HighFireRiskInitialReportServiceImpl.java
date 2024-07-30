@@ -150,7 +150,7 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 
 			PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
 
-			FileUploadUtils.getPathFileName(baseDir, filePath);
+			// FileUploadUtils.getPathFileName(baseDir, filePath);
 
 			Integer wordFileVersion = report.getWordFileVersion();
 

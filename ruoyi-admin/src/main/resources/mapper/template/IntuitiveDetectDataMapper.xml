@@ -52,7 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="view != null  and view != ''"> and view = #{view}</if>
             <if test="viewParentId != null  and viewParentId != ''"> and view_parent_id = #{viewParentId}</if>
         </where>
-        order by weights asc
+        order by weights asc, first_code asc, id asc
     </select>
     
     <select id="selectIntuitiveDetectDataViewList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
@@ -78,6 +78,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="viewParentId != null  and viewParentId != ''"> and a.view_parent_id = #{viewParentId} and a.view = '2' </if>
             <if test="viewParentId == null  or viewParentId == ''"> and a.view_parent_id is not null and a.view = '2' </if>
         </where>
+        order by a.first_code asc, a.id asc
     </select>
     
     <select id="selectIntuitiveDetectDataViewById" parameterType="Long" resultMap="IntuitiveDetectDataResult">
@@ -197,6 +198,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <delete id="deleteIntuitiveDetectDataById" parameterType="Long">
         delete from intuitive_detect_data where id = #{id}
+    </delete>
+    
+    <delete id="deleteIntuitiveDetectDataByTemplateIdAndUnitType" >
+        delete from intuitive_detect_data where template_id = #{templateId} and unit_type = #{unitType}
     </delete>
 
     <delete id="deleteIntuitiveDetectDataByIds" parameterType="String">

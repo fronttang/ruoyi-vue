@@ -2,6 +2,8 @@ package com.ruoyi.electrical.template.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
 import com.ruoyi.electrical.template.dto.IntuitiveDetectQuery;
 import com.ruoyi.electrical.vo.DictVO;
@@ -69,4 +71,7 @@ public interface IntuitiveDetectMapper {
 	public List<DictVO> selectIntuitiveDetectDict(Long templateId);
 
 	public List<DictVO> selectIntuitiveDetectListDict(IntuitiveDetect intuitiveDetect);
+
+	public int deleteIntuitiveDetectByTemplateIdAndUnitType(@Param("templateId") Long templateId,
+			@Param("unitType") String unitType);
 }

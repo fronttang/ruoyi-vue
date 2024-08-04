@@ -75,7 +75,8 @@
           size="mini"
           @click="handleExport"
         >导出</el-button>
-        <el-col :span="1.5" >
+      </el-col>
+      <el-col :span="1.5" >
           <el-button
             type="info"
             plain
@@ -83,7 +84,6 @@
             size="mini"
             @click="handleImport"
           >导入</el-button>
-        </el-col>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -632,8 +632,8 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      this.download('system/user/importTemplate', {
-      }, `user_template_${new Date().getTime()}.xlsx`)
+      //this.download('system/user/importTemplate', {
+      //}, `user_template_${new Date().getTime()}.xlsx`)
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {

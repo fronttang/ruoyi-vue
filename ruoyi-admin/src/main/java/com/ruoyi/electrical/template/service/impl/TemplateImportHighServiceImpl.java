@@ -155,8 +155,7 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 									IntuitiveDetectDanger danger = new IntuitiveDetectDanger();
 									danger.setCreateBy(userId);
 									danger.setCreateTime(new Date());
-									danger.setAccMethod(
-											StrUtil.isNotBlank(subData.getAccMethod()) ? subData.getAccMethod() : "1");
+									danger.setAccMethod(StrUtil.isNotBlank(subData.getAccMethod()) ? "2" : "1");
 									danger.setDataId(scData.getId());
 									danger.setTemplateId(templateId);
 									danger.setDescription(dataDanger.getDescription());

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.CacheConstants;
@@ -26,6 +27,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.domain.ProjectArea;
+import com.ruoyi.electrical.project.service.IOwnerUnitImportService;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.project.service.IProjectService;
@@ -51,6 +53,9 @@ public class OwnerUnitController extends BaseController {
 
 	@Autowired
 	private IProjectAreaService projectAreaService;
+
+	@Autowired
+	private IOwnerUnitImportService ownerUnitImportService;
 
 	@Autowired
 	private RedisCache redisCache;
@@ -176,5 +181,25 @@ public class OwnerUnitController extends BaseController {
 			ajax.put("status", status);
 		}
 		return ajax;
+	}
+
+	/**
+	 * 业主单元导入
+	 * 
+	 * @param type
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/import/{projectId}")
+	public AjaxResult importOwnerUnit(@PathVariable Long projectId, MultipartFile file) throws Exception {
+
+		return ownerUnitImportService.importOwnerUnit(projectId, null, file);
+	}
+
+	@PostMapping("/import/{projectId}/{type}")
+	public AjaxResult importOwnerUnitHigh(@PathVariable Long projectId, @PathVariable String type, MultipartFile file,
+			String highRiskType) throws Exception {
+
+		return ownerUnitImportService.importOwnerUnit(projectId, type, file);
 	}
 }

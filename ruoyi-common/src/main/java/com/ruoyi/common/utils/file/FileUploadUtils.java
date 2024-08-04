@@ -19,6 +19,7 @@ import com.ruoyi.common.utils.uuid.IdUtils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 
@@ -77,6 +78,23 @@ public class FileUploadUtils {
 	public static final String upload(String baseDir, MultipartFile file) throws IOException {
 		try {
 			return upload(baseDir, file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
+		} catch (Exception e) {
+			throw new IOException(e.getMessage(), e);
+		}
+	}
+
+	public static final String uploadClientVersionFile(String baseDir, MultipartFile file) throws IOException {
+		try {
+
+			LocalDateTime now = LocalDateTime.now();
+			String datePath = DateUtil.format(now, "yyyy/MM/dd");
+			String uuid = IdUtil.getSnowflakeNextIdStr();
+			String baseName = FilenameUtils.getBaseName(file.getOriginalFilename());
+			String fileName = StrUtil.format("{}/{}/{}.{}", datePath, uuid, baseName, getExtension(file));
+
+			String absPath = getAbsoluteFile(baseDir, fileName).getAbsolutePath();
+			file.transferTo(Paths.get(absPath));
+			return getPathFileName(baseDir, fileName);
 		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		}

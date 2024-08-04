@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="OwnerUnit" id="OwnerUnitResult">
         <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
         <result property="name"    column="name"    />
         <result property="type"    column="type"    />
         <result property="detectId"    column="detect_id"    />
@@ -65,7 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, name, type, detect_id, detect_name, temperature, humidity, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
+        select id, code, name, type, detect_id, detect_name, temperature, humidity, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
@@ -156,6 +157,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into owner_unit
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
+            <if test="code != null">code,</if>
             <if test="name != null">name,</if>
             <if test="type != null">type,</if>
             <if test="detectId != null">detect_id,</if>
@@ -209,6 +211,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
+            <if test="code != null">#{code},</if>
             <if test="name != null">#{name},</if>
             <if test="type != null">#{type},</if>
             <if test="detectId != null">#{detectId},</if>
@@ -265,6 +268,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateOwnerUnit" parameterType="OwnerUnit">
         update owner_unit
         <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null">code = #{code},</if>
             <if test="name != null">name = #{name},</if>
             <if test="type != null">type = #{type},</if>
             <if test="detectId != null">detect_id = #{detectId},</if>

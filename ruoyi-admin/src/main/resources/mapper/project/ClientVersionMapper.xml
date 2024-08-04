@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.project.mapper.ClientVersionMapper">
+    
+    <resultMap type="ClientVersion" id="ClientVersionResult">
+        <result property="id"    column="id"    />
+        <result property="client"    column="client"    />
+        <result property="name"    column="name"    />
+        <result property="version"    column="version"    />
+        <result property="forced"    column="forced"    />
+        <result property="content"    column="content"    />
+        <result property="downloadUrl"    column="download_url"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectClientVersionVo">
+        select id, client, name, version, forced, content, download_url, create_by, create_time, update_by, update_time from client_version
+    </sql>
+
+    <select id="selectClientVersionList" parameterType="ClientVersion" resultMap="ClientVersionResult">
+        <include refid="selectClientVersionVo"/>
+        <where>  
+            <if test="client != null  and client != ''"> and client = #{client}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="version != null  and version != ''"> and version = #{version}</if>
+            <if test="forced != null  and forced != ''"> and forced = #{forced}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="downloadUrl != null  and downloadUrl != ''"> and download_url = #{downloadUrl}</if>
+        </where>
+        order by id desc
+    </select>
+    
+    <select id="selectClientVersionById" parameterType="Long" resultMap="ClientVersionResult">
+        <include refid="selectClientVersionVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertClientVersion" parameterType="ClientVersion">
+        insert into client_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="client != null and client != ''">client,</if>
+            <if test="name != null">name,</if>
+            <if test="version != null">version,</if>
+            <if test="forced != null">forced,</if>
+            <if test="content != null">content,</if>
+            <if test="downloadUrl != null">download_url,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="client != null and client != ''">#{client},</if>
+            <if test="name != null">#{name},</if>
+            <if test="version != null">#{version},</if>
+            <if test="forced != null">#{forced},</if>
+            <if test="content != null">#{content},</if>
+            <if test="downloadUrl != null">#{downloadUrl},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateClientVersion" parameterType="ClientVersion">
+        update client_version
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="client != null and client != ''">client = #{client},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="forced != null">forced = #{forced},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="downloadUrl != null">download_url = #{downloadUrl},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteClientVersionById" parameterType="Long">
+        delete from client_version where id = #{id}
+    </delete>
+
+    <delete id="deleteClientVersionByIds" parameterType="String">
+        delete from client_version where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

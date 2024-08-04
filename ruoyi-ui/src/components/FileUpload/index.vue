@@ -55,7 +55,7 @@ export default {
     // 大小限制(MB)
     fileSize: {
       type: Number,
-      default: 5,
+      default: 50,
     },
     // 文件类型, 例如['png', 'jpg', 'jpeg']
     fileType: {
@@ -66,6 +66,10 @@ export default {
     isShowTip: {
       type: Boolean,
       default: true
+    },
+    uploadFileUrl: {
+      type: String,
+      default: () => process.env.VUE_APP_BASE_API + "/common/upload"
     }
   },
   data() {
@@ -73,7 +77,7 @@ export default {
       number: 0,
       uploadList: [],
       baseUrl: process.env.VUE_APP_BASE_API,
-      uploadFileUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传文件服务器地址
+      //uploadFileUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传文件服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },

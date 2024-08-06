@@ -29,9 +29,15 @@ public class OwnerUnitImportHighRentalHouseDto extends OwnerUnitImportHighDto {
 	private String acreage;
 
 	/**
+	 * 建筑层数
+	 */
+	@Excel(name = "建筑层数", orderNum = "10")
+	private Long layers;
+
+	/**
 	 * 户数
 	 */
-	@Excel(name = "租户套间数", orderNum = "10")
+	@Excel(name = "租户套间数", orderNum = "11")
 	private Long doorNumber;
 
 }

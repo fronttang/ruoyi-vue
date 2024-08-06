@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
@@ -104,8 +105,15 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 					.collect(Collectors.toMap(AreaDict::getDictLabel, AreaDict::getDictValue, (v1, v2) -> v2)));
 		}
 
+		log.info("districtDict:{}", JSON.toJSONString(districtDict));
+		log.info("streetDict:{}", JSON.toJSONString(streetDict));
+		log.info("communityDict:{}", JSON.toJSONString(communityDict));
+		log.info("hamletDict:{}", JSON.toJSONString(hamletDict));
+
 		// 获取项目区域配置
 		List<ProjectArea> projectAreaLists = projectAreaService.queryProjectAreaByProjectId(projectId);
+
+		log.info("projectAreaLists:{}", JSON.toJSONString(projectAreaLists));
 
 		// 工业园/出租屋
 		if ("1".equalsIgnoreCase(project.getType()) || "2".equalsIgnoreCase(project.getType())) {
@@ -164,6 +172,7 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 
 			for (T data : importData) {
 				try {
+					log.info("importData:{}", JSON.toJSONString(data));
 					ProjectArea projectArea = null;
 					if ("1".equalsIgnoreCase(project.getType())) {
 						projectArea = checkUrbanVillageData((OwnerUnitImportUrbanVillageDto) data, districtDict,
@@ -178,6 +187,8 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 						projectArea = checkChargingStationData((OwnerUnitImportChargingStationDto) data, districtDict,
 								streetDict, projectAreaLists, chargingStationTypeMap, propertyTypeMap);
 					}
+
+					log.info("projectArea:{}", JSON.toJSONString(projectArea));
 
 					if (projectArea == null) {
 						continue;
@@ -265,7 +276,7 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 
 		ProjectArea projectArea = getProjectArea(projectAreaLists, district, street, community, hamlet);
 		if (projectArea == null) {
-			data.setResult("区/街道/社区/村 项目中没有配置");
+			data.setResult("区/街道/社区/村 项目中未配置");
 			return null;
 		}
 		return projectArea;
@@ -291,7 +302,7 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 
 		ProjectArea projectArea = getProjectArea(projectAreaLists, district, street);
 		if (projectArea == null) {
-			data.setResult("区/街道 项目中没有配置");
+			data.setResult("区/街道 项目中未配置");
 			return null;
 		}
 		return projectArea;
@@ -307,6 +318,11 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 		String district = districtDict.get(data.getDistrict());
 		String street = streetDict.get(data.getStreet());
 		String community = communityDict.get(data.getCommunity());
+
+		log.info("district:{}", district);
+		log.info("street:{}", street);
+		log.info("community:{}", community);
+
 		if (StrUtil.isBlank(data.getDistrict()) || StrUtil.isBlank(data.getStreet())
 				|| StrUtil.isBlank(data.getCommunity())) {
 			data.setResult("区/街道/社区 不能为空");
@@ -318,8 +334,9 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 		}
 
 		ProjectArea projectArea = getProjectArea(projectAreaLists, district, street, community);
+		log.info("projectArea:{}", JSON.toJSONString(projectArea));
 		if (projectArea == null) {
-			data.setResult("区/街道/社区 项目中没有配置");
+			data.setResult("区/街道/社区 项目中未配置");
 			return null;
 		}
 		return projectArea;
@@ -346,7 +363,7 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 
 		ProjectArea projectArea = getProjectArea(projectAreaLists, district, street);
 		if (projectArea == null) {
-			data.setResult("区/街道 项目中没有配置");
+			data.setResult("区/街道 项目中未配置");
 			return null;
 		}
 
@@ -399,8 +416,8 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 			if (CollUtil.isNotEmpty(projectArea)) {
 				return projectArea.stream().filter((item) -> {
 					return item.getDistrict().equalsIgnoreCase(district) && item.getStreet().equalsIgnoreCase(street)
-							&& (StrUtil.isNotBlank(community) && item.getCommunity().equalsIgnoreCase(community))
-							&& (StrUtil.isNotBlank(hamlet) && item.getHamlet().equalsIgnoreCase(hamlet));
+							&& item.getCommunity().equalsIgnoreCase(community)
+							&& item.getHamlet().equalsIgnoreCase(hamlet);
 				}).findFirst().get();
 			}
 		} catch (Exception e) {

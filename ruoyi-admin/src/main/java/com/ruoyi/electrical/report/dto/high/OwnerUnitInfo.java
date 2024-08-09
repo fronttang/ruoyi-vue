@@ -3,13 +3,22 @@ package com.ruoyi.electrical.report.dto.high;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.data.style.Style;
+
 import lombok.Data;
 
 @Data
+@SuppressWarnings("unused")
 public class OwnerUnitInfo {
 
 	/** 名称 */
 	private String name;
+
+	/**
+	 * 编码
+	 */
+	private String code;
 
 	/** 检测地址 */
 	private String address;
@@ -33,7 +42,7 @@ public class OwnerUnitInfo {
 	private String highRiskType;
 
 	/** 单位类型 */
-	private String unitType;
+	// private String unitType;
 
 	/** 场所类型 */
 	private String venueType;
@@ -59,8 +68,32 @@ public class OwnerUnitInfo {
 	/** 有无证照 */
 	private String licence;
 
+	public String getLicence() {
+		return "1".equalsIgnoreCase(this.licence) ? "有" : "无";
+	}
+
 	/** 消防安全重点单位 */
-	private String safetyKeyUnit;
+	private String fireSafetyUnit;
+
+	private TextRenderData fireSafetyUnit1;
+
+	private TextRenderData fireSafetyUnit0;
+
+	public TextRenderData getFireSafetyUnit1() {
+		if ("1".equalsIgnoreCase(this.fireSafetyUnit)) {
+			return new TextRenderData("R", new Style("Wingdings 2", 12));
+		} else {
+			return new TextRenderData("\u00A3", new Style("Wingdings 2", 12));
+		}
+	}
+
+	public TextRenderData getFireSafetyUnit0() {
+		if ("0".equalsIgnoreCase(this.fireSafetyUnit)) {
+			return new TextRenderData("R", new Style("Wingdings 2", 12));
+		} else {
+			return new TextRenderData("\u00A3", new Style("Wingdings 2", 12));
+		}
+	}
 
 	/**
 	 * 区县
@@ -95,4 +128,23 @@ public class OwnerUnitInfo {
 	 */
 	private Map<String, Object> config = new HashMap<String, Object>();
 
+	/**
+	 * 单位类型
+	 */
+	private Map<String, Object> unitType = new HashMap<String, Object>();
+
+	/**
+	 * 开门状态
+	 */
+	private String openStatus = "开业";
+
+	/**
+	 * 检测员
+	 */
+	private String inspector;
+
+	/**
+	 * 所属网格
+	 */
+	private String grid;
 }

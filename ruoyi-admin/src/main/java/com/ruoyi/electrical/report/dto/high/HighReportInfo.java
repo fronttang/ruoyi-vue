@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.dto.high;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import cn.hutool.core.collection.CollUtil;
@@ -33,8 +34,9 @@ public class HighReportInfo {
 
 	public Double getTotalScore() {
 		if (CollUtil.isNotEmpty(danger)) {
-			Optional<Double> reduce = danger.stream().map(HighDangerInfo::getScore).reduce(Double::sum);
-			return reduce.get();
+			Optional<Double> reduce = danger.stream().filter((d) -> Objects.nonNull(d.getScore()))
+					.map(HighDangerInfo::getScore).reduce(Double::sum);
+			return reduce.isPresent() ? reduce.get() : 0D;
 		}
 		return 0D;
 	}

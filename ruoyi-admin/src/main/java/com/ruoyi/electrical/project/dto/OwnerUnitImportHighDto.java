@@ -47,6 +47,12 @@ public class OwnerUnitImportHighDto extends OwnerUnitImportResultDto {
 	private String community;
 
 	/**
+	 * 所属网格
+	 */
+	@Excel(name = "所属网格", orderNum = "5")
+	private String grid;
+
+	/**
 	 * 检测地址
 	 */
 	@Excel(name = "场所地址", orderNum = "6")

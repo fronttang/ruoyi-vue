@@ -21,7 +21,6 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.electrical.project.domain.AreaDict;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
@@ -206,7 +205,7 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 					ownerUnit.setCommunity(projectArea.getCommunity());
 					ownerUnit.setHamlet(projectArea.getHamlet());
 					ownerUnit.setArea(projectArea.getId());
-					ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+					ownerUnit.setCreateBy("admin");
 					ownerUnit.setCreateTime(DateUtils.getNowDate());
 					ownerUnit.setUpdateTime(DateUtils.getNowDate());
 

@@ -98,6 +98,11 @@ public class OwnerUnit extends BaseEntity {
 	@Excel(name = "网格员")
 	private Long gridman;
 
+	/**
+	 * 所属网格
+	 */
+	private String grid;
+
 	/** 检测地址 */
 	@Excel(name = "检测地址")
 	private String address;
@@ -204,7 +209,7 @@ public class OwnerUnit extends BaseEntity {
 
 	/** 消防安全重点单位 */
 	@Excel(name = "消防安全重点单位")
-	private String safetyKeyUnit;
+	private String fireSafetyUnit;
 
 	/** 充电站类型 */
 	@Excel(name = "充电站类型")

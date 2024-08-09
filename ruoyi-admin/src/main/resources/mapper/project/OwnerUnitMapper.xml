@@ -25,6 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="entrust"    column="entrust"    />
         <result property="manager"    column="manager"    />
         <result property="gridman"    column="gridman"    />
+        <result property="grid"    column="grid"    />
         <result property="address"    column="address"    />
         <result property="contact"    column="contact"    />
         <result property="phone"    column="phone"    />
@@ -48,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="highRiskType"    column="high_risk_type"    />
         <result property="staffs"    column="staffs"    />
         <result property="licence"    column="licence"    />
-        <result property="safetyKeyUnit"    column="safety_key_unit"    />
+        <result property="fireSafetyUnit"    column="fire_safety_unit"    />
         <result property="stationType"    column="station_type"    />
         <result property="rounds"    column="rounds"    />
         <result property="detectModule"    column="detect_module"    />
@@ -66,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, code, name, type, detect_id, detect_name, temperature, humidity, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, safety_key_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
+        select id, code, name, type, detect_id, detect_name, temperature, humidity, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, grid, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, fire_safety_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
@@ -105,7 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="highRiskType != null  and highRiskType != ''"> and high_risk_type = #{highRiskType}</if>
             <if test="staffs != null "> and staffs = #{staffs}</if>
             <if test="licence != null  and licence != ''"> and licence = #{licence}</if>
-            <if test="safetyKeyUnit != null  and safetyKeyUnit != ''"> and safety_key_unit = #{safetyKeyUnit}</if>
+            <if test="fireSafetyUnit != null  and fireSafetyUnit != ''"> and fire_safety_unit = #{fireSafetyUnit}</if>
             <if test="stationType != null  and stationType != ''"> and station_type = #{stationType}</if>
             <if test="rounds != null "> and rounds = #{rounds}</if>
             <if test="detectModule != null  and detectModule != ''"> and detect_module = #{detectModule}</if>
@@ -137,12 +138,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     
     <select id="getOwnerUnitById" parameterType="Long" resultMap="OwnerUnitResult">
-         select o.id, o.name, o.type, o.detect_id, o.detect_name, o.temperature, o.humidity, o.project_id, o.project_name, o.area, 
+         select o.id, o.code, o.name, o.type, o.detect_id, o.detect_name, o.temperature, o.humidity, o.project_id, o.project_name, o.area, 
          o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
-         o.entrust, o.manager, o.gridman, o.address, o.contact, o.phone, o.acreage, o.layers, 
+         o.entrust, o.manager, o.gridman, o.grid, o.address, o.contact, o.phone, o.acreage, o.layers, 
          o.nature, o.test_start_date, o.test_end_date, o.test_date, o.test_content, o.door_number, o.buildman, o.unit_type, 
          o.incharge, o.venue_type, o.business_scope, o.safety_incharge, o.safety_incharge_phone, o.safety_manager, 
-         o.safety_manager_phone, o.high_risk_type, o.staffs, o.licence, o.safety_key_unit, o.station_type, o.rounds, 
+         o.safety_manager_phone, o.high_risk_type, o.staffs, o.licence, o.fire_safety_unit, o.station_type, o.rounds, 
          o.detect_module, o.operating, o.property_type, o.property_name, o.panorama_pic, o.station_pic, 
          o.create_by, o.create_time, o.update_by, o.update_time 
          from owner_unit o  
@@ -172,6 +173,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="entrust != null">entrust,</if>
             <if test="manager != null">manager,</if>
             <if test="gridman != null">gridman,</if>
+            <if test="grid != null">grid,</if>
             <if test="address != null">address,</if>
             <if test="contact != null">contact,</if>
             <if test="phone != null">phone,</if>
@@ -195,7 +197,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="highRiskType != null">high_risk_type,</if>
             <if test="staffs != null">staffs,</if>
             <if test="licence != null">licence,</if>
-            <if test="safetyKeyUnit != null">safety_key_unit,</if>
+            <if test="fireSafetyUnit != null">fire_safety_unit,</if>
             <if test="stationType != null">station_type,</if>
             <if test="rounds != null">rounds,</if>
             <if test="detectModule != null">detect_module,</if>
@@ -226,6 +228,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="entrust != null">#{entrust},</if>
             <if test="manager != null">#{manager},</if>
             <if test="gridman != null">#{gridman},</if>
+            <if test="grid != null">#{grid},</if>
             <if test="address != null">#{address},</if>
             <if test="contact != null">#{contact},</if>
             <if test="phone != null">#{phone},</if>
@@ -249,7 +252,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="highRiskType != null">#{highRiskType},</if>
             <if test="staffs != null">#{staffs},</if>
             <if test="licence != null">#{licence},</if>
-            <if test="safetyKeyUnit != null">#{safetyKeyUnit},</if>
+            <if test="fireSafetyUnit != null">#{fireSafetyUnit},</if>
             <if test="stationType != null">#{stationType},</if>
             <if test="rounds != null">#{rounds},</if>
             <if test="detectModule != null">#{detectModule},</if>
@@ -283,6 +286,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="entrust != null">entrust = #{entrust},</if>
             <if test="manager != null">manager = #{manager},</if>
             <if test="gridman != null">gridman = #{gridman},</if>
+            <if test="grid != null">grid = #{grid},</if>
             <if test="address != null">address = #{address},</if>
             <if test="contact != null">contact = #{contact},</if>
             <if test="phone != null">phone = #{phone},</if>
@@ -306,7 +310,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="highRiskType != null">high_risk_type = #{highRiskType},</if>
             <if test="staffs != null">staffs = #{staffs},</if>
             <if test="licence != null">licence = #{licence},</if>
-            <if test="safetyKeyUnit != null">safety_key_unit = #{safetyKeyUnit},</if>
+            <if test="fireSafetyUnit != null">fire_safety_unit = #{fireSafetyUnit},</if>
             <if test="stationType != null">station_type = #{stationType},</if>
             <if test="rounds != null">rounds = #{rounds},</if>
             <if test="detectModule != null">detect_module = #{detectModule},</if>

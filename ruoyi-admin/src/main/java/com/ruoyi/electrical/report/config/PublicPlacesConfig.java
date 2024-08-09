@@ -26,22 +26,22 @@ import lombok.Data;
 @HighConfig("5")
 public class PublicPlacesConfig {
 
-	/**
-	 * 是否属于消防安全重点单位1是0否
-	 */
-	private String fireSafetyUnit;
-
-	private TextRenderData fireSafetyUnit1;
-
-	private TextRenderData fireSafetyUnit0;
-
-	public TextRenderData getFireSafetyUnit1() {
-		return fireSafetyUnit1;
-	}
-
-	public TextRenderData getFireSafetyUnit0() {
-		return fireSafetyUnit0;
-	}
+//	/**
+//	 * 是否属于消防安全重点单位1是0否
+//	 */
+//	private String fireSafetyUnit;
+//
+//	private TextRenderData fireSafetyUnit1;
+//
+//	private TextRenderData fireSafetyUnit0;
+//
+//	public TextRenderData getFireSafetyUnit1() {
+//		return fireSafetyUnit1;
+//	}
+//
+//	public TextRenderData getFireSafetyUnit0() {
+//		return fireSafetyUnit0;
+//	}
 
 	/**
 	 * 是否建立逐级消防安全责任制，明确单位消防安全管理人员

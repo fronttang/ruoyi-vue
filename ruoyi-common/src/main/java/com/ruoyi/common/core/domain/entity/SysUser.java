@@ -43,6 +43,11 @@ public class SysUser extends BaseEntity {
 	 */
 	private Long projectId;
 
+	/**
+	 * 记录员
+	 */
+	private String recorder;
+
 	/** 用户账号 */
 	@Excel(name = "登录名称")
 	private String userName;
@@ -291,6 +296,14 @@ public class SysUser extends BaseEntity {
 
 	public void setProjectId(Long projectId) {
 		this.projectId = projectId;
+	}
+
+	public String getRecorder() {
+		return recorder;
+	}
+
+	public void setRecorder(String recorder) {
+		this.recorder = recorder;
 	}
 
 	@Override

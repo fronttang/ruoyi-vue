@@ -83,6 +83,29 @@
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
+
+      <el-row :gutter="10" class="mb8">
+        <el-col :span="1.5" v-if="this.projectType == '3'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportDanger"
+          >导出隐患台账</el-button>
+        </el-col>
+        <el-col :span="1.5" v-if="this.projectType == '3'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportMissDevice"
+          >导出缺失设备台账</el-button>
+        </el-col>
+        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      </el-row>
+
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -180,6 +203,7 @@ export default {
         pageSize: 10,
         name: null,
         id: null,
+        ids: null,
         projectId: this.$store.state.settings.projectId,
         district: null,
         street: null,
@@ -300,6 +324,20 @@ export default {
         const params = {};
         this.$tab.openPage("隐患列表", '/danger/list/index/' + unitId, params);
       }
+    },
+    handleExportMissDevice(row){
+      this.queryParams.ids = this.ids;
+
+      this.download('/miss/device/export', {
+        ...this.queryParams
+      }, `缺失设备台账.xlsx`)
+    },
+    handleExportDanger(row){
+      this.queryParams.ids = this.ids;
+
+      this.download('/owner/unit/danger/export', {
+        ...this.queryParams
+      }, `高风险隐患台账.xlsx`)
     }
   }
 };

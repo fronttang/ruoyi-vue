@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.danger.mapper.MissDeviceMapper">
+    
+    <resultMap type="com.ruoyi.electrical.dto.MissDeviceExportQueryDto" id="MissDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
+        <result property="name"    column="name"    />
+        <result property="grid"    column="grid"    />
+        <result property="address"    column="address"    />
+        <result property="layers"    column="layers"    />
+        <result property="acreage"    column="acreage"    />
+        <result property="doorNumber"    column="door_number"    />
+        <result property="contact"    column="contact"    />
+        <result property="phone"    column="phone"    />
+        <result property="highRiskType"    column="high_risk_type"    />
+    </resultMap>
+    
+    <select id="exportByQuery" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="MissDeviceResult">
+    	select t.* from (select o.id, o.code, o.name, o.grid, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
+    	o.district, o.street, o.community, o.hamlet, o.high_risk_type,
+		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
+		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
+		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
+		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date
+		from owner_unit o 
+		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		where o.project_id = #{projectId}) t
+		<where>  
+            <if test="name != null and name !='' "> and t.name like concat('%', #{name}, '%')</if>
+            <if test="district != null and district !='' "> and t.district = #{district}</if>
+            <if test="street != null and street !='' "> and t.street = #{street}</if>
+            <if test="community != null and community !='' "> and t.community = #{community}</if>
+            <if test="hamlet != null and hamlet !='' "> and t.hamlet = #{hamlet}</if>
+            <if test="highRiskType != null and highRiskType !='' "> and t.high_risk_type = #{highRiskType}</if>
+            <if test="initialStatus != null and initialStatus !='' "> and t.initial_status = #{initialStatus}</if>
+            <if test="reviewStatus != null and reviewStatus !='' "> and t.review_status = #{reviewStatus}</if>
+            <if test="startInitialDate != null and startInitialDate !='' "> and date(t.initial_date) &gt;= #{startInitialDate}</if>
+            <if test="endInitialDate != null and endInitialDate !='' "> and date(t.initial_date) &lt;= #{endInitialDate}</if>
+            <if test="startReviewDate != null and startReviewDate !='' "> and date(t.review_date) &gt;= #{startReviewDate}</if>
+            <if test="endReivewDate != null and endReivewDate !='' "> and date(t.review_date) &lt;= #{endReivewDate}</if>
+        </where>
+    	
+    </select>
+    
+    <select id="exportByUnitId" parameterType="Long" resultMap="MissDeviceResult">
+    	select t.* from (select o.id, o.code, o.name, o.grid, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
+    	o.district, o.street, o.community, o.hamlet, o.high_risk_type,
+		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
+		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
+		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
+		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date
+		from owner_unit o 
+		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		where o.project_id = #{projectId}) t
+		where t.id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    	
+    </select>
+
+	<resultMap type="com.ruoyi.electrical.dto.MissDeviceJsonDataDto" id="MissDeviceJsonResult">
+        <result property="device"    column="device"  typeHandler="com.ruoyi.electrical.danger.type.JsonObjectTypeHandler"   />
+    </resultMap>
+    
+     <select id="getMissDevicesByUnitId" parameterType="Long" resultMap="MissDeviceJsonResult">
+    	select d.device from owner_unit_miss_device d where d.unit_id = #{unitId}
+    </select>
+    
+    
+</mapper>

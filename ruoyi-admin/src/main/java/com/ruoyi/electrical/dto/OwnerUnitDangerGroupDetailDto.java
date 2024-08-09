@@ -8,6 +8,11 @@ import lombok.Data;
 public class OwnerUnitDangerGroupDetailDto {
 
 	/**
+	 * 业主单元列表
+	 */
+	private Long[] ids;
+
+	/**
 	 * 业主单元ID
 	 */
 	private Long unitId;

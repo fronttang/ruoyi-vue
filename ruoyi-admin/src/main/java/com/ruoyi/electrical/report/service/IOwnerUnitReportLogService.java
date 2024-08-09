@@ -2,7 +2,6 @@ package com.ruoyi.electrical.report.service;
 
 import java.util.List;
 
-import com.ruoyi.electrical.report.domain.OwnerUnitReport;
 import com.ruoyi.electrical.report.domain.OwnerUnitReportLog;
 
 /**

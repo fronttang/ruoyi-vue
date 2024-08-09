@@ -179,4 +179,9 @@ public class OwnerUnitDanger extends BaseEntity {
 	 */
 	private String inspectionPic;
 
+	/**
+	 * 备注
+	 */
+	private String remark;
+
 }

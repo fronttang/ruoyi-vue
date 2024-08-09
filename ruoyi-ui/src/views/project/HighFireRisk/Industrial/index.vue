@@ -231,8 +231,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="消防安全重点单位" label-width="130px" prop="safetyKeyUnit">
-                <el-radio-group v-model="form.safetyKeyUnit">
+              <el-form-item label="消防安全重点单位" label-width="130px" prop="fireSafetyUnit">
+                <el-radio-group v-model="form.fireSafetyUnit">
                   <el-radio label="1">是</el-radio>
                   <el-radio label="0">否</el-radio>
                 </el-radio-group>
@@ -388,7 +388,7 @@ export default {
         safetyManager: null,
         staffs: null,
         licence: null,
-        safetyKeyUnit: null,
+        fireSafetyUnit: null,
         stationType: null,
         detectModule: null,
         operating: null,
@@ -524,7 +524,7 @@ export default {
         safetyManagerPhone: null,
         staffs: null,
         licence: '1',
-        safetyKeyUnit: '0',
+        fireSafetyUnit: '0',
         stationType: null,
         detectModule: null,
         operating: null,

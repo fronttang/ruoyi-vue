@@ -185,7 +185,7 @@
         <el-row>
             <el-col :span="12">
               <el-form-item label="检测模块" label-width="100px"  prop="detectModuleArr">
-                <el-select v-model="form.detectModuleArr" placeholder="请选择检测模块" multiple filterable>
+                <el-select v-model="form.detectModuleArr" placeholder="请选择检测模块" multiple filterable @change="$forceUpdate()">
                   <el-option
                     v-for="dict in dict.type.detect_module"
                     :key="dict.value"

@@ -225,9 +225,9 @@
         </el-row>
         <el-row>
             <el-col :span="24">
-              <el-form-item label="检测起止日期" label-width="100px" prop="testDate">
-                <el-date-picker clearable
-                  v-model="form.testDate"
+              <el-form-item label="检测起止日期" label-width="100px" prop="testDateStr">
+                <el-date-picker clearable @change="$forceUpdate()"
+                  v-model="form.testDateStr"
                   type="daterange"
                   range-separator="-"
                   value-format="yyyy-MM-dd"
@@ -254,8 +254,8 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-              <el-form-item label="检测内容" label-width="100px" prop="testContent">
-                <el-select v-model="form.testContent" placeholder="请选择检测内容" multiple filterable>
+              <el-form-item label="检测内容" label-width="100px" prop="testContentAttr">
+                <el-select v-model="form.testContentAttr" placeholder="请选择检测内容" multiple filterable @change="$forceUpdate()">
                   <el-option
                     v-for="dict in dict.type.detect_content"
                     :key="dict.value"
@@ -494,7 +494,9 @@ export default {
         testStartDate: null,
         testEndDate: null,
         testDate: null,
+        testDateStr: null,
         testContent: null,
+        testContentAttr: null,
         doorNumber: null,
         buildman: null,
         unitType: null,
@@ -586,10 +588,10 @@ export default {
       getOwnerUnit(id).then(response => {
         this.form = response.data;
         if(this.form.testStartDate != null && this.form.testEndDate != null ){
-          this.form.testDate = [this.form.testStartDate, this.form.testEndDate];
+          this.form.testDateStr = [this.form.testStartDate, this.form.testEndDate];
         }
-        if(this.form.testContent != null) {
-          this.form.testContent = this.form.testContent.split(',');
+        if(this.form.testContent != null && this.form.testContent != '' ) {
+          this.form.testContentAttr = this.form.testContent.split(',');
         }
         this.open = true;
         this.title = "修改工业园电检";
@@ -599,13 +601,13 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if(this.form.testDate != null){
-            this.form.testStartDate = this.form.testDate[0];
-            this.form.testEndDate = this.form.testDate[1];
-            this.form.testDate = this.form.testDate.join(",");
+          if(this.form.testDateStr != null){
+            this.form.testStartDate = this.form.testDateStr[0];
+            this.form.testEndDate = this.form.testDateStr[1];
+            this.form.testDate = this.form.testDateStr.join(",");
           }
-          if(this.form.testContent != null){
-            this.form.testContent = this.form.testContent.join(",");
+          if(this.form.testContentAttr != null){
+            this.form.testContent = this.form.testContentAttr.join(",");
           }
           if (this.form.id != null) {
             updateOwnerUnit(this.form).then(response => {

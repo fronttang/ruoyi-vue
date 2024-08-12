@@ -6,8 +6,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.electrical.danger.handler.FormbDangerHandlerFactory;
+import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 
-import io.swagger.annotations.ApiModelProperty;
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -49,6 +51,11 @@ public class OwnerUnitDanger extends BaseEntity {
 	 * 项目ID
 	 */
 	private Long projectId;
+
+	/**
+	 * 项目类型
+	 */
+	private String projectType;
 
 	/**
 	 * 检测单位ID
@@ -183,5 +190,75 @@ public class OwnerUnitDanger extends BaseEntity {
 	 * 备注
 	 */
 	private String remark;
+
+	/**
+	 * 列表及详情位置
+	 * 
+	 * @return
+	 */
+	public String getLocation() {
+
+		// ProjectType type = enumutil
+		// 城中村/工业园
+		if ("1".equalsIgnoreCase(this.projectType) || "2".equalsIgnoreCase(this.projectType)) {
+
+			if ("B".equalsIgnoreCase(this.formType)) {
+				if (StrUtil.isNotBlank(this.formCode)) {
+					IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory
+							.getFormbDangerHander(this.formCode);
+					if (formbDangerHander != null) {
+						return formbDangerHander.getInfoLocation(this);
+					}
+				}
+			}
+		} else if ("4".equalsIgnoreCase(this.projectType)) {
+			// 充电桩
+			if (StrUtil.isNotBlank(this.chargingPileName)) {
+				return StrUtil.format("{}{}", this.chargingPileName, this.location);
+			}
+		}
+
+		return this.location;
+	}
+
+	public String getDescription() {
+		if ("B".equalsIgnoreCase(this.formType)) {
+			if (StrUtil.isNotBlank(this.formCode)) {
+				IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory.getFormbDangerHander(this.formCode);
+				if (formbDangerHander != null) {
+					return formbDangerHander.getDescription(this);
+				}
+			}
+		}
+
+		return this.description;
+	}
+
+	public String getSuggestions() {
+		if ("B".equalsIgnoreCase(this.formType)) {
+			if (StrUtil.isNotBlank(this.formCode)) {
+				IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory.getFormbDangerHander(this.formCode);
+				if (formbDangerHander != null) {
+					return formbDangerHander.getSuggestions(this);
+				}
+			}
+		}
+
+		return this.suggestions;
+	}
+
+	public String getLevel() {
+		// B表隐患位置处理
+		if ("B".equalsIgnoreCase(this.formType)) {
+			if (StrUtil.isNotBlank(this.formCode)) {
+				IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory.getFormbDangerHander(this.formCode);
+				if (formbDangerHander != null) {
+					return formbDangerHander.getLevel(this);
+				}
+			}
+		}
+
+		return this.level;
+	}
 
 }

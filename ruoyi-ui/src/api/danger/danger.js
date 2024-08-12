@@ -41,3 +41,10 @@ export function getBuildingDict(unitId) {
     method: 'get'
   })
 }
+
+export function exportMissDevice(query) {
+  return request({
+    url: '/miss/device/export',
+    method: 'get'
+  })
+}

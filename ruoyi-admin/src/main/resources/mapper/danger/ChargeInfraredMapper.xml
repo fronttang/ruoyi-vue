@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.danger.mapper.ChargeInfraredMapper">
+    
+    <resultMap type="ChargeInfrared" id="ChargeInfraredResult">
+        <result property="id"    column="id"    />
+        <result property="unitId"    column="unit_id"    />
+        <result property="unitName"    column="unit_name"    />
+        <result property="buildingId"    column="building_id"    />
+        <result property="buildingName"    column="building_name"    />
+        <result property="unitAreaId"    column="unit_area_id"    />
+        <result property="areaName"    column="area_name"    />
+        <result property="detectId"    column="detect_id"    />
+        <result property="detectName"    column="detect_name"    />
+        <result property="type"    column="type"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="deviceCode"    column="device_code"    />
+        <result property="imageCode"    column="image_code"    />
+        <result property="inspectionPic"    column="inspection_pic"    />
+        <result property="result"    column="result"    />
+        <result property="infraredPic"    column="infrared_pic"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="district"    column="district"    />
+        <result property="districtName"    column="district_name"    />
+        <result property="street"    column="street"    />
+        <result property="streetName"    column="street_name"    />
+        <result property="community"    column="community"    />
+        <result property="communityName"    column="community_name"    />
+        <result property="hamlet"    column="hamlet"    />
+        <result property="hamletName"    column="hamlet_name"    />
+    </resultMap>
+
+    <sql id="selectChargeInfraredVo">
+        select * from (select d.id, d.unit_id, u.name as unit_name, u.detect_id, du.name as detect_name, a.name as area_name, b.name as building_name,
+        d.building_id, d.unit_area_id, d.form_id, d.form_code, d.form_type, d.form_data_id,  
+        d.status, d.inspector, d.inspector_id, d.initial_time, 
+        d.create_by, d.create_time, d.update_by, d.update_time, 
+        u.district, u.street, u.community, u.hamlet, aa.dict_label as district_name, bb.dict_label as street_name, cc.dict_label as community_name, dd.dict_label as hamlet_name,
+        JSON_UNQUOTE(d.formb->'$.data.deviceName') as device_name,
+        JSON_UNQUOTE(d.formb->'$.data.deviceCode') as device_code,
+        JSON_UNQUOTE(d.formb->'$.data.imageCode') as image_code,
+        JSON_UNQUOTE(d.formb->'$.data.overallPic') as overall_pic,  
+        JSON_UNQUOTE(d.formb->'$.data.result') as result,  
+        JSON_UNQUOTE(d.formb->'$.data.type') as type,  
+        JSON_UNQUOTE(d.formb->'$.data.infraredPic') as infrared_pic,  
+        JSON_UNQUOTE(d.formb->'$.data.inspectionPic') as inspection_pic
+         
+        from owner_unit_danger d 
+        left join owner_unit u on u.id = d.unit_id
+        left join sys_dict_data aa on (u.district = aa.dict_value and aa.dict_type='district' and aa.project_id = u.project_id)
+		left join sys_dict_data bb on (u.street = bb.dict_value and bb.dict_type='street' and bb.project_id = u.project_id)
+		left join sys_dict_data cc on (u.community = cc.dict_value and cc.dict_type='community' and cc.project_id = u.project_id)
+		left join sys_dict_data dd on (u.hamlet = dd.dict_value and dd.dict_type='hamlet' and dd.project_id = u.project_id)
+        left join detect_unit du on du.id = u.detect_id
+        left join owner_unit_area a on a.id = d.unit_area_id
+        left join owner_unit_building b on b.id = d.building_id 
+        where u.project_id = #{projectId}) t 
+    </sql>
+
+    <select id="selectChargeInfraredList" parameterType="ChargeInfrared" resultMap="ChargeInfraredResult">
+        <include refid="selectChargeInfraredVo"/>
+        where t.form_type = 'B' and t.form_code = 'B1' 
+            <if test="keyword != null  and keyword != ''"> 
+            and (
+            t.unit_name like concat('%', #{keyword}, '%') 
+            or t.building_name like concat('%', #{keyword}, '%') 
+            or t.detect_name like concat('%', #{keyword}, '%') 
+            or t.area_name like concat('%', #{keyword}, '%') 
+            or t.device_name like concat('%', #{keyword}, '%') 
+            )
+            </if>
+            <if test="type != null  and type != ''"> and t.type = #{type}</if>
+            <if test="result != null  and result != ''"> and t.result = #{result}</if>
+            <if test="startDate != null  and startDate != ''"> and date(t.initial_time) &gt;= #{startDate}</if>
+            <if test="endDate != null  and endDate != ''"> and date(t.initial_time) &lt;= #{endDate}</if>
+            <if test="district != null  and district != ''"> and t.district = #{district}</if>
+            <if test="street != null  and street != ''"> and t.street = #{street}</if>
+            <if test="community != null  and community != ''"> and t.community = #{community}</if>
+            <if test="hamlet != null  and hamlet != ''"> and t.hamlet = #{hamlet}</if>
+    </select>
+    
+    <select id="selectChargeInfraredById" parameterType="Long" resultMap="ChargeInfraredResult">
+        <include refid="selectChargeInfraredVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertChargeInfrared" parameterType="ChargeInfrared">
+        insert into charge_infrared
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="unitId != null">unit_id,</if>
+            <if test="unitName != null">unit_name,</if>
+            <if test="buildingId != null">building_id,</if>
+            <if test="buildingName != null">building_name,</if>
+            <if test="unitAreaId != null">unit_area_id,</if>
+            <if test="areaName != null">area_name,</if>
+            <if test="type != null">type,</if>
+            <if test="deviceName != null">device_name,</if>
+            <if test="deviceCode != null">device_code,</if>
+            <if test="imageCode != null">image_code,</if>
+            <if test="inspectionPic != null">inspection_pic,</if>
+            <if test="result != null">result,</if>
+            <if test="infraredPic != null">infrared_pic,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="unitId != null">#{unitId},</if>
+            <if test="unitName != null">#{unitName},</if>
+            <if test="buildingId != null">#{buildingId},</if>
+            <if test="buildingName != null">#{buildingName},</if>
+            <if test="unitAreaId != null">#{unitAreaId},</if>
+            <if test="areaName != null">#{areaName},</if>
+            <if test="type != null">#{type},</if>
+            <if test="deviceName != null">#{deviceName},</if>
+            <if test="deviceCode != null">#{deviceCode},</if>
+            <if test="imageCode != null">#{imageCode},</if>
+            <if test="inspectionPic != null">#{inspectionPic},</if>
+            <if test="result != null">#{result},</if>
+            <if test="infraredPic != null">#{infraredPic},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateChargeInfrared" parameterType="ChargeInfrared">
+        update charge_infrared
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="unitId != null">unit_id = #{unitId},</if>
+            <if test="unitName != null">unit_name = #{unitName},</if>
+            <if test="buildingId != null">building_id = #{buildingId},</if>
+            <if test="buildingName != null">building_name = #{buildingName},</if>
+            <if test="unitAreaId != null">unit_area_id = #{unitAreaId},</if>
+            <if test="areaName != null">area_name = #{areaName},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="deviceName != null">device_name = #{deviceName},</if>
+            <if test="deviceCode != null">device_code = #{deviceCode},</if>
+            <if test="imageCode != null">image_code = #{imageCode},</if>
+            <if test="inspectionPic != null">inspection_pic = #{inspectionPic},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="infraredPic != null">infrared_pic = #{infraredPic},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteChargeInfraredById" parameterType="Long">
+        delete from charge_infrared where id = #{id}
+    </delete>
+
+    <delete id="deleteChargeInfraredByIds" parameterType="String">
+        delete from charge_infrared where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

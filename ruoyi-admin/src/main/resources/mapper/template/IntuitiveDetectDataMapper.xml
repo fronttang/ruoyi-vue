@@ -18,6 +18,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="secondaryCode"    column="secondary_code"    />
         <result property="secondaryContent"    column="secondary_content"    />
         <result property="weights"    column="weights"    />
+        <result property="weightsCEs"    column="weights_c_es"    />
+        <result property="weightsCNes"    column="weights_c_nes"    />
+        <result property="weightsDEs"    column="weights_d_es"    />
+        <result property="weightsDNes"    column="weights_d_nes"    />
+        <result property="attribution"    column="attribution"  typeHandler="com.ruoyi.electrical.type.ListStringTypeHandler"  />
         <result property="output"    column="output"    />
         <result property="maxScore"    column="max_score"    />
         <result property="view"    column="view"    />
@@ -29,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectIntuitiveDetectDataVo">
-        select id, template_id, detect_title, type, unit_type, module_type, detect_module, parent_id, first_code, first_content, secondary_code, secondary_content, weights, output, max_score, view, view_parent_id, create_by, create_time, update_by, update_time from intuitive_detect_data
+        select id, template_id, detect_title, type, unit_type, module_type, detect_module, parent_id, first_code, first_content, secondary_code, secondary_content, weights, weights_c_es, weights_c_nes, weights_d_es, weights_d_nes, attribution, output, max_score, view, view_parent_id, create_by, create_time, update_by, update_time from intuitive_detect_data
     </sql>
 
     <select id="selectIntuitiveDetectDataList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
@@ -129,6 +134,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="secondaryCode != null">secondary_code,</if>
             <if test="secondaryContent != null">secondary_content,</if>
             <if test="weights != null">weights,</if>
+            <if test="weightsCEs != null">weights_c_es,</if>
+            <if test="weightsCNes != null">weights_c_nes,</if>
+            <if test="weightsDEs != null">weights_d_es,</if>
+            <if test="weightsDNes != null">weights_d_nes,</if>
+            <if test="attribution != null">attribution,</if>
             <if test="output != null">output,</if>
             <if test="maxScore != null">max_score,</if>
             <if test="view != null">view,</if>
@@ -151,6 +161,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="secondaryCode != null">#{secondaryCode},</if>
             <if test="secondaryContent != null">#{secondaryContent},</if>
             <if test="weights != null">#{weights},</if>
+            <if test="weightsCEs != null">#{weightsCEs},</if>
+            <if test="weightsCNes != null">#{weightsCNes},</if>
+            <if test="weightsDEs != null">#{weightsDEs},</if>
+            <if test="weightsDNes != null">#{weightsDNes},</if>
+            <if test="attribution != null">#{attribution,typeHandler=com.ruoyi.electrical.type.ListStringTypeHandler},</if>
             <if test="output != null">#{output},</if>
             <if test="maxScore != null">#{maxScore},</if>
             <if test="view != null">#{view},</if>
@@ -177,6 +192,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="secondaryCode != null">secondary_code = #{secondaryCode},</if>
             <if test="secondaryContent != null">secondary_content = #{secondaryContent},</if>
             <if test="weights != null">weights = #{weights},</if>
+            <if test="weightsCEs != null">weights_c_es = #{weightsCEs},</if>
+            <if test="weightsCNes != null">weights_c_nes = #{weightsCNes},</if>
+            <if test="weightsDEs != null">weights_d_es = #{weightsDEs},</if>
+            <if test="weightsDNes != null">weights_d_nes = #{weightsDNes},</if>
+            <if test="attribution != null">attribution = #{attribution,typeHandler=com.ruoyi.electrical.type.ListStringTypeHandler},</if>
             <if test="output != null">output = #{output},</if>
             <if test="maxScore != null">max_score = #{maxScore},</if>
             <if test="view != null">view = #{view},</if>
@@ -210,4 +230,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+    
+    
+    <resultMap type="com.ruoyi.electrical.report.dto.station.StationFormData" id="StationFormDataResult">
+        <result property="firstCode"    column="first_code"    />
+        <result property="firstContent"    column="first_content"    />
+        <result property="weightsCEs"    column="weights_c_es"    />
+        <result property="weightsCNes"    column="weights_c_nes"    />
+        <result property="weightsDEs"    column="weights_d_es"    />
+        <result property="weightsDNes"    column="weights_d_nes"    />
+    </resultMap>
+    
+    
+    <select id="selectStationDetectDataByModule" resultMap="StationFormDataResult">
+    	select d.id, d.template_id, d.detect_title, d.type, d.unit_type, d.module_type, d.detect_module, 
+    	d.parent_id, d.first_code, d.first_content, d.secondary_code, d.secondary_content,
+    	 d.weights, d.weights_c_es, d.weights_c_nes, d.weights_d_es, d.weights_d_nes, d.attribution, 
+    	 d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time ,
+    	 (select count(1) from owner_unit_danger ud where ud.unit_id=#{unitId} and ud.form_data_id = d.id)
+    	 from intuitive_detect_data d where d.template_id = #{templateId} and d.detect_module = #{module}
+    </select>
 </mapper>

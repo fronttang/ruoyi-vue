@@ -64,7 +64,7 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 		String userId = String.valueOf(SecurityUtils.getUserId());
 
 		int index = 1;
-		int scIndex = 1;
+		// int scIndex = 1;
 		for (TemplateImportHighForm form : formList) {
 
 			// 计分模块1级
@@ -169,7 +169,7 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 								}
 							}
 
-							++scIndex;
+							// ++scIndex;
 						}
 					}
 				}

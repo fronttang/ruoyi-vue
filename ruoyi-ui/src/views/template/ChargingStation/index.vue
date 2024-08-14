@@ -123,8 +123,32 @@
           <el-input v-model="form.firstCode" placeholder="请输入编号" />
           <el-input v-model="form.firstContent" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="权重" label-width="100px" prop="weights">
-          <el-input v-model="form.weights" placeholder="请输入权重" />
+        <el-form-item label="归属" label-width="100px" prop="attribution" v-if="this.form.detectModule == '6'">
+          <el-checkbox-group type="" v-model="form.attribution">
+            <el-checkbox key="1" label="1" value="1">非车载充电桩</el-checkbox>
+            <el-checkbox key="2" label="2" value="2">交流充电桩</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label-width="0px">
+          <el-card class="box-card" shadow="always">
+            <div slot="header" class="clearfix">
+              <span>权重</span>
+            </div>
+            <div class="text item">
+              <el-form-item label="集中式含储能" label-width="120px" prop="weightsCEs">
+                <el-input v-model="form.weightsCEs" placeholder="请输入权重(集中式含储能)" />
+              </el-form-item>
+              <el-form-item label="集中式不含储能" label-width="120px" prop="weightsCNes">
+                <el-input v-model="form.weightsCNes" placeholder="请输入权重(集中式不含储能)" />
+              </el-form-item>
+              <el-form-item label="分散式含储能" label-width="120px" prop="weightsDEs">
+                <el-input v-model="form.weightsDEs" placeholder="请输入权重(分散式含储能)" />
+              </el-form-item>
+              <el-form-item label="分散式不含储能" label-width="120px" prop="weightsDNes">
+                <el-input v-model="form.weightsDNes" placeholder="请输入权重(分散式不含储能)" />
+              </el-form-item>
+            </div>
+          </el-card>
         </el-form-item>
         <template>
           <el-row :gutter="10" class="mb8">
@@ -319,6 +343,11 @@ export default {
         firstContent: null,
         secondaryCode: null,
         secondaryContent: null,
+        weightsCEs: null,
+        weightsCNes: null,
+        weightsDEs: null,
+        weightsDNes: null,
+        attribution: [],
         dangers : [],
         weights: null,
         output: null,

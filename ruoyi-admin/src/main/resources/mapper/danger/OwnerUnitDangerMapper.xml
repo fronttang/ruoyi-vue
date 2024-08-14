@@ -96,6 +96,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitId != null  and unitId != ''"> and d.unit_id = #{unitId}</if>
             <if test="level != null  and level != ''"> and d.level = #{level}</if>
             <if test="initialTime != null"> and date(d.initial_time) = #{initialTime}</if>
+            <if test="formId != null"> and d.form_id = #{formId}</if>
         </where>
     </select>
     

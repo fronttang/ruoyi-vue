@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.ruoyi.electrical.report.dto.station.StationFormData;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
 import com.ruoyi.electrical.vo.DictVO;
 
@@ -72,4 +73,7 @@ public interface IntuitiveDetectDataMapper {
 
 	public int deleteIntuitiveDetectDataByTemplateIdAndUnitType(@Param("templateId") Long templateId,
 			@Param("unitType") String unitType);
+
+	public List<StationFormData> selectStationDetectDataByModule(@Param("module") String module,
+			@Param("templateId") Long templateId, @Param("unitId") Long unitId);
 }

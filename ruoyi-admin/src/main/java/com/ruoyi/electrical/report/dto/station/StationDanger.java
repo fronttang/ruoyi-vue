@@ -28,5 +28,35 @@ public class StationDanger {
 	/**
 	 * 位置
 	 */
-	private Object location;
+	private String location;
+
+	/**
+	 * 一级编号
+	 */
+	private String firstCode;
+
+	/**
+	 * 权重（集中式含储能）
+	 */
+	private Double weightsCEs;
+
+	/**
+	 * 权重（集中式不含储能）
+	 */
+	private Double weightsCNes;
+
+	/**
+	 * 权重（分散式含储能）
+	 */
+	private Double weightsDEs;
+
+	/**
+	 * 权重（分散式不含储能）
+	 */
+	private Double weightsDNes;
+
+	/**
+	 * 合并
+	 */
+	private boolean merge = false;
 }

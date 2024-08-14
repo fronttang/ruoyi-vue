@@ -45,4 +45,10 @@ public class StationInitialReport {
 	 * 隐患列表
 	 */
 	private List<StationDanger> danger = new ArrayList<StationDanger>();
+
+	/**
+	 * 充电桩检查
+	 */
+	private StationPile pileForm = new StationPile();
+
 }

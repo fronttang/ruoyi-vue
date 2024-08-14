@@ -22,7 +22,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectChargingPileVo">
-        select id, unit_id, name, code, rounds, type, brand, model, power, serial_number, create_by, create_time, update_by, update_time from charging_pile
+        select id, unit_id, name, code, rounds, type, brand, model, power, serial_number, create_by, create_time, update_by, update_time
+        from charging_pile 
     </sql>
 
     <select id="selectChargingPileList" parameterType="ChargingPile" resultMap="ChargingPileResult">
@@ -43,6 +44,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectChargingPileById" parameterType="Long" resultMap="ChargingPileResult">
         <include refid="selectChargingPileVo"/>
         where id = #{id}
+    </select>
+    
+    <select id="countChargingPileDangers"  resultType="Integer">
+       select count(1) from owner_unit_danger d
+       where d.form_data_id = #{formDataId} and #{pileId} member of(d.charging_pile_id)
     </select>
 
     <insert id="insertChargingPile" parameterType="ChargingPile" useGeneratedKeys="true" keyProperty="id">

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
+import com.ruoyi.electrical.report.dto.station.StationDanger;
 import com.ruoyi.electrical.vo.DictVO;
 import com.ruoyi.electrical.vo.OwnerUnitDangerGroupDetailVo;
 
@@ -88,5 +89,7 @@ public interface OwnerUnitDangerMapper {
 	public List<OwnerUnitDangerGroupDetailVo> ownerUnitDangerGroupList(OwnerUnitDangerGroupDetailDto data);
 
 	public List<OwnerUnitDangerGroupDetailVo> ownerUnitBuildingDangerGroupList(OwnerUnitDangerGroupDetailDto data);
+
+	public List<StationDanger> stationReportDangerList(@Param("formId") Long formId, @Param("unitId") Long unitId);
 
 }

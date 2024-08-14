@@ -1,5 +1,12 @@
 package com.ruoyi.electrical.report.dto.station;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
 import com.deepoove.poi.data.style.PictureStyle;
@@ -9,6 +16,7 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
@@ -210,4 +218,81 @@ public class StationOwnerUnitInfo {
 	private String street;
 
 	private String streetName;
+
+	private Double score;
+
+	private String result;
+
+	public String getResult() {
+
+		Double score = this.getScore();
+
+		if (score > 95) {
+			return "蓝色";
+		} else if (score <= 95 && score > 90) {
+			return "黄色";
+		} else if (score <= 90 && score > 80) {
+			return "橙色";
+		} else if (score <= 80) {
+			return "红色";
+		}
+		return "";
+	}
+
+	/**
+	 * 分数信息
+	 */
+	private List<StationFormData> scoreDatas;
+
+	public Double getScore() {
+		if (CollUtil.isNotEmpty(scoreDatas)) {
+
+			String detectModule = this.getDetectModule();
+			if (StrUtil.isNotBlank(detectModule)) {
+				String[] modules = detectModule.split(",");
+				if (modules != null) {
+
+					List<String> moduleList = Arrays.asList(modules);
+					// 储能
+					final boolean es = moduleList.contains("4");
+
+					// 集中式
+					final boolean concentrated = "1".equalsIgnoreCase(this.getStationType());
+					// 分散式
+					final boolean dispersion = "2".equalsIgnoreCase(this.getStationType());
+
+					Optional<BigDecimal> reduce = scoreDatas.stream().map((d) -> {
+
+						if (es) {
+							if (concentrated && Objects.nonNull(d.getWeightsCEs())) {
+								return new BigDecimal(100).multiply(new BigDecimal(0.99))
+										.multiply(new BigDecimal(d.getWeightsCEs()));
+							} else if (dispersion && Objects.nonNull(d.getWeightsDEs())) {
+								return new BigDecimal(100).multiply(new BigDecimal(0.99))
+										.multiply(new BigDecimal(d.getWeightsDEs()));
+							}
+						} else {
+							if (concentrated && Objects.nonNull(d.getWeightsCNes())) {
+								return new BigDecimal(100).multiply(new BigDecimal(0.99))
+										.multiply(new BigDecimal(d.getWeightsCNes()));
+							} else if (dispersion && Objects.nonNull(d.getWeightsDNes())) {
+								return new BigDecimal(100).multiply(new BigDecimal(0.99))
+										.multiply(new BigDecimal(d.getWeightsDNes()));
+							}
+						}
+						return BigDecimal.ZERO;
+					}).reduce(BigDecimal::add);
+
+					if (reduce.isPresent()) {
+						BigDecimal score = reduce.get();
+						score = new BigDecimal(100).subtract(score);
+						score = score.setScale(4, RoundingMode.HALF_DOWN);
+						return score.doubleValue();
+					}
+				}
+			}
+		}
+		return 100D;
+	}
+
 }

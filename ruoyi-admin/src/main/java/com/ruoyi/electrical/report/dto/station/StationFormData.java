@@ -1,9 +1,16 @@
 package com.ruoyi.electrical.report.dto.station;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
 public class StationFormData {
+
+	/**
+	 * ID
+	 */
+	private Long id;
 
 	/**
 	 * 一级编号
@@ -13,7 +20,7 @@ public class StationFormData {
 	/**
 	 * 一级编号内容
 	 */
-	private String firstContent;
+	private Object firstContent;
 
 	/**
 	 * 权重（集中式含储能）
@@ -34,6 +41,9 @@ public class StationFormData {
 	 * 权重（分散式不含储能）
 	 */
 	private Double weightsDNes;
+
+	/** 归属1非车载充电桩2交流充电桩 */
+	private List<String> attribution;
 
 	/**
 	 * 隐患数

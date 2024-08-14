@@ -123,10 +123,13 @@
           <el-input v-model="form.firstCode" placeholder="请输入编号" />
           <el-input v-model="form.firstContent" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+        <el-form-item label="权重" label-width="100px" prop="weights">
+          <el-input v-model="form.weights" placeholder="请输入权重" />
+        </el-form-item>
         <el-form-item label="归属" label-width="100px" prop="attribution" v-if="this.form.detectModule == '6'">
           <el-checkbox-group type="" v-model="form.attribution">
-            <el-checkbox key="1" label="1" value="1">非车载充电桩</el-checkbox>
-            <el-checkbox key="2" label="2" value="2">交流充电桩</el-checkbox>
+            <el-checkbox key="非车载充电桩" label="非车载充电桩" value="非车载充电桩">非车载充电桩</el-checkbox>
+            <el-checkbox key="交流充电桩" label="交流充电桩" value="交流充电桩">交流充电桩</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label-width="0px">

@@ -1,6 +1,9 @@
 package com.ruoyi.electrical.template.service;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 
 /**
@@ -67,4 +70,6 @@ public interface IIntuitiveDetectDangerService {
 	public List<IntuitiveDetectDanger> selectIntuitiveDetectDangersByDataId(Long dataId);
 
 	public Long countDangersByDataIdAndUnitId(Long dataId, Long unitId);
+
+	public int deleteIntuitiveDetectDangerByTemplateId(@Param("templateId") Long templateId);
 }

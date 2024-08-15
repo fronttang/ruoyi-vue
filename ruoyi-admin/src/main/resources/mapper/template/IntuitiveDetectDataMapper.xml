@@ -223,6 +223,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteIntuitiveDetectDataByTemplateIdAndUnitType" >
         delete from intuitive_detect_data where template_id = #{templateId} and unit_type = #{unitType}
     </delete>
+    
+    <delete id="deleteIntuitiveDetectDataByTemplateId" >
+        delete from intuitive_detect_data where template_id = #{templateId}
+    </delete>
 
     <delete id="deleteIntuitiveDetectDataByIds" parameterType="String">
         delete from intuitive_detect_data where id in 
@@ -250,5 +254,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	 d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time ,
     	 (select count(1) from owner_unit_danger ud where ud.unit_id=#{unitId} and ud.form_data_id = d.id) as dangers
     	 from intuitive_detect_data d where d.template_id = #{templateId} and d.detect_module = #{module}
+    	 order by d.weights asc
     </select>
 </mapper>

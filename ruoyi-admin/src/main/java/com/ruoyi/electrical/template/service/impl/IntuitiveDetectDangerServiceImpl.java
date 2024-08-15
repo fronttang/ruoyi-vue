@@ -96,4 +96,9 @@ public class IntuitiveDetectDangerServiceImpl implements IIntuitiveDetectDangerS
 	public Long countDangersByDataIdAndUnitId(Long dataId, Long unitId) {
 		return intuitiveDetectDangerMapper.countDangersByDataIdAndUnitId(dataId, unitId);
 	}
+
+	@Override
+	public int deleteIntuitiveDetectDangerByTemplateId(Long templateId) {
+		return intuitiveDetectDangerMapper.deleteIntuitiveDetectDangerByTemplateId(templateId);
+	}
 }

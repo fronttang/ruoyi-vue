@@ -37,8 +37,10 @@ import com.ruoyi.electrical.template.dto.TemplateImportHighForm;
 import com.ruoyi.electrical.template.dto.TemplateImportHighFormData;
 import com.ruoyi.electrical.template.dto.TemplateImportHighFormDataDanger;
 import com.ruoyi.electrical.template.dto.TemplateImportHighFormSubData;
+import com.ruoyi.electrical.template.dto.TemplateImportStationDto;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
 import com.ruoyi.electrical.template.service.ITemplateImportHighService;
+import com.ruoyi.electrical.template.service.ITemplateImportStationService;
 import com.ruoyi.electrical.vo.DictVO;
 import com.ruoyi.system.service.ISysDictTypeService;
 
@@ -68,6 +70,9 @@ public class IntuitiveDetectController extends BaseController {
 
 	@Autowired
 	private ITemplateImportHighService templateImportHighService;
+
+	@Autowired
+	private ITemplateImportStationService importStationService;
 
 	/**
 	 * 查询直观检测标题列表
@@ -246,6 +251,37 @@ public class IntuitiveDetectController extends BaseController {
 
 		return toAjax(templateImportHighService.saveFormData(templateId, unitType,
 				new ArrayList<TemplateImportHighForm>(formMap.values()), delete));
+	}
+
+	/**
+	 * 充电站检测项导入
+	 * 
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/station/import/{templateId}")
+	public AjaxResult importStationFormTemplate(MultipartFile file, boolean delete, @PathVariable Long templateId)
+			throws Exception {
+
+		ImportParams params = new ImportParams();
+//      导入Excel表中表名所占行
+		// params.setTitleRows(1);
+//      导入Excel表中属性信息所占行
+		params.setHeadRows(1);
+
+		@Cleanup
+		InputStream inputStream = file.getInputStream();
+		List<TemplateImportStationDto> importData = ExcelImportUtil.importExcel(file.getInputStream(),
+				TemplateImportStationDto.class, params);
+
+		log.info("TemplateImportStationDto:{}", JSON.toJSONString(importData));
+
+		if (CollUtil.isEmpty(importData)) {
+			return AjaxResult.error();
+		}
+
+		return toAjax(importStationService.saveFormData(templateId, importData, delete));
 	}
 
 }

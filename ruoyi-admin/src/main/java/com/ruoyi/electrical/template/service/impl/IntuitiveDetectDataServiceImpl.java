@@ -183,4 +183,9 @@ public class IntuitiveDetectDataServiceImpl implements IIntuitiveDetectDataServi
 	public int deleteIntuitiveDetectDataByTemplateIdAndUnitType(Long templateId, String unitType) {
 		return intuitiveDetectDataMapper.deleteIntuitiveDetectDataByTemplateIdAndUnitType(templateId, unitType);
 	}
+
+	@Override
+	public int deleteIntuitiveDetectDataByTemplateId(Long templateId) {
+		return intuitiveDetectDataMapper.deleteIntuitiveDetectDataByTemplateId(templateId);
+	}
 }

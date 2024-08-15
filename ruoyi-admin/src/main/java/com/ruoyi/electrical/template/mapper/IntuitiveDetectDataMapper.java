@@ -74,6 +74,8 @@ public interface IntuitiveDetectDataMapper {
 	public int deleteIntuitiveDetectDataByTemplateIdAndUnitType(@Param("templateId") Long templateId,
 			@Param("unitType") String unitType);
 
+	public int deleteIntuitiveDetectDataByTemplateId(@Param("templateId") Long templateId);
+
 	public List<StationFormData> selectStationDetectDataByModule(@Param("module") String module,
 			@Param("templateId") Long templateId, @Param("unitId") Long unitId);
 }

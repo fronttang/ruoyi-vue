@@ -115,6 +115,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteIntuitiveDetectDangerByDataId" parameterType="Long">
         delete from intuitive_detect_danger where data_id = #{id}
     </delete>
+    
+    <delete id="deleteIntuitiveDetectDangerByTemplateId" parameterType="Long">
+        delete from intuitive_detect_danger where template_id = #{templateId}
+    </delete>
 
     <delete id="deleteIntuitiveDetectDangerByDataIds" parameterType="String">
         delete from intuitive_detect_danger where data_id in 

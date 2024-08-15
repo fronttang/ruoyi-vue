@@ -68,4 +68,6 @@ public interface IntuitiveDetectDangerMapper {
 	public int deleteIntuitiveDetectDangerByDataIds(Long[] dataId);
 
 	public Long countDangersByDataIdAndUnitId(@Param("dataId") Long dataId, @Param("unitId") Long unitId);
+
+	public int deleteIntuitiveDetectDangerByTemplateId(@Param("templateId") Long templateId);
 }

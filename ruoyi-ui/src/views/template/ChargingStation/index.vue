@@ -60,6 +60,15 @@
           v-hasPermi="['template:IntuitiveDetectData:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="1.5" >
+        <el-button
+          type="info"
+          plain
+          icon="el-icon-upload2"
+          size="mini"
+          @click="handleImport"
+        >导入</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -225,6 +234,36 @@
         <el-button @click="cancelDanger">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 用户导入对话框 -->
+    <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
+      <el-upload
+        ref="upload"
+        :limit="1"
+        accept=".xlsx, .xls"
+        :headers="upload.headers"
+        :action="upload.url + '?delete=' + upload.delete"
+        :disabled="upload.isUploading"
+        :on-progress="handleFileUploadProgress"
+        :on-success="handleFileSuccess"
+        :auto-upload="false"
+        drag
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip text-center" slot="tip">
+          <div class="el-upload__tip" slot="tip">
+            <el-checkbox v-model="upload.delete" /> 是否删除已经存在的模板数据
+          </div>
+          <span>仅允许导入xls、xlsx格式文件。</span>
+          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="importTemplate">下载模板</el-link>
+        </div>
+      </el-upload>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFileForm">确 定</el-button>
+        <el-button @click="upload.open = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -232,6 +271,7 @@
 import { listIntuitiveDetectData, getIntuitiveDetectData, delIntuitiveDetectData, addIntuitiveDetectData, updateIntuitiveDetectData } from "@/api/template/IntuitiveDetectData";
 import { getIntuitiveDetectDict } from "@/api/template/IntuitiveDetect";
 import { getTemplateDict } from "@/api/template/Template";
+import { getToken } from "@/utils/auth";
 
 export default {
   name: "IntuitiveDetectData",
@@ -295,7 +335,22 @@ export default {
         description: [
           { required: true, message: "请输入隐患描述", trigger: "blur" }
         ],
-      }
+      },
+      // 导入参数
+      upload: {
+        // 是否显示弹出层（导入）
+        open: false,
+        // 弹出层标题（导入）
+        title: "",
+        // 是否禁用上传
+        isUploading: false,
+        // 是否删除已经存在的数据
+        delete: 0,
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/template/IntuitiveDetect/station/import/" + parseInt(this.$route.params.templateId)
+      },
     };
   },
   created() {
@@ -483,6 +538,32 @@ export default {
       this.download('template/IntuitiveDetectData/export', {
         ...this.queryParams
       }, `IntuitiveDetectData_${new Date().getTime()}.xlsx`)
+    },
+    /** 导入按钮操作 */
+    handleImport() {
+      this.upload.title = "导入";
+      this.upload.open = true;
+    },
+    /** 下载模板操作 */
+    importTemplate() {
+      //this.download('system/user/importTemplate', {
+      //}, `user_template_${new Date().getTime()}.xlsx`)
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      this.upload.open = false;
+      this.upload.isUploading = false;
+      this.$refs.upload.clearFiles();
+      this.$alert("<div style='overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;'>" + response.msg + "</div>", "导入结果", { dangerouslyUseHTMLString: true });
+      this.getList();
+    },
+    // 提交上传文件
+    submitFileForm() {
+      this.$refs.upload.submit();
     }
   }
 };

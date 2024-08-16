@@ -90,6 +90,6 @@ public interface OwnerUnitDangerMapper {
 
 	public List<OwnerUnitDangerGroupDetailVo> ownerUnitBuildingDangerGroupList(OwnerUnitDangerGroupDetailDto data);
 
-	public List<StationDanger> stationReportDangerList(@Param("formId") Long formId, @Param("unitId") Long unitId);
+	public List<StationDanger> stationReportDangerList(@Param("unitId") Long unitId);
 
 }

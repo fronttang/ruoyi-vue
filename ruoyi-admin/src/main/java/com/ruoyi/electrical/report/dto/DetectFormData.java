@@ -29,4 +29,9 @@ public class DetectFormData {
 	 * 单项判定
 	 */
 	private String decide;
+
+	/**
+	 * 合并单元格
+	 */
+	private boolean merge = false;
 }

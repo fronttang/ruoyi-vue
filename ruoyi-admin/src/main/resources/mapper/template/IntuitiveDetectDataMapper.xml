@@ -60,6 +60,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by weights asc, first_code asc, id asc
     </select>
     
+    <select id="selectReportIntuitiveDetectDataList"  resultMap="IntuitiveDetectDataResult">
+        select d.id, d.template_id, d.detect_title, d.type, d.unit_type, d.module_type, d.detect_module, 
+        d.parent_id, d.first_code, d.first_content, 
+        d.secondary_code, d.secondary_content, d.weights, d.weights_c_es, d.weights_c_nes, d.weights_d_es, d.weights_d_nes, d.attribution, 
+        d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time,
+        (select count(1) from owner_unit_danger ud where ud.form_data_id = d.id and ud.unit_id = #{unitId} ) as danger
+        from intuitive_detect_data d
+        where d.template_id = #{templateId}
+        and d.output = '1' 
+        order by d.weights asc, d.first_code asc, d.id asc
+    </select>
+    
     <select id="selectIntuitiveDetectDataViewList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
         select a.id, b.template_id, b.detect_title, b.type, b.unit_type, b.module_type, b.detect_module, b.parent_id, a.first_code, a.first_content, 
         b.secondary_code, b.secondary_content, b.weights, b.output, b.max_score, b.view, a.view_parent_id, b.create_by, b.create_time, b.update_by, b.update_time 
@@ -239,6 +251,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="com.ruoyi.electrical.report.dto.station.StationFormData" id="StationFormDataResult">
         <result property="firstCode"    column="first_code"    />
         <result property="firstContent"    column="first_content"    />
+        <result property="detectModule"    column="detect_module"    />
         <result property="weightsCEs"    column="weights_c_es"    />
         <result property="weightsCNes"    column="weights_c_nes"    />
         <result property="weightsDEs"    column="weights_d_es"    />
@@ -247,13 +260,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
     
     
-    <select id="selectStationDetectDataByModule" resultMap="StationFormDataResult">
+    <select id="selectStationDetectData" resultMap="StationFormDataResult">
     	select d.id, d.template_id, d.detect_title, d.type, d.unit_type, d.module_type, d.detect_module, 
     	d.parent_id, d.first_code, d.first_content, d.secondary_code, d.secondary_content,
     	 d.weights, d.weights_c_es, d.weights_c_nes, d.weights_d_es, d.weights_d_nes, d.attribution, 
     	 d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time ,
     	 (select count(1) from owner_unit_danger ud where ud.unit_id=#{unitId} and ud.form_data_id = d.id) as dangers
-    	 from intuitive_detect_data d where d.template_id = #{templateId} and d.detect_module = #{module}
+    	 from intuitive_detect_data d where d.template_id = #{templateId} 
     	 order by d.weights asc
     </select>
 </mapper>

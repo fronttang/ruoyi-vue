@@ -66,4 +66,6 @@ public interface IIntuitiveDetectService {
 	public List<DictVO> selectIntuitiveDetectListDict(IntuitiveDetect intuitiveDetect);
 
 	public int deleteIntuitiveDetectByTemplateIdAndUnitType(Long templateId, String unitType);
+
+	public int deleteIntuitiveDetectByTemplateId(Long templateId);
 }

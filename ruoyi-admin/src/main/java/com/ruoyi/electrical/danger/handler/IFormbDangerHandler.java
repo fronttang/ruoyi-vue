@@ -27,4 +27,18 @@ public interface IFormbDangerHandler {
 	 * 位置
 	 */
 	String getInfoLocation(OwnerUnitDanger vo);
+
+	/**
+	 * 结果
+	 */
+	String getResult(OwnerUnitDanger vo);
+
+	/**
+	 * 符合是否汇总
+	 */
+	default boolean isSummary(OwnerUnitDanger vo) {
+		return true;
+	}
+
+	String getPicture(OwnerUnitDanger vo);
 }

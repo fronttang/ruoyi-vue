@@ -331,6 +331,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="com.ruoyi.electrical.report.dto.station.StationDanger" id="StationDangerResult">
         <result property="chargingPileName"    column="charging_pile_name"    />
+        <result property="dangerId"    column="danger_id"    />
+        <result property="formId"    column="form_id"    />
+        <result property="formCode"    column="form_code"    />
+        <result property="formType"    column="form_type"    />
+        <result property="formDataId"    column="form_data_id"    />
         <result property="level"    column="level"    />
         <result property="description"    column="description"    />
         <result property="suggestions"    column="suggestions"    />
@@ -340,6 +345,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="weightsDEs"    column="weights_d_es"    />
         <result property="weightsDNes"    column="weights_d_nes"    />
         <result property="firstCode"    column="first_code"    />
+        <result property="chargingPileId"    column="charging_pile_id"  typeHandler="com.ruoyi.electrical.type.ListStringTypeHandler"   />
     </resultMap>
 
 
@@ -357,7 +363,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join owner_unit_area a on a.id = d.unit_area_id
         left join owner_unit_building b on b.id = d.building_id
         left join intuitive_detect_data idd on idd.id = d.form_data_id
-        where d.unit_id = #{unitId} and d.form_id = #{formId}
+        where d.unit_id = #{unitId} and u.rounds = d.rounds
     </select>
     
 </mapper>

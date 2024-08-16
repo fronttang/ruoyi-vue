@@ -13,7 +13,7 @@ public class FormB8DangerHandler implements IFormbDangerHandler {
 
 	private static String TEST_RESULT_3 = "测试不动作";
 
-	// private static String TEST_RESULT_4 = "抄表到户";
+	private static String TEST_RESULT_4 = "抄表到户";
 
 	@Override
 	public String getLevel(OwnerUnitDanger vo) {
@@ -81,6 +81,15 @@ public class FormB8DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
+	@Override
+	public boolean isSummary(OwnerUnitDanger vo) {
+		String testResults = getTestResults(vo);
+		if (TEST_RESULT_4.equalsIgnoreCase(testResults)) {
+			return false;
+		}
+		return true;
+	}
+
 	private FormB8 getFormb(OwnerUnitDanger vo) {
 		if (vo == null) {
 			return null;
@@ -97,7 +106,8 @@ public class FormB8DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB8 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
@@ -109,6 +119,15 @@ public class FormB8DangerHandler implements IFormbDangerHandler {
 		FormB8 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getTestResults();
+		}
+		return null;
+	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB8 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
 		}
 		return null;
 	}

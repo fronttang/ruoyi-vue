@@ -108,7 +108,17 @@ public class FormB11DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public boolean isSummary(OwnerUnitDanger vo) {
+		String result = getResult(vo);
+		if (QUALIFIED.equalsIgnoreCase(result)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB11 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
@@ -128,6 +138,15 @@ public class FormB11DangerHandler implements IFormbDangerHandler {
 		FormB11 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getOther();
+		}
+		return null;
+	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB11 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
 		}
 		return null;
 	}

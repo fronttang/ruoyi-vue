@@ -4,10 +4,14 @@ import com.ruoyi.electrical.report.annotation.Formb;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Formb("B13")
-public class FormB13 {
+public class FormB13 extends BaseFormB {
 
 	/**
 	 * 检测地点

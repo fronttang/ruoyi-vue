@@ -72,4 +72,6 @@ public interface IIntuitiveDetectDataService {
 	public int deleteIntuitiveDetectDataByTemplateIdAndUnitType(Long templateId, String unitType);
 
 	public int deleteIntuitiveDetectDataByTemplateId(Long templateId);
+
+	public List<IntuitiveDetectData> selectReportIntuitiveDetectDataList(Long templateId, Long unitId);
 }

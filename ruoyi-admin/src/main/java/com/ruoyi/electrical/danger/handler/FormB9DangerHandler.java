@@ -54,6 +54,15 @@ public class FormB9DangerHandler implements IFormbDangerHandler {
 		return location;
 	}
 
+	@Override
+	public boolean isSummary(OwnerUnitDanger vo) {
+		String result = getResult(vo);
+		if (QUALIFIED.equalsIgnoreCase(result)) {
+			return false;
+		}
+		return true;
+	}
+
 	private FormB9 getFormb(OwnerUnitDanger vo) {
 		if (vo == null) {
 			return null;
@@ -70,7 +79,8 @@ public class FormB9DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB9 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
@@ -82,6 +92,15 @@ public class FormB9DangerHandler implements IFormbDangerHandler {
 		FormB9 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getVoltage();
+		}
+		return null;
+	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB9 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
 		}
 		return null;
 	}

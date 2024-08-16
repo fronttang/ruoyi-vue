@@ -4,10 +4,14 @@ import com.ruoyi.electrical.report.annotation.Formb;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Formb("B4")
-public class FormB4 {
+public class FormB4 extends BaseFormB {
 
 	/**
 	 * 灯具类型 普通/仓库

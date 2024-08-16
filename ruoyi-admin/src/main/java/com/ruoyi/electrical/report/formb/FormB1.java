@@ -1,12 +1,27 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.deepoove.poi.data.FilePictureRenderData;
+import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.data.style.PictureStyle;
+import com.deepoove.poi.data.style.Style;
+import com.deepoove.poi.xwpf.WidthScalePattern;
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 import com.ruoyi.electrical.report.annotation.Formb;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Formb("B1")
-public class FormB1 {
+@SuppressWarnings("unused")
+public class FormB1 extends BaseFormB {
 
 	/**
 	 * 辐射率
@@ -84,9 +99,54 @@ public class FormB1 {
 	private String result;
 
 	/**
+	 * 合格
+	 */
+
+	private TextRenderData result1;
+
+	/**
+	 * 不合格
+	 */
+	private TextRenderData result2;
+
+	public TextRenderData getResult1() {
+		if (IFormbDangerHandler.QUALIFIED.equalsIgnoreCase(this.result)) {
+			return new TextRenderData("R", new Style("Wingdings 2", 12));
+		} else {
+			return new TextRenderData("\u00A3", new Style("Wingdings 2", 12));
+		}
+	}
+
+	public TextRenderData getResult2() {
+		if (IFormbDangerHandler.FAILURE.equalsIgnoreCase(this.result)) {
+			return new TextRenderData("R", new Style("Wingdings 2", 12));
+		} else {
+			return new TextRenderData("\u00A3", new Style("Wingdings 2", 12));
+		}
+	}
+
+	/**
 	 * 红外判定图
 	 */
 	private String infraredPic;
+
+	private FilePictureRenderData infraredPicture;
+
+	public FilePictureRenderData getInfraredPicture() {
+		if (StrUtil.isBlank(this.infraredPic)) {
+			return null;
+		}
+		// 本地资源路径
+		String localPath = RuoYiConfig.getProfile();
+		// 数据库资源地址
+		String filePath = localPath + StringUtils.substringAfter(this.infraredPic, Constants.RESOURCE_PREFIX);
+
+		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setScalePattern(WidthScalePattern.FIT);
+		qualification.setPictureStyle(pictureStyle);
+		return qualification;
+	}
 
 	/**
 	 * 单相检测

@@ -1,13 +1,21 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.data.style.Style;
+import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 import com.ruoyi.electrical.report.annotation.Formb;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Formb("BB1")
-public class FormBB1 {
+@SuppressWarnings("unused")
+public class FormBB1 extends BaseFormB {
 
 	/**
 	 * 辐射率
@@ -74,4 +82,31 @@ public class FormBB1 {
 	 */
 	@ApiModelProperty("判定结果 合格/不合格")
 	private String result;
+
+	/**
+	 * 合格
+	 */
+
+	private TextRenderData result1;
+
+	/**
+	 * 不合格
+	 */
+	private TextRenderData result2;
+
+	public TextRenderData getResult1() {
+		if (IFormbDangerHandler.QUALIFIED.equalsIgnoreCase(this.result)) {
+			return new TextRenderData("R", new Style("Wingdings 2", 12));
+		} else {
+			return new TextRenderData("\u00A3", new Style("Wingdings 2", 12));
+		}
+	}
+
+	public TextRenderData getResult2() {
+		if (IFormbDangerHandler.FAILURE.equalsIgnoreCase(this.result)) {
+			return new TextRenderData("R", new Style("Wingdings 2", 12));
+		} else {
+			return new TextRenderData("\u00A3", new Style("Wingdings 2", 12));
+		}
+	}
 }

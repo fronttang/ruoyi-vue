@@ -54,6 +54,15 @@ public class FormB13DangerHandler implements IFormbDangerHandler {
 		return location;
 	}
 
+	@Override
+	public boolean isSummary(OwnerUnitDanger vo) {
+		String result = getResult(vo);
+		if (FAILURE.equalsIgnoreCase(result)) {
+			return true;
+		}
+		return false;
+	}
+
 	private FormB13 getFormb(OwnerUnitDanger vo) {
 		if (vo == null) {
 			return null;
@@ -70,10 +79,20 @@ public class FormB13DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB13 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
+		}
+		return null;
+	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB13 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
 		}
 		return null;
 	}

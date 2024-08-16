@@ -105,4 +105,6 @@ public class IntuitiveDetectData extends BaseEntity {
 
 	private List<IntuitiveDetectDanger> dangers;
 
+	private Integer danger;
+
 }

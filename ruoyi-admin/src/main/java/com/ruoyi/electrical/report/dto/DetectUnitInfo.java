@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.dto;
 
 import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.style.PictureStyle;
+import com.deepoove.poi.xwpf.WidthScalePattern;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
@@ -37,34 +38,52 @@ public class DetectUnitInfo {
 	private String contactPhone;
 
 	/** logo */
-	private Object logo;
+	private String logo;
 
 	@SuppressWarnings("unused")
 	private FilePictureRenderData logoPic;
 
 	public FilePictureRenderData getLogoPic() {
-		String logo = String.valueOf(this.logo);
-		if (StrUtil.isBlank(logo)) {
+		if (StrUtil.isBlank(this.logo)) {
 			return null;
 		}
 		// 本地资源路径
 		String localPath = RuoYiConfig.getProfile();
 		// 数据库资源地址
-		String filePath = localPath + StringUtils.substringAfter(logo, Constants.RESOURCE_PREFIX);
+		String filePath = localPath + StringUtils.substringAfter(this.logo, Constants.RESOURCE_PREFIX);
 
-		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		FilePictureRenderData logo = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();
 		pictureStyle.setWidth(50);
 		pictureStyle.setHeight(50);
 		// pictureStyle.setScalePattern(WidthScalePattern.FIT);
-		qualification.setPictureStyle(pictureStyle);
-		return qualification;
+		logo.setPictureStyle(pictureStyle);
+		return logo;
 	}
 
 	/** 营业执照 */
 	private String businessLicense;
 
 	/** 资质 */
-	private Object qualification;
+	private String qualification;
+
+	@SuppressWarnings("unused")
+	private FilePictureRenderData qualificationPic;
+
+	public FilePictureRenderData getQualificationPic() {
+		if (StrUtil.isBlank(this.qualification)) {
+			return null;
+		}
+		// 本地资源路径
+		String localPath = RuoYiConfig.getProfile();
+		// 数据库资源地址
+		String filePath = localPath + StringUtils.substringAfter(this.qualification, Constants.RESOURCE_PREFIX);
+
+		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setScalePattern(WidthScalePattern.FIT);
+		qualification.setPictureStyle(pictureStyle);
+		return qualification;
+	}
 
 }

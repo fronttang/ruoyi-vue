@@ -32,6 +32,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
 import com.ruoyi.electrical.template.dto.IntuitiveDetectQuery;
+import com.ruoyi.electrical.template.dto.TemplateImportDto;
 import com.ruoyi.electrical.template.dto.TemplateImportHighDto;
 import com.ruoyi.electrical.template.dto.TemplateImportHighForm;
 import com.ruoyi.electrical.template.dto.TemplateImportHighFormData;
@@ -40,6 +41,7 @@ import com.ruoyi.electrical.template.dto.TemplateImportHighFormSubData;
 import com.ruoyi.electrical.template.dto.TemplateImportStationDto;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
 import com.ruoyi.electrical.template.service.ITemplateImportHighService;
+import com.ruoyi.electrical.template.service.ITemplateImportService;
 import com.ruoyi.electrical.template.service.ITemplateImportStationService;
 import com.ruoyi.electrical.vo.DictVO;
 import com.ruoyi.system.service.ISysDictTypeService;
@@ -73,6 +75,9 @@ public class IntuitiveDetectController extends BaseController {
 
 	@Autowired
 	private ITemplateImportStationService importStationService;
+
+	@Autowired
+	private ITemplateImportService importService;
 
 	/**
 	 * 查询直观检测标题列表
@@ -282,6 +287,37 @@ public class IntuitiveDetectController extends BaseController {
 		}
 
 		return toAjax(importStationService.saveFormData(templateId, importData, delete));
+	}
+
+	/**
+	 * 城中村/工业园检测项导入
+	 * 
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/form/import/{templateId}")
+	public AjaxResult importFormTemplate(MultipartFile file, boolean delete, @PathVariable Long templateId)
+			throws Exception {
+
+		ImportParams params = new ImportParams();
+//      导入Excel表中表名所占行
+		// params.setTitleRows(1);
+//      导入Excel表中属性信息所占行
+		params.setHeadRows(1);
+
+		@Cleanup
+		InputStream inputStream = file.getInputStream();
+		List<TemplateImportDto> importData = ExcelImportUtil.importExcel(file.getInputStream(), TemplateImportDto.class,
+				params);
+
+		log.info("TemplateImportDto:{}", JSON.toJSONString(importData));
+
+		if (CollUtil.isEmpty(importData)) {
+			return AjaxResult.error();
+		}
+
+		return toAjax(importService.saveFormData(templateId, importData, delete));
 	}
 
 }

@@ -13,11 +13,13 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 
 	private static String ACTION_NULL = "不动作";
 
-	// private static String MANUALTEST_ACTION = "手动动作";
+	private static String MANUALTEST_ACTION = "手动动作";
 
 	private static String MANUALTEST_NO_ACTION = "手动不动作";
 
 	private static String OTHER_UN = "未安装";
+
+	private static String OTHER_1 = "住户不允许断电无法进行测试";
 
 	@Override
 	public String getLevel(OwnerUnitDanger vo) {
@@ -84,7 +86,6 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 		String manualTest = getManualTest(vo);
 		String other = getOther(vo);
 
-		// 合格
 		if (FAILURE.equalsIgnoreCase(result)) {
 			// 不合格
 			if (ACTION_FILL.equalsIgnoreCase(action) || ACTION_1000.equalsIgnoreCase(action)
@@ -110,6 +111,23 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 		return "漏电保护开关";
 	}
 
+	@Override
+	public boolean isSummary(OwnerUnitDanger vo) {
+		String result = getResult(vo);
+		String action = getAction(vo);
+		String other = getOther(vo);
+		if (QUALIFIED.equalsIgnoreCase(result)) {
+			if (MANUALTEST_ACTION.equalsIgnoreCase(action)) {
+				return false;
+			}
+		} else if (FAILURE.equalsIgnoreCase(result)) {
+			if (OTHER_1.equalsIgnoreCase(other)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private FormB6 getFormb(OwnerUnitDanger vo) {
 		if (vo == null) {
 			return null;
@@ -126,7 +144,8 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB6 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
@@ -154,6 +173,15 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 		FormB6 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getOther();
+		}
+		return null;
+	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB6 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
 		}
 		return null;
 	}

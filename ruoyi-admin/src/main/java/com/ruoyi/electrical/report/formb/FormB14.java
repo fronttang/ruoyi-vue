@@ -4,10 +4,18 @@ import com.ruoyi.electrical.report.annotation.Formb;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Formb("B14")
-public class FormB14 {
+public class FormB14 extends BaseFormB {
+
+	public static final String TYPE_RESIDUALCURRENT = "residualCurrent";
+
+	public static final String TYPE_ALARMTIME = "alarmTime";
 
 	/**
 	 * 剩余电流值检测
@@ -20,6 +28,11 @@ public class FormB14 {
 	 */
 	@ApiModelProperty("报警时间检测")
 	private AlarmTime alarmTime = new AlarmTime();
+
+	/**
+	 * 剩余电流值 报警时间 residualCurrent / alarmTime
+	 */
+	private String type;
 
 	/**
 	 * 报警时间检测

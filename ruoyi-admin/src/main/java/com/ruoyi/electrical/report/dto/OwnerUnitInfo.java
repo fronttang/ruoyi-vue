@@ -82,5 +82,5 @@ public class OwnerUnitInfo {
 	/**
 	 * A级隐患数
 	 */
-	private Integer dangers;
+	private Long dangers;
 }

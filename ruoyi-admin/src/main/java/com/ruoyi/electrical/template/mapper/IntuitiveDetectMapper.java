@@ -74,4 +74,6 @@ public interface IntuitiveDetectMapper {
 
 	public int deleteIntuitiveDetectByTemplateIdAndUnitType(@Param("templateId") Long templateId,
 			@Param("unitType") String unitType);
+
+	public int deleteIntuitiveDetectByTemplateId(@Param("templateId") Long templateId);
 }

@@ -76,11 +76,22 @@ public class FormBB1DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormBB1 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
 		}
 		return null;
 	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormBB1 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
+		}
+		return null;
+	}
+
 }

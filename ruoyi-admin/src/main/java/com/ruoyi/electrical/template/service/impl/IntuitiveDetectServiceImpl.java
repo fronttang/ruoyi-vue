@@ -106,4 +106,9 @@ public class IntuitiveDetectServiceImpl implements IIntuitiveDetectService {
 	public int deleteIntuitiveDetectByTemplateIdAndUnitType(Long templateId, String unitType) {
 		return intuitiveDetectMapper.deleteIntuitiveDetectByTemplateIdAndUnitType(templateId, unitType);
 	}
+
+	@Override
+	public int deleteIntuitiveDetectByTemplateId(Long templateId) {
+		return intuitiveDetectMapper.deleteIntuitiveDetectByTemplateId(templateId);
+	}
 }

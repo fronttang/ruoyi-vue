@@ -108,6 +108,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteIntuitiveDetectByTemplateIdAndUnitType" >
         delete from intuitive_detect where template_id = #{templateId} and unit_type = #{unitType}
     </delete>
+    
+    <delete id="deleteIntuitiveDetectByTemplateId" >
+        delete from intuitive_detect where template_id = #{templateId}
+    </delete>
 
     <delete id="deleteIntuitiveDetectByIds" parameterType="String">
         delete from intuitive_detect where id in 

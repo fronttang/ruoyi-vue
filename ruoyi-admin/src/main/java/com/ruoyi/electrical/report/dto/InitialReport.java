@@ -1,10 +1,12 @@
 package com.ruoyi.electrical.report.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.ruoyi.electrical.project.domain.Project;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.Data;
 
 /**
@@ -52,5 +54,38 @@ public class InitialReport {
 	 * B表数据
 	 */
 	private Map<String, List<Object>> formb;
+
+	/**
+	 * 隐患数据 符合项 B表
+	 */
+	private List<UrbanVillageDanger> conformb = new ArrayList<UrbanVillageDanger>();
+
+	/**
+	 * 不符合项 B表
+	 */
+	private List<UrbanVillageDanger> nconformb = new ArrayList<UrbanVillageDanger>();
+
+	/**
+	 * 不符合项
+	 */
+	private List<UrbanVillageDanger> nconform = new ArrayList<UrbanVillageDanger>();
+
+	/**
+	 * 所有隐患
+	 */
+	@SuppressWarnings("unused")
+	private List<UrbanVillageDanger> dangers = new ArrayList<UrbanVillageDanger>();
+
+	public List<UrbanVillageDanger> getDangers() {
+		List<UrbanVillageDanger> dangers = new ArrayList<UrbanVillageDanger>();
+
+		if (CollUtil.isNotEmpty(this.nconformb)) {
+			dangers.addAll(this.nconformb);
+		}
+		if (CollUtil.isNotEmpty(this.nconform)) {
+			dangers.addAll(this.nconform);
+		}
+		return dangers;
+	}
 
 }

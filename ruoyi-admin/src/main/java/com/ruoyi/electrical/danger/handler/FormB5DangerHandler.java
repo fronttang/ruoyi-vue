@@ -80,7 +80,8 @@ public class FormB5DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB5 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
@@ -88,4 +89,12 @@ public class FormB5DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB5 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
+		}
+		return null;
+	}
 }

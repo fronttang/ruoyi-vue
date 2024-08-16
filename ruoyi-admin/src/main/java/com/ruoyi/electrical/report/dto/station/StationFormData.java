@@ -23,6 +23,11 @@ public class StationFormData {
 	private Object firstContent;
 
 	/**
+	 * 检测板块
+	 */
+	private String detectModule;
+
+	/**
 	 * 权重（集中式含储能）
 	 */
 	private Double weightsCEs;
@@ -42,7 +47,9 @@ public class StationFormData {
 	 */
 	private Double weightsDNes;
 
-	/** 归属1非车载充电桩2交流充电桩 */
+	/**
+	 * 归属1非车载充电桩2交流充电桩
+	 */
 	private List<String> attribution;
 
 	/**

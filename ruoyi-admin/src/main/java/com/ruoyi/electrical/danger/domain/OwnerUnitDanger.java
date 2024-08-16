@@ -146,6 +146,11 @@ public class OwnerUnitDanger extends BaseEntity {
 	@Excel(name = "B类表数据")
 	private JSONObject formb;
 
+	/**
+	 * B14的ID
+	 */
+	private Long b14;
+
 	/** 整改员 */
 	@Excel(name = "整改员")
 	private String rectification;
@@ -259,6 +264,42 @@ public class OwnerUnitDanger extends BaseEntity {
 		}
 
 		return this.level;
+	}
+
+	public boolean isSummary() {
+		if ("B".equalsIgnoreCase(this.formType)) {
+			if (StrUtil.isNotBlank(this.formCode)) {
+				IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory.getFormbDangerHander(this.formCode);
+				if (formbDangerHander != null) {
+					return formbDangerHander.isSummary(this);
+				}
+			}
+		}
+		return false;
+	}
+
+	public String getResult() {
+		if ("B".equalsIgnoreCase(this.formType)) {
+			if (StrUtil.isNotBlank(this.formCode)) {
+				IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory.getFormbDangerHander(this.formCode);
+				if (formbDangerHander != null) {
+					return formbDangerHander.getResult(this);
+				}
+			}
+		}
+		return null;
+	}
+
+	public String getPicture() {
+		if ("B".equalsIgnoreCase(this.formType)) {
+			if (StrUtil.isNotBlank(this.formCode)) {
+				IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory.getFormbDangerHander(this.formCode);
+				if (formbDangerHander != null) {
+					return formbDangerHander.getPicture(this);
+				}
+			}
+		}
+		return this.dangerPic;
 	}
 
 }

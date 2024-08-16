@@ -94,7 +94,17 @@ public class FormB15DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
-	private String getResult(OwnerUnitDanger vo) {
+	@Override
+	public boolean isSummary(OwnerUnitDanger vo) {
+		String result = getResult(vo);
+		if (FAILURE.equalsIgnoreCase(result)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getResult(OwnerUnitDanger vo) {
 		FormB15 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getResult();
@@ -106,6 +116,15 @@ public class FormB15DangerHandler implements IFormbDangerHandler {
 		FormB15 formb = getFormb(vo);
 		if (formb != null) {
 			return formb.getTemperature();
+		}
+		return null;
+	}
+
+	@Override
+	public String getPicture(OwnerUnitDanger vo) {
+		FormB15 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getOverallPic();
 		}
 		return null;
 	}

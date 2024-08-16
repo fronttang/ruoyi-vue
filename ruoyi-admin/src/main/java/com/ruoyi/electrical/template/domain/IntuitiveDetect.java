@@ -47,4 +47,9 @@ public class IntuitiveDetect extends BaseEntity {
 	/** 归属1公共区域2户3配电房 */
 	@Excel(name = "归属1公共区域2户3配电房")
 	private List<String> attribution;
+
+	/**
+	 * 检测表内容
+	 */
+	private List<IntuitiveDetectData> datas;
 }

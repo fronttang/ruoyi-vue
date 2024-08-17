@@ -128,4 +128,9 @@ public class FormB7DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
+	@Override
+	public String getReportLocation(OwnerUnitDanger vo) {
+		return "";
+	}
+
 }

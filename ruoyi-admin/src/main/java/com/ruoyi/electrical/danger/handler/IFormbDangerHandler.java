@@ -29,6 +29,11 @@ public interface IFormbDangerHandler {
 	String getInfoLocation(OwnerUnitDanger vo);
 
 	/**
+	 * 报告位置
+	 */
+	String getReportLocation(OwnerUnitDanger vo);
+
+	/**
 	 * 结果
 	 */
 	String getResult(OwnerUnitDanger vo);

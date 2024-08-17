@@ -6,6 +6,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.report.formb.FormB14;
 
+import cn.hutool.core.util.StrUtil;
+
 @FormbDangerHandler("B14")
 public class FormB14DangerHandler implements IFormbDangerHandler {
 
@@ -73,9 +75,28 @@ public class FormB14DangerHandler implements IFormbDangerHandler {
 		String location = null;
 		FormB14 formb = getFormb(vo);
 		if (formb != null) {
-			// TODO
+			String type = getType(vo);
+			if (FormB14.TYPE_RESIDUALCURRENT.equals(type)) {
+				if (Objects.nonNull(formb.getResidualCurrent())) {
+					return formb.getResidualCurrent().getLocation();
+				}
+			} else if (FormB14.TYPE_ALARMTIME.equals(type)) {
+				if (Objects.nonNull(formb.getAlarmTime())) {
+					return formb.getAlarmTime().getAddress();
+				}
+			}
 		}
 		return location;
+	}
+
+	@Override
+	public String getReportLocation(OwnerUnitDanger vo) {
+
+		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+
+		return StrUtil.format("{}{}", buildingName, unitAreaName);
+
 	}
 
 	private FormB14 getFormb(OwnerUnitDanger vo) {

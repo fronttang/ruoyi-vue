@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.report.formb.FormB8;
 
+import cn.hutool.core.util.StrUtil;
+
 @FormbDangerHandler("B8")
 public class FormB8DangerHandler implements IFormbDangerHandler {
 
@@ -130,6 +132,16 @@ public class FormB8DangerHandler implements IFormbDangerHandler {
 			return formb.getOverallPic();
 		}
 		return null;
+	}
+
+	@Override
+	public String getReportLocation(OwnerUnitDanger vo) {
+
+		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+
+		return StrUtil.format("{}{}", buildingName, unitAreaName);
+
 	}
 
 }

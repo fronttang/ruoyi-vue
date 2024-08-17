@@ -197,6 +197,37 @@ public class OwnerUnitDanger extends BaseEntity {
 	private String remark;
 
 	/**
+	 * 报告位置
+	 */
+	@SuppressWarnings("unused")
+	private String reportLocation;
+
+	/**
+	 * 报告位置
+	 * 
+	 * @return
+	 */
+	public String getReportLocation() {
+
+		// ProjectType type = enumutil
+		// 城中村/工业园
+		if ("1".equalsIgnoreCase(this.projectType) || "2".equalsIgnoreCase(this.projectType)) {
+
+			if ("B".equalsIgnoreCase(this.formType)) {
+				if (StrUtil.isNotBlank(this.formCode)) {
+					IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory
+							.getFormbDangerHander(this.formCode);
+					if (formbDangerHander != null) {
+						return formbDangerHander.getReportLocation(this);
+					}
+				}
+			}
+		}
+
+		return this.location;
+	}
+
+	/**
 	 * 列表及详情位置
 	 * 
 	 * @return

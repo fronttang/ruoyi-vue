@@ -10,7 +10,9 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter.Feature;
 
 @MappedTypes(JSONObject.class)
 @MappedJdbcTypes(JdbcType.LONGVARCHAR)
@@ -29,7 +31,7 @@ public class JsonObjectTypeHandler extends BaseTypeHandler<JSONObject> {
 	@Override
 	public void setNonNullParameter(PreparedStatement ps, int i, JSONObject parameter, JdbcType jdbcType)
 			throws SQLException {
-		ps.setString(i, String.valueOf(parameter.toJSONString()));
+		ps.setString(i, String.valueOf(JSON.toJSONString(parameter, Feature.WriteMapNullValue)));
 	}
 
 	/**

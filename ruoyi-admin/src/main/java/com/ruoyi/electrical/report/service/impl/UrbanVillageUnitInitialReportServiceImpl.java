@@ -26,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter.Feature;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
@@ -58,6 +60,7 @@ import com.ruoyi.electrical.report.dto.InitialReport;
 import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.dto.UrbanVillageDanger;
+import com.ruoyi.electrical.report.formb.FormB14;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
@@ -127,7 +130,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			return 0;
 		}
 
-		log.info("initialReport : " + initialReport);
+		log.info("initialReport:{} ", JSON.toJSONString(initialReport, Feature.WriteMapNullValue));
 
 		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
 		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL()
@@ -135,7 +138,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				.bind("formb.BB1", policy).bind("formb.B2", policy).bind("formb.B3", policy).bind("formb.B4", policy)
 				.bind("formb.B5", policy).bind("formb.B6", policy).bind("formb.B7", policy).bind("formb.B8", policy)
 				.bind("formb.B9", policy).bind("formb.B10", policy).bind("formb.B11", policy).bind("formb.B12", policy)
-				.bind("formb.B13", policy).bind("formb.B14", policy).bind("formb.B15", policy);
+				.bind("formb.B13", policy).bind("formb.B14", policy).bind("formb.B14A", policy)
+				.bind("formb.B14B", policy).bind("formb.B15", policy);
 		Configure config = configureBuilder.build();
 		try {
 
@@ -238,27 +242,48 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			Map<String, List<Object>> collect = dangers.stream()
 					.collect(Collectors.groupingBy(OwnerUnitDanger::getFormCode, Collectors.mapping((dang) -> {
 						JSONObject formbJson = dang.getFormb();
-						if (frombMap.get(dang.getFormCode()) != null) {
+						if (Objects.nonNull(formbJson) && frombMap.get(dang.getFormCode()) != null) {
 							try {
-								Object newInstance = frombMap.get(dang.getFormCode()).newInstance();
-								if (Objects.nonNull(formb)) {
-									JSONObject formbData = formbJson.getJSONObject("data");
-									if (Objects.nonNull(formbData)) {
-										BeanUtils.copyProperties(formbData, newInstance);
-										BeanUtil.setFieldValue(newInstance, "temperature", ownerUnit.getTemperature());
-										BeanUtil.setFieldValue(newInstance, "humidity", ownerUnit.getHumidity());
-										String detectDate = DateUtil.format(dang.getInitialTime(),
-												DatePattern.CHINESE_DATE_FORMATTER);
-										BeanUtil.setFieldValue(newInstance, "detectDate", detectDate);
-									}
+								JSONObject formbData = formbJson.getJSONObject("data");
+								if (Objects.nonNull(formbData)) {
+									Object formbBean = formbData.toJavaObject(frombMap.get(dang.getFormCode()));
+									// BeanUtils.copyProperties(formbBean, newInstance);
+									BeanUtil.setFieldValue(formbBean, "temperature", ownerUnit.getTemperature());
+									BeanUtil.setFieldValue(formbBean, "humidity", ownerUnit.getHumidity());
+									String detectDate = DateUtil.format(dang.getInitialTime(),
+											DatePattern.CHINESE_DATE_FORMATTER);
+									BeanUtil.setFieldValue(formbBean, "detectDate", detectDate);
+									return formbBean;
 								}
-								return newInstance;
 							} catch (Exception e) {
 								log.error("", e);
 							}
 						}
-						return formbJson;
+						return null;
 					}, Collectors.toList())));
+
+			if (CollUtil.isNotEmpty(collect)) {
+
+				collect.forEach((key, value) -> {
+					if ("B14".equalsIgnoreCase(key)) {
+						List<Object> residualCurrents = value.stream().filter((d) -> {
+							FormB14 b14 = (FormB14) d;
+							return FormB14.TYPE_RESIDUALCURRENT.equalsIgnoreCase(b14.getType());
+						}).collect(Collectors.toList());
+
+						formb.put("B14A", residualCurrents);
+
+						List<Object> alarmTimes = value.stream().filter((d) -> {
+							FormB14 b14 = (FormB14) d;
+							return FormB14.TYPE_ALARMTIME.equalsIgnoreCase(b14.getType());
+						}).collect(Collectors.toList());
+
+						formb.put("B14B", alarmTimes);
+					} else {
+						formb.put(key, value);
+					}
+				});
+			}
 
 			formb.putAll(collect);
 
@@ -384,7 +409,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 						conformbMap.put(data.getFormCode(), danger);
 					}
-					danger.getLocations().add(data.getLocation());
+					danger.getLocations().add(data.getReportLocation());
 
 				});
 				conformb.addAll(new ArrayList<UrbanVillageDanger>(conformbMap.values()));
@@ -414,7 +439,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 						conformbMap.put(data.getFormCode(), danger);
 					}
-					danger.getLocations().add(data.getLocation());
+					danger.getLocations().add(data.getReportLocation());
 
 					String picture = data.getPicture();
 					if (StrUtil.isNotBlank(picture)) {
@@ -455,7 +480,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 						dangerMap.put(dangerId, danger);
 					}
-					danger.getLocations().add(data.getLocation());
+					danger.getLocations().add(data.getReportLocation());
 
 				});
 				conform.addAll(new ArrayList<UrbanVillageDanger>(dangerMap.values()));

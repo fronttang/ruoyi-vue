@@ -192,4 +192,9 @@ public class FormB2DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
+	@Override
+	public String getReportLocation(OwnerUnitDanger vo) {
+		return "";
+	}
+
 }

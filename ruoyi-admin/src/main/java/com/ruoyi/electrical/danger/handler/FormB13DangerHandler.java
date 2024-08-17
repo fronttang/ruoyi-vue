@@ -55,6 +55,16 @@ public class FormB13DangerHandler implements IFormbDangerHandler {
 	}
 
 	@Override
+	public String getReportLocation(OwnerUnitDanger vo) {
+
+		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+
+		return StrUtil.format("{}{}", buildingName, unitAreaName);
+
+	}
+
+	@Override
 	public boolean isSummary(OwnerUnitDanger vo) {
 		String result = getResult(vo);
 		if (FAILURE.equalsIgnoreCase(result)) {

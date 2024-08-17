@@ -108,5 +108,4 @@ public class FormB14 extends BaseFormB {
 		@ApiModelProperty("判定结果 合格/不合格")
 		private String result;
 	}
-
 }

@@ -50,11 +50,18 @@ import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysUserService;
 
+import cn.binarywang.wx.miniapp.api.WxMaQrcodeService;
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.symmetric.DES;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -78,6 +85,9 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 
 	@Autowired
 	private ISysUserService sysUserService;
+
+	@Autowired
+	private WxMaService wxMaService;
 
 	private static Map<String, String> HIGH_TYPE_NAME_MAP = new HashMap<String, String>();
 
@@ -122,6 +132,8 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 
 		OwnerUnitInfo ownerUnitInfo = new OwnerUnitInfo();
 		BeanUtils.copyProperties(ownerUnit, ownerUnitInfo);
+
+		buildMngQrcode(ownerUnitInfo);
 
 		try {
 
@@ -214,6 +226,46 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 			return 0;
 		} finally {
 
+		}
+	}
+
+	private void buildMngQrcode(OwnerUnitInfo ownerUnitInfo) {
+		if (StrUtil.isNotBlank(ownerUnitInfo.getMngQrcode())) {
+			return;
+		}
+		try {
+			String page = "pages/home/user/index";
+
+			DES des = SecureUtil.des("0185786A0362F7F2B0C316B31D1BAD62".getBytes());
+
+			String key = des.encryptHex(String.valueOf(ownerUnitInfo.getId()));
+
+			WxMaQrcodeService qrcodeService = wxMaService.getQrcodeService();
+			byte[] qrCodeByte = qrcodeService.createWxaCodeUnlimitBytes(key, page, false,
+					WxMaConstants.DEFAULT_ENV_VERSION, 430, true, null, false);
+
+			LocalDateTime now = LocalDateTime.now();
+			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+			String fileName = timestamp + IdUtil.getSnowflakeNextIdStr();
+			String datePath = DateUtil.format(now, "yyyy/MM/dd");
+
+			String filePath = StrUtil.format("{}/{}.png", datePath, fileName);
+
+			String baseDir = RuoYiConfig.getUploadPath();
+			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
+
+			ImgUtil.write(ImgUtil.toImage(qrCodeByte), saveFile);
+
+			// String qrcode = ImgUtil.toBase64DataUri(ImgUtil.toImage(qrCodeByte), "png");
+			String qrcode = FileUploadUtils.getPathFileName(baseDir, filePath);
+			ownerUnitInfo.setMngQrcode(qrcode);
+
+			OwnerUnit update = new OwnerUnit();
+			update.setId(ownerUnitInfo.getId());
+			update.setMngQrcode(ownerUnitInfo.getMngQrcode());
+			ownerUnitMapper.updateOwnerUnit(update);
+		} catch (Exception e) {
+			log.error("", e);
 		}
 	}
 

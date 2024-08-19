@@ -64,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectChargeInfraredList" parameterType="ChargeInfrared" resultMap="ChargeInfraredResult">
         <include refid="selectChargeInfraredVo"/>
-        where t.form_type = 'B' and t.form_code = 'B1' 
+        where t.form_type = 'B' and t.form_code in ('B1','BB1') 
             <if test="keyword != null  and keyword != ''"> 
             and (
             t.unit_name like concat('%', #{keyword}, '%') 

@@ -166,6 +166,19 @@ public class FormB14DangerHandler implements IFormbDangerHandler {
 
 	@Override
 	public String getPicture(OwnerUnitDanger vo) {
+		FormB14 formb = getFormb(vo);
+		if (formb != null) {
+			String type = getType(vo);
+			if (FormB14.TYPE_RESIDUALCURRENT.equals(type)) {
+				if (Objects.nonNull(formb.getResidualCurrent())) {
+					return formb.getResidualCurrent().getOverallPic();
+				}
+			} else if (FormB14.TYPE_ALARMTIME.equals(type)) {
+				if (Objects.nonNull(formb.getAlarmTime())) {
+					return formb.getAlarmTime().getInspectionPic();
+				}
+			}
+		}
 		return null;
 	}
 }

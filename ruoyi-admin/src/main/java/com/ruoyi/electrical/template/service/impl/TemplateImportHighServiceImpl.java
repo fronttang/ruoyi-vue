@@ -74,7 +74,7 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 			firstData.setUnitType(unitType);
 			firstData.setDetectTitle(0L);
 			firstData.setModuleType("1");// 1级
-			firstData.setMaxScore(StrUtil.isNotBlank(form.getMaxScore()) ? Long.valueOf(form.getMaxScore()) : 0);
+			firstData.setMaxScore(StrUtil.isNotBlank(form.getMaxScore()) ? Long.valueOf(form.getMaxScore()) : null);
 			firstData.setFirstCode(String.valueOf(index));
 			firstData.setFirstContent(form.getName());
 			firstData.setTemplateId(templateId);
@@ -106,7 +106,7 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 					viewData.setCreateTime(new Date());
 					viewData.setUnitType(unitType);
 					viewData.setDetectTitle(detect.getId());
-					viewData.setMaxScore(0L);
+					viewData.setMaxScore(null);
 
 					String content = formData.getFirstContent();
 					String code = StrUtil.subBefore(content, ".", false);
@@ -134,7 +134,7 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 							scData.setParentId(firstData.getId());
 							scData.setMaxScore(
 									StrUtil.isNotBlank(subData.getMaxScore()) ? Long.valueOf(subData.getMaxScore())
-											: 0);
+											: null);
 							String firstContent = subData.getFirstContent();
 							String firstCode = StrUtil.subBefore(firstContent, ".", false);
 							firstCode = StrUtil.subBefore(firstCode, "．", false);
@@ -155,14 +155,18 @@ public class TemplateImportHighServiceImpl implements ITemplateImportHighService
 									IntuitiveDetectDanger danger = new IntuitiveDetectDanger();
 									danger.setCreateBy(userId);
 									danger.setCreateTime(new Date());
-									danger.setAccMethod(StrUtil.isNotBlank(subData.getAccMethod()) ? "2" : "1");
+
+									// 1按项 2按个数
+									String accMethod = "按个数累积".equalsIgnoreCase(subData.getAccMethod()) ? "2" : "1";
+
+									danger.setAccMethod(accMethod);
 									danger.setDataId(scData.getId());
 									danger.setTemplateId(templateId);
 									danger.setDescription(dataDanger.getDescription());
 									danger.setSuggestions(dataDanger.getSuggestions());
 									danger.setScore(StrUtil.isNotBlank(dataDanger.getScore())
 											? Long.valueOf(dataDanger.getScore())
-											: 0);
+											: null);
 									danger.setLevel(dangerLevelMap.get(dataDanger.getLevel()));
 
 									detectDangerService.insertIntuitiveDetectDanger(danger);

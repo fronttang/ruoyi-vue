@@ -11,6 +11,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	<result property="suggestions"    column="suggestions"    />
     	<result property="dangerPic"    column="danger_pic"    />
     	<result property="inspectorId"    column="inspector_id"    />
+    	<result property="formId"    column="form_id"    />
+        <result property="formDataId"    column="form_data_id"    />
+        <result property="maxScore"    column="max_score"    />
+        <result property="formName"    column="form_name"    />
+        <result property="formDataName"    column="form_data_name"    />
+        <result property="dangerId"    column="danger_id"    />
+        <result property="accMethod"    column="acc_method"    />
+        <result property="dataMaxScore"    column="data_max_score"    />
     </resultMap>
     
     <resultMap type="OwnerUnitDanger" id="OwnerUnitDangerResult">
@@ -267,9 +275,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
     
     <select id="selectOwnerDangerHighReportByUnitId" parameterType="Long" resultMap="HighReportDanger">
-    	select da.first_content,dd.score,dd.id,d.description,d.suggestions,d.danger_pic,d.inspector_id from owner_unit_danger d 
+    	select da.first_content, dd.score,dd.id, d.description, d.suggestions, d.danger_pic, d.inspector_id, d.danger_id,
+    	id.id as form_id, id.first_content as form_name, id.max_score, da.id as form_data_id, da.first_content as form_data_name,
+    	(CASE WHEN dd.acc_method is null THEN '1' ELSE dd.acc_method END) as acc_method, da.max_score as data_max_score
+    	from owner_unit_danger d 
 		left join intuitive_detect_danger dd on dd.id = d.danger_id
 		left join intuitive_detect_data da on da.id = dd.data_id
+		left join intuitive_detect_data id on id.id = da.parent_id
 		where d.unit_id = #{unitId} order by d.id asc
     </select>
     

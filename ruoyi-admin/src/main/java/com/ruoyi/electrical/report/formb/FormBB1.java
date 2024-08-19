@@ -1,10 +1,17 @@
 package com.ruoyi.electrical.report.formb;
 
+import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.data.style.PictureStyle;
 import com.deepoove.poi.data.style.Style;
+import com.deepoove.poi.xwpf.WidthScalePattern;
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 import com.ruoyi.electrical.report.annotation.Formb;
 
+import cn.hutool.core.util.StrUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +29,30 @@ public class FormBB1 extends BaseFormB {
 	 */
 	@ApiModelProperty("辐射率")
 	private String radiation;
+
+	/**
+	 * 天气
+	 */
+	@ApiModelProperty("天气")
+	private String weather;
+
+	/**
+	 * 测试距离（m)
+	 */
+	@ApiModelProperty("测试距离（m)")
+	private String distance;
+
+	/**
+	 * 风速（m/s）
+	 */
+	@ApiModelProperty("风速（m/s）")
+	private String windSpeed;
+
+	/**
+	 * 检测时间 yyyy-MM-dd
+	 */
+	@ApiModelProperty("检测时间 yyyy-MM-dd")
+	private String detectionTime;
 
 	/**
 	 * 检测位置
@@ -76,6 +107,29 @@ public class FormBB1 extends BaseFormB {
 	 */
 	@ApiModelProperty("现场检测图")
 	private String inspectionPic;
+
+	/**
+	 * 红外判定图
+	 */
+	private String infraredPic;
+
+	private FilePictureRenderData infraredPicture;
+
+	public FilePictureRenderData getInfraredPicture() {
+		if (StrUtil.isBlank(this.infraredPic)) {
+			return null;
+		}
+		// 本地资源路径
+		String localPath = RuoYiConfig.getProfile();
+		// 数据库资源地址
+		String filePath = localPath + StringUtils.substringAfter(this.infraredPic, Constants.RESOURCE_PREFIX);
+
+		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setScalePattern(WidthScalePattern.FIT);
+		qualification.setPictureStyle(pictureStyle);
+		return qualification;
+	}
 
 	/**
 	 * 判定结果 合格/不合格

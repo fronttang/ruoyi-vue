@@ -68,6 +68,18 @@ public class FormB14 extends BaseFormB {
 		 */
 		@ApiModelProperty("判定结果 合格/不合格")
 		private String result;
+
+		/**
+		 * 整体外观图
+		 */
+		@ApiModelProperty("整体外观图")
+		private String overallPic;
+
+		/**
+		 * 现场检测图
+		 */
+		@ApiModelProperty("现场检测图")
+		private String inspectionPic;
 	}
 
 	@Data
@@ -107,5 +119,17 @@ public class FormB14 extends BaseFormB {
 		 */
 		@ApiModelProperty("判定结果 合格/不合格")
 		private String result;
+
+		/**
+		 * 整体外观图
+		 */
+		@ApiModelProperty("整体外观图")
+		private String overallPic;
+
+		/**
+		 * 现场检测图
+		 */
+		@ApiModelProperty("现场检测图")
+		private String inspectionPic;
 	}
 }

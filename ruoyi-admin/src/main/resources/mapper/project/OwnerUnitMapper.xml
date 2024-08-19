@@ -64,10 +64,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="mngQrcode"    column="mng_qrcode"    />
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, code, name, type, detect_id, detect_name, temperature, humidity, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, grid, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, fire_safety_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
+        select id, code, name, type, detect_id, detect_name, temperature, humidity, mng_qrcode, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, grid, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, fire_safety_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
@@ -145,7 +146,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          o.incharge, o.venue_type, o.business_scope, o.safety_incharge, o.safety_incharge_phone, o.safety_manager, 
          o.safety_manager_phone, o.high_risk_type, o.staffs, o.licence, o.fire_safety_unit, o.station_type, o.rounds, 
          o.detect_module, o.operating, o.property_type, o.property_name, o.panorama_pic, o.station_pic, 
-         o.create_by, o.create_time, o.update_by, o.update_time 
+         o.create_by, o.create_time, o.update_by, o.update_time, o.mng_qrcode
          from owner_unit o  
          left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		 left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
@@ -210,6 +211,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="mngQrcode != null">mng_qrcode,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -265,6 +267,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="mngQrcode != null">#{mngQrcode},</if>
          </trim>
     </insert>
 
@@ -323,6 +326,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="mngQrcode != null">mng_qrcode = #{mngQrcode},</if>
         </trim>
         where id = #{id}
     </update>

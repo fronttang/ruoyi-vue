@@ -243,4 +243,8 @@ public class OwnerUnit extends BaseEntity {
 	@Excel(name = "点位图")
 	private String stationPic;
 
+	/**
+	 * 业主二维码
+	 */
+	private String mngQrcode;
 }

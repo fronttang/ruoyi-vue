@@ -13,6 +13,22 @@ import lombok.Data;
 @Data
 public class HighDangerInfo {
 
+	private Long formId;
+
+	private String formName;
+
+	private Long formDataId;
+
+	private String formDataName;
+
+	private Long dangerId;
+
+	private Double maxScore;
+
+	private Double dataMaxScore;
+
+	private String accMethod;
+
 	private String firstContent;
 
 	private Double score;

@@ -29,7 +29,7 @@ export default{
 
       this.instance = WebOfficeSDK.init({
         officeType: this.officeType,
-        appId: 'SX20240722BGJGZR',
+        appId: process.env.WEB_OFFICE_APP_ID,
         fileId: this.fileId,
         mount: "#weboffice",
         commonOptions: {

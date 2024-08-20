@@ -1,22 +1,9 @@
 package com.ruoyi.electrical.dto;
 
-import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
-
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class OwnerUnitDangerExportDto extends OwnerUnitDanger {
-
-	private static final long serialVersionUID = 1L;
-
-	/**
-	 * 检测表数据ID
-	 */
-	private Long dataId;
+public class OwnerUnitDangerExportDto {
 
 	/**
 	 * 一级编号
@@ -31,11 +18,86 @@ public class OwnerUnitDangerExportDto extends OwnerUnitDanger {
 	/**
 	 * 最高扣分数
 	 */
-	private Long maxScore;
+	private Double maxScore;
 
 	/**
 	 * 扣分
 	 */
-	private Long score;
+	private Double score;
+
+	/**
+	 * 检测表ID
+	 */
+	private Long formId;
+
+	/**
+	 * 检测表名称
+	 */
+	private String formName;
+
+	/**
+	 * 检测表数据ID
+	 */
+	private Long formDataId;
+
+	/**
+	 * 检测表数据名称
+	 */
+	private String formDataName;
+
+	/**
+	 * 隐患名称
+	 */
+	private Long dangerId;
+
+	/**
+	 * 检测项最大扣分
+	 */
+	private Double dataMaxScore;
+
+	/**
+	 * 计分模式
+	 */
+	private String accMethod;
+
+	/**
+	 * 隐患描述
+	 */
+	private String description;
+
+	/**
+	 * 整改建议
+	 */
+	private String suggestions;
+
+	/**
+	 * 隐患图片
+	 */
+	private String dangerPic;
+
+	/**
+	 * 检测员ID
+	 */
+	private Long inspectorId;
+
+	/**
+	 * 隐患等级
+	 */
+	private String level;
+
+	/**
+	 * 整体外观图
+	 */
+	private String overallPic;
+
+	/**
+	 * 现场检测图
+	 */
+	private String inspectionPic;
+
+	/**
+	 * 整改图
+	 */
+	private String rectificationPic;
 
 }

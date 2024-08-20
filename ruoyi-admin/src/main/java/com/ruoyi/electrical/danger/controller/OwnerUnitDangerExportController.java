@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +20,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
+import com.ruoyi.electrical.danger.service.ComputeHighScoreService;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerExportService;
 import com.ruoyi.electrical.dto.DangerExportIndustrialDto;
 import com.ruoyi.electrical.dto.DangerExportQueryDto;
@@ -30,8 +29,8 @@ import com.ruoyi.electrical.dto.DangerExportRentalHouseDto.OwnerUnitDangerDataEx
 import com.ruoyi.electrical.dto.DangerExportRentalHouseDto.OwnerUnitDangerInfoExportDto;
 import com.ruoyi.electrical.dto.DangerExportSmallDto;
 import com.ruoyi.electrical.dto.IDangerExportDto;
-import com.ruoyi.electrical.dto.OwnerUnitDangerExportDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
+import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
@@ -194,15 +193,14 @@ public class OwnerUnitDangerExportController extends BaseController {
 			return null;
 		}
 
-		List<OwnerUnitDangerExportDto> dangers = data.getDangers();
+		List<HighDangerInfo> dangers = data.getDangers();
 
 		Map<Long, OwnerUnitDangerDataExportDto> dataMap = new HashMap<Long, OwnerUnitDangerDataExportDto>();
 
 		if (CollUtil.isNotEmpty(dangers)) {
 
-			Optional<Long> total = dangers.stream().filter((d) -> Objects.nonNull(d.getScore()))
-					.map(OwnerUnitDangerExportDto::getScore).reduce(Long::sum);
-			dto.setTotalScore(total.isPresent() ? total.get() : 0L);
+			ComputeHighScoreService compute = new ComputeHighScoreService();
+			dto.setTotalScore(compute.compute(dangers));
 
 			dangers.forEach((danger) -> {
 
@@ -222,7 +220,13 @@ public class OwnerUnitDangerExportController extends BaseController {
 				OwnerUnitDangerInfoExportDto infoExport = new OwnerUnitDangerInfoExportDto();
 				BeanUtils.copyProperties(danger, infoExport);
 
-				infoExport.setLevel(LEVEL_MAP.get(infoExport.getLevel()));
+				infoExport.setLevel(LEVEL_MAP.get(danger.getLevel()));
+
+				if ("2".equalsIgnoreCase(danger.getStatus())) {
+					infoExport.setRectificationStatus("是");
+				} else {
+					infoExport.setRectificationStatus("否");
+				}
 
 				String dangerPic = danger.getDangerPic();
 				if (StrUtil.isNotBlank(dangerPic)) {

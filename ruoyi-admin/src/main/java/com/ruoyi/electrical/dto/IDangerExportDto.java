@@ -14,5 +14,5 @@ public interface IDangerExportDto {
 
 	void setOpenStatus(String openStatus);
 
-	void setTotalScore(Long totalScore);
+	void setTotalScore(Double totalScore);
 }

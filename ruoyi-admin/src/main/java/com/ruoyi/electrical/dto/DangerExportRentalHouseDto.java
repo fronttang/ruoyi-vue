@@ -70,27 +70,27 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 	private Long layers;
 
 	/**
-	 * 总分
-	 */
-	@Excel(name = "总得分", orderNum = "10", needMerge = true)
-	private Long totalScore;
-
-	/**
 	 * 网络照片
 	 */
-	@Excel(name = "网络照片", orderNum = "22", type = 2, imageType = 2, needMerge = true)
+	@Excel(name = "网格照片", orderNum = "10", type = 2, imageType = 2, needMerge = true)
 	private byte[] businessLicense;
 
 	/**
 	 * 经营状态
 	 */
-	@Excel(name = "经营状态", orderNum = "23", needMerge = true)
+	@Excel(name = "经营状态", orderNum = "11", needMerge = true)
 	private String openStatus = "开业";
+
+	/**
+	 * 总分
+	 */
+	@Excel(name = "总得分", orderNum = "12", needMerge = true)
+	private Double totalScore;
 
 	/**
 	 * 隐患列表
 	 */
-	@ExcelCollection(name = "扣分标准", orderNum = "11")
+	@ExcelCollection(name = "扣分标准", orderNum = "13")
 	private List<OwnerUnitDangerDataExportDto> dangers;
 
 	@Data
@@ -100,7 +100,7 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 		 * 扣分标准
 		 */
 		@Excel(name = "扣分标准", orderNum = "11", needMerge = true)
-		private Long maxScore;
+		private Double maxScore;
 
 		/**
 		 * 隐患

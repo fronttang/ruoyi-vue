@@ -77,7 +77,10 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 	 */
 	@Override
 	public int insertOwnerUnit(OwnerUnit ownerUnit) {
-		ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+		// ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+		if (StrUtil.isBlank(ownerUnit.getCreateBy())) {
+			ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+		}
 		ownerUnit.setCreateTime(DateUtils.getNowDate());
 		ownerUnit.setUpdateTime(DateUtils.getNowDate());
 		return ownerUnitMapper.insertOwnerUnit(ownerUnit);

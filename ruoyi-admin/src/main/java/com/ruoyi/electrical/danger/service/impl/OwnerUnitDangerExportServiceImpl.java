@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ruoyi.electrical.danger.mapper.OwnerUnitDangerExportMapper;
+import com.ruoyi.electrical.danger.mapper.OwnerUnitDangerMapper;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerExportService;
 import com.ruoyi.electrical.dto.DangerExportQueryDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
@@ -18,6 +19,9 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 	@Autowired
 	private OwnerUnitDangerExportMapper dangerExportMapper;
 
+	@Autowired
+	private OwnerUnitDangerMapper ownerUnitDangerMapper;
+
 	@Override
 	public List<DangerExportQueryDto> exportByQuery(OwnerUnitDangerGroupDetailDto data) {
 
@@ -25,7 +29,7 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 		if (CollUtil.isNotEmpty(exportByQuery)) {
 
 			exportByQuery.forEach((d) -> {
-				d.setDangers(dangerExportMapper.queryDangersByUnitId(d.getId()));
+				d.setDangers(ownerUnitDangerMapper.selectOwnerDangerHighReportByUnitId(d.getId()));
 			});
 		}
 		return exportByQuery;
@@ -37,7 +41,7 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 		if (CollUtil.isNotEmpty(exportByUnitId)) {
 
 			exportByUnitId.forEach((d) -> {
-				d.setDangers(dangerExportMapper.queryDangersByUnitId(d.getId()));
+				d.setDangers(ownerUnitDangerMapper.selectOwnerDangerHighReportByUnitId(d.getId()));
 			});
 		}
 		return exportByUnitId;

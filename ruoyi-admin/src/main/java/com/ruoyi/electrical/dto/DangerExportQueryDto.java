@@ -2,6 +2,8 @@ package com.ruoyi.electrical.dto;
 
 import java.util.List;
 
+import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
+
 import lombok.Data;
 
 @Data
@@ -128,5 +130,5 @@ public class DangerExportQueryDto {
 	/**
 	 * 隐患列表
 	 */
-	private List<OwnerUnitDangerExportDto> dangers;
+	private List<HighDangerInfo> dangers;
 }

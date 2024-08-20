@@ -16,11 +16,11 @@ export default{
           reportId: this.$route.params.reportId,
           type: this.$route.params.type,
           fileId: null,
-          officeType: WebOfficeSDK.OfficeType.Writer
+          officeType: WebOfficeSDK.OfficeType.Writer,
+          appId: process.env.VUE_APP_WEB_OFFICE_APP_ID,
         }
     },
     mounted() {
-
       this.fileId = this.reportId + '_' + this.type;
       
       if(this.type === '3'){
@@ -29,7 +29,7 @@ export default{
 
       this.instance = WebOfficeSDK.init({
         officeType: this.officeType,
-        appId: process.env.WEB_OFFICE_APP_ID,
+        appId: this.appId,
         fileId: this.fileId,
         mount: "#weboffice",
         commonOptions: {

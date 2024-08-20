@@ -228,6 +228,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				log.error("", e);
 			}
 		});
+		formb.put("B14A", Arrays.asList(new FormB14()));
+		formb.put("B14B", Arrays.asList(new FormB14()));
 
 		List<OwnerUnitDanger> dangers = new ArrayList<OwnerUnitDanger>();
 		// 查所有formb的隐患数据

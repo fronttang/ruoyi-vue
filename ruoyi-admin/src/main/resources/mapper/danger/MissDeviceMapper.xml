@@ -47,7 +47,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     
     <select id="exportByUnitId" parameterType="Long" resultMap="MissDeviceResult">
-    	select t.* from (select o.id, o.code, o.name, o.grid, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
+    	select o.id, o.code, o.name, o.grid, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, o.high_risk_type,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
@@ -56,8 +56,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from owner_unit o 
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
 		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
-		where o.project_id = #{projectId}) t
-		where t.id in 
+		where o.id in 
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

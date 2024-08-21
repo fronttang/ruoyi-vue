@@ -81,7 +81,7 @@ public class DangerExportSmallDto implements IDangerExportDto {
 	 * 经营状态
 	 */
 	@Excel(name = "经营状态", orderNum = "11", needMerge = true)
-	private String openStatus = "开业";
+	private String openStatus = "正常";
 
 	/**
 	 * 总分

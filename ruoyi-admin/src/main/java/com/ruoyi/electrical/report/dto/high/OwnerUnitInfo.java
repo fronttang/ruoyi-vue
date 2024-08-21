@@ -190,7 +190,7 @@ public class OwnerUnitInfo {
 	/**
 	 * 开门状态
 	 */
-	private String openStatus = "开业";
+	private String openStatus = "正常";
 
 	/**
 	 * 检测员

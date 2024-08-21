@@ -106,6 +106,7 @@ public class OwnerUnitDangerExportController extends BaseController {
 
 		if (CollUtil.isNotEmpty(rentalHouse)) {
 			ExportParams rentalHouseParams = new ExportParams();
+			// rentalHouseParams.setCreateHeadRows(false);
 			rentalHouseParams.setSheetName("出租屋");
 			rentalHouseParams.setTitle("出租屋火灾隐患排查表");
 			Map<String, Object> rentalHouseMap = new HashMap<String, Object>();

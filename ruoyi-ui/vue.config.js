@@ -69,6 +69,10 @@ module.exports = {
         deleteOriginalAssets: false                    // 压缩后删除原文件
       })
     ],
+    //关闭 webpack 的性能提示
+    performance: {
+      hints:false
+    }
   },
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test

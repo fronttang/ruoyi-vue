@@ -28,4 +28,19 @@ public class OwnerUnitReportInfo {
 	 * 制式WORD报告版本号
 	 */
 	private Integer wordFileVersion;
+
+	/**
+	 * 开始复检时间
+	 */
+	private String startReviewDate;
+
+	/**
+	 * 结束复检时间
+	 */
+	private String endReviewDate;
+
+	/**
+	 * 复检人员
+	 */
+	private String reviewer;
 }

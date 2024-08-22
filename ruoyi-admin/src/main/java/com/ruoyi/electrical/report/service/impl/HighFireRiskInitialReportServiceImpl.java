@@ -115,6 +115,11 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 	}
 
 	@Override
+	public int reviewReport(Long reportId) {
+		return initialReport(reportId);
+	}
+
+	@Override
 	public int initialReport(Long reportId) {
 
 		OwnerUnitReport report = unitReportService.selectOwnerUnitReportById(reportId);
@@ -183,9 +188,13 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 
 			NiceXWPFDocument main;
 
+			String template = StrUtil.format("report/initial/high/Initial_Report{}.docx", ownerUnit.getHighRiskType());
+			if ("2".equalsIgnoreCase(report.getType())) {
+				template = StrUtil.format("report/review/high/Review_Report{}.docx", ownerUnit.getHighRiskType());
+			}
+
 			// 标题
-			InputStream mainInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream(
-					StrUtil.format("report/initial/high/Initial_Report{}.docx", ownerUnit.getHighRiskType()));
+			InputStream mainInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream(template);
 			XWPFTemplate mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
 			main = mainTemplate.getXWPFDocument();
 
@@ -222,7 +231,7 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 
 			// return AjaxResult.success(data);
 		} catch (Exception e) {
-			log.error("生成初检报告失败！", e);
+			log.error("生成报告失败！", e);
 			return 0;
 		} finally {
 

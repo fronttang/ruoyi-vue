@@ -1,7 +1,9 @@
 package com.ruoyi.electrical.report.service.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +63,7 @@ import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.dto.UrbanVillageDanger;
 import com.ruoyi.electrical.report.formb.FormB14;
+import com.ruoyi.electrical.report.mapper.OwnerUnitReportMapper;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
@@ -69,6 +72,7 @@ import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDangerService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
+import com.ruoyi.electrical.vo.OwnerUnitReivewDateVo;
 import com.ruoyi.system.service.ISysDictDataService;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -110,6 +114,9 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 	@Autowired
 	private IOwnerUnitDangerService ownerUnitDangerService;
 
+	@Autowired
+	private OwnerUnitReportMapper ownerUnitReportMapper;
+
 	private static Set<Class<?>> allFormbBeans = new HashSet<Class<?>>();
 
 	static {
@@ -120,6 +127,74 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				.setScanners(Scanners.TypesAnnotated));
 
 		allFormbBeans = reflections.getTypesAnnotatedWith(Formb.class);
+	}
+
+	@Override
+	public int reviewReport(Long reportId) {
+
+		InitialReport initialReport = getReviewReportData(reportId);
+		if (initialReport == null) {
+			return 0;
+		}
+
+		log.info("reviewReport:{} ", JSON.toJSONString(initialReport, Feature.WriteMapNullValue));
+
+		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
+		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("device", policy);
+		Configure config = configureBuilder.build();
+		try {
+
+			Map<String, Object> dataMap = BeanUtil.beanToMap(initialReport);
+
+			NiceXWPFDocument main;
+
+			// 模板
+			InputStream mainInputStream = ClassPathResource.class.getClassLoader()
+					.getResourceAsStream("report/review/review_report.docx");
+			XWPFTemplate mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
+			main = mainTemplate.getXWPFDocument();
+
+			return saveReportFile(reportId, initialReport, main);
+
+			// return AjaxResult.success(data);
+		} catch (Exception e) {
+			log.error("生成电气检测复检报告失败！", e);
+			return 0;
+		} finally {
+
+		}
+	}
+
+	private int saveReportFile(Long reportId, InitialReport initialReport, NiceXWPFDocument main)
+			throws IOException, FileNotFoundException {
+		LocalDateTime now = LocalDateTime.now();
+		String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+		String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
+		String datePath = DateUtil.format(now, "yyyy/MM/dd");
+
+		String filePath = StrUtil.format("{}/{}", datePath, fileName);
+
+		String baseDir = RuoYiConfig.getUploadPath();
+		File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
+
+		main.write(new FileOutputStream(saveFile));
+
+		PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
+
+		Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
+
+		if (wordFileVersion == null) {
+			wordFileVersion = 1;
+		} else {
+			wordFileVersion = wordFileVersion + 1;
+		}
+
+		OwnerUnitReport report = new OwnerUnitReport();
+		report.setId(reportId);
+		report.setWordFileVersion(wordFileVersion);
+		report.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
+
+		return unitReportService.updateOwnerUnitReport(report);
 	}
 
 	@Override
@@ -165,34 +240,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			XWPFTemplate formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
 			main = main.merge(formTemplate.getXWPFDocument());
 
-			LocalDateTime now = LocalDateTime.now();
-			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
-			String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
-			String datePath = DateUtil.format(now, "yyyy/MM/dd");
-
-			String filePath = StrUtil.format("{}/{}", datePath, fileName);
-
-			String baseDir = RuoYiConfig.getUploadPath();
-			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
-
-			main.write(new FileOutputStream(saveFile));
-
-			PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
-
-			Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
-
-			if (wordFileVersion == null) {
-				wordFileVersion = 1;
-			} else {
-				wordFileVersion = wordFileVersion + 1;
-			}
-
-			OwnerUnitReport report = new OwnerUnitReport();
-			report.setId(reportId);
-			report.setWordFileVersion(wordFileVersion);
-			report.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
-
-			return unitReportService.updateOwnerUnitReport(report);
+			return saveReportFile(reportId, initialReport, main);
 
 			// return AjaxResult.success(data);
 		} catch (Exception e) {
@@ -261,7 +309,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 								log.error("", e);
 							}
 						}
-						return null;
+						return formbJson;
 					}, Collectors.toList())));
 
 			if (CollUtil.isNotEmpty(collect)) {
@@ -413,6 +461,14 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					}
 					danger.getLocations().add(data.getReportLocation());
 
+					String picture = data.getPicture();
+					if (StrUtil.isNotBlank(picture)) {
+						List<String> split = StrUtil.split(picture, ",");
+						if (CollUtil.isNotEmpty(split)) {
+							danger.getPictures().addAll(split);
+						}
+					}
+
 				});
 				conformb.addAll(new ArrayList<UrbanVillageDanger>(conformbMap.values()));
 			}
@@ -484,6 +540,13 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					}
 					danger.getLocations().add(data.getReportLocation());
 
+					String picture = data.getPicture();
+					if (StrUtil.isNotBlank(picture)) {
+						List<String> split = StrUtil.split(picture, ",");
+						if (CollUtil.isNotEmpty(split)) {
+							danger.getPictures().addAll(split);
+						}
+					}
 				});
 				conform.addAll(new ArrayList<UrbanVillageDanger>(dangerMap.values()));
 			}
@@ -586,6 +649,208 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			});
 		}
 		unitInfo.setDetectContent(detectContent);
+	}
+
+	private InitialReport getReviewReportData(Long reportId) {
+
+		OwnerUnitReport report = unitReportService.selectOwnerUnitReportById(reportId);
+		if (report == null) {
+			return null;
+		}
+
+		OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(report.getUnitId());
+
+		if (ownerUnit == null) {
+			return null;
+		}
+
+		Project project = projectService.selectProjectById(ownerUnit.getProjectId());
+
+		if (project == null) {
+			return null;
+		}
+
+		DetectUnit detectUnit = detectUnitService.selectDetectUnitById(project.getDetectId());
+		if (detectUnit == null) {
+			return null;
+		}
+
+		InitialReport initialReport = new InitialReport();
+
+		DetectDevice queryDevice = new DetectDevice();
+		queryDevice.setDetectId(detectUnit.getId());
+
+		// 检测设备
+		List<DetectDevice> detectDevices = detectDeviceService.selectDetectDeviceList(queryDevice);
+		if (CollUtil.isNotEmpty(detectDevices)) {
+			List<DetectDeviceInfo> deviceInfos = new ArrayList<DetectDeviceInfo>();
+
+			for (int i = 0; i < detectDevices.size(); i++) {
+				DetectDevice detectDevice = detectDevices.get(i);
+				DetectDeviceInfo deviceInfo = new DetectDeviceInfo();
+				deviceInfo.setId(String.valueOf(i + 1));
+				deviceInfo.setName(detectDevice.getName());
+				deviceInfo.setDeviceId(detectDevice.getDeviceId());
+				deviceInfo.setCalibrationDate(
+						DateUtil.format(detectDevice.getCalibrationDate(), DatePattern.CHINESE_DATE_FORMATTER));
+				deviceInfos.add(deviceInfo);
+			}
+			initialReport.setDevice(deviceInfos);
+		}
+
+		DetectUnitInfo detectUnitInfo = new DetectUnitInfo();
+		BeanUtils.copyProperties(detectUnit, detectUnitInfo);
+
+		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
+		BeanUtils.copyProperties(report, reportInfo, "detectData");
+		reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+
+		OwnerUnitReivewDateVo ownerUnitReviewDate = ownerUnitReportMapper.getOwnerUnitReviewDate(ownerUnit.getId());
+		OwnerUnitReivewDateVo ownerUnitReviewer = ownerUnitReportMapper.getOwnerUnitReviewer(ownerUnit.getId());
+		if (ownerUnitReviewer != null) {
+			reportInfo.setReviewer(ownerUnitReviewer.getReviewer());
+		}
+
+		if (ownerUnitReviewDate != null) {
+
+			if (ownerUnitReviewDate.getStartReviewDate() != null) {
+				reportInfo.setStartReviewDate(ownerUnitReviewDate.getStartReviewDate());
+			}
+			if (ownerUnitReviewDate.getEndReviewDate() != null) {
+				reportInfo.setEndReviewDate(ownerUnitReviewDate.getEndReviewDate());
+			}
+		}
+
+		OwnerUnitInfo unitInfo = new OwnerUnitInfo();
+		BeanUtils.copyProperties(ownerUnit, unitInfo, "nature", "testStartDate", "testEndDate");
+		unitInfo.setTestStartDate(DateUtil.format(ownerUnit.getTestStartDate(), DatePattern.CHINESE_DATE_FORMATTER));
+		unitInfo.setTestEndDate(DateUtil.format(ownerUnit.getTestEndDate(), DatePattern.CHINESE_DATE_FORMATTER));
+
+		// 所有隐患数据
+		OwnerUnitDanger dangerQuery = new OwnerUnitDanger();
+		dangerQuery.setUnitId(ownerUnit.getId());
+		List<OwnerUnitDanger> unitDangerList = ownerUnitDangerService.ownerUnitDangerList(dangerQuery);
+
+		// 符合项
+		buildReivewConform(initialReport, unitDangerList);
+		// 不符合项
+		buildReivewNConform(initialReport, unitDangerList);
+
+		initialReport.setCreateDate(DateUtil.format(new Date(), DatePattern.CHINESE_DATE_FORMATTER));
+		initialReport.setDetect(detectUnitInfo);
+		initialReport.setProject(project);
+		initialReport.setUnit(unitInfo);
+		initialReport.setReport(reportInfo);
+
+		return initialReport;
+	}
+
+	// 复检符合项
+	private void buildReivewConform(InitialReport initialReport, List<OwnerUnitDanger> unitDangerList) {
+		if (CollUtil.isNotEmpty(unitDangerList)) {
+
+			List<UrbanVillageDanger> conform = initialReport.getConform();
+
+			List<OwnerUnitDanger> dangers = unitDangerList.stream().filter((d) -> "2".equals(d.getStatus()))
+					.collect(Collectors.toList());
+			buildReviewDanger(conform, dangers);
+		}
+	}
+
+	// 复检符合项
+	private void buildReivewNConform(InitialReport initialReport, List<OwnerUnitDanger> unitDangerList) {
+		if (CollUtil.isNotEmpty(unitDangerList)) {
+
+			List<UrbanVillageDanger> nconform = initialReport.getNconform();
+
+			List<OwnerUnitDanger> dangers = unitDangerList.stream().filter((d) -> !"2".equals(d.getStatus()))
+					.collect(Collectors.toList());
+			buildReviewDanger(nconform, dangers);
+		}
+	}
+
+	private void buildReviewDanger(List<UrbanVillageDanger> nconform, List<OwnerUnitDanger> dangers) {
+		if (CollUtil.isNotEmpty(dangers)) {
+
+			List<OwnerUnitDanger> acFormDanger = dangers.stream().filter((d) -> !"B".equalsIgnoreCase(d.getFormType()))
+					.collect(Collectors.toList());
+
+			// 按检测项汇总
+			Map<Long, UrbanVillageDanger> dangerMap = new HashMap<Long, UrbanVillageDanger>();
+			acFormDanger.forEach((data) -> {
+
+				Long dangerId = data.getDangerId();
+				if (dangerId == null) {
+					dangerId = IdUtil.getSnowflakeNextId();
+				}
+
+				UrbanVillageDanger danger = dangerMap.get(dangerId);
+				if (danger == null) {
+					danger = new UrbanVillageDanger();
+					danger.setDescription(data.getDescription());
+					danger.setSuggestions(data.getSuggestions());
+
+					dangerMap.put(dangerId, danger);
+				}
+				danger.getLocations().add(data.getReportLocation());
+
+				String picture = data.getPicture();
+				if (StrUtil.isNotBlank(picture)) {
+					List<String> split = StrUtil.split(picture, ",");
+					if (CollUtil.isNotEmpty(split)) {
+						danger.getPictures().addAll(split);
+					}
+				}
+
+				String rectificationPic = data.getRectificationPic();
+				if (StrUtil.isNotBlank(rectificationPic)) {
+					List<String> split = StrUtil.split(rectificationPic, ",");
+					if (CollUtil.isNotEmpty(split)) {
+						danger.getRectificationPics().addAll(split);
+					}
+				}
+
+			});
+			nconform.addAll(new ArrayList<UrbanVillageDanger>(dangerMap.values()));
+
+			List<OwnerUnitDanger> bFormDanger = dangers.stream().filter((d) -> "B".equalsIgnoreCase(d.getFormType()))
+					.collect(Collectors.toList());
+
+			// 按检测项汇总
+			Map<String, UrbanVillageDanger> dangerBMap = new HashMap<String, UrbanVillageDanger>();
+			bFormDanger.forEach((data) -> {
+
+				String formCode = data.getFormCode();
+
+				UrbanVillageDanger danger = dangerBMap.get(formCode);
+				if (danger == null) {
+					danger = new UrbanVillageDanger();
+					danger.setDescription(data.getDescription());
+					danger.setSuggestions(data.getSuggestions());
+
+					dangerBMap.put(formCode, danger);
+				}
+				danger.getLocations().add(data.getReportLocation());
+
+				String picture = data.getPicture();
+				if (StrUtil.isNotBlank(picture)) {
+					List<String> split = StrUtil.split(picture, ",");
+					if (CollUtil.isNotEmpty(split)) {
+						danger.getPictures().addAll(split);
+					}
+				}
+
+				String rectificationPic = data.getRectificationPic();
+				if (StrUtil.isNotBlank(rectificationPic)) {
+					List<String> split = StrUtil.split(rectificationPic, ",");
+					if (CollUtil.isNotEmpty(split)) {
+						danger.getRectificationPics().addAll(split);
+					}
+				}
+
+			});
+			nconform.addAll(new ArrayList<UrbanVillageDanger>(dangerBMap.values()));
+		}
 	}
 
 }

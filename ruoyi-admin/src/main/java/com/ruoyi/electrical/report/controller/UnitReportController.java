@@ -33,12 +33,12 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 初检报告
+ * 初检/复检报告
  */
 @Slf4j
 @RestController
-@RequestMapping("/report/download/initial")
-public class InitialReportController extends BaseController {
+@RequestMapping("/report/download")
+public class UnitReportController extends BaseController {
 
 	@Autowired
 	private IOwnerUnitReportService unitReportService;
@@ -72,18 +72,38 @@ public class InitialReportController extends BaseController {
 		if (ownerUnit == null) {
 			return AjaxResult.error();
 		}
+		if ("1".equalsIgnoreCase(report.getType())) {
 
-		// 城中村 / 工业园
-		if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
-			return toAjax(urbanVillageUnitInitialReportService.initialReport(reportId));
-		} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
-			// 高风险
-			return toAjax(fireRiskInitialReportService.initialReport(reportId));
+			// 城中村 / 工业园
+			if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
+				return toAjax(urbanVillageUnitInitialReportService.initialReport(reportId));
+			} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
+				// 高风险
+				return toAjax(fireRiskInitialReportService.initialReport(reportId));
 
-		} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
-			// 充电站
-			return toAjax(chargingStationInitialReportService.initialReport(reportId));
+			} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
+				// 充电站
+				return toAjax(chargingStationInitialReportService.initialReport(reportId));
 
+			} else {
+				return AjaxResult.error();
+			}
+		} else if ("2".equalsIgnoreCase(report.getType())) {
+
+			// 城中村 / 工业园
+			if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
+				return toAjax(urbanVillageUnitInitialReportService.reviewReport(reportId));
+			} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
+				// 高风险
+				return toAjax(fireRiskInitialReportService.reviewReport(reportId));
+
+			} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
+				// 充电站
+				return toAjax(chargingStationInitialReportService.reviewReport(reportId));
+
+			} else {
+				return AjaxResult.error();
+			}
 		} else {
 			return AjaxResult.error();
 		}

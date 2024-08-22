@@ -124,41 +124,62 @@
             icon="el-icon-edit"
             @click="handleAudit(scope.row)"
           >审核</el-button>
-          <el-button v-if="scope.row.status === '0' || scope.row.status === '1'"
-            size="medium"
-            type="text"
-            @click="handleUpdate(scope.row)"
-          ><i class="iconfont iconfont-word"></i></el-button>
-          <el-button v-if="scope.row.status === '3'"
-            size="medium"
-            type="text"
-            icon="iconfont iconfont-bg-word"
-            @click="handleUpdate(scope.row)"
-          ></el-button>
-          <el-button v-if="scope.row.status === '3'"
-            size="medium"
-            type="text"
-            icon="iconfont iconfont-bg-pdf"
-            @click="handleUpdate(scope.row)"
-          ></el-button>
-          <el-button
-            size="medium"
-            type="text"
-            icon="iconfont iconfont-download1"
-            @click="handleUpdate(scope.row)"
-          ></el-button>
-          <el-button
-            size="medium"
-            type="text"
-            icon="iconfont iconfont-download"
-            @click="handleUpdate(scope.row)"
-          ></el-button>
-          <el-button
-            size="medium"
-            type="text"
-            icon="iconfont iconfont-reload"
-            @click="handleUpdate(scope.row)"
-          ></el-button>
+          <el-tooltip class="item" effect="dark" content="打开制式Word报告" placement="top">
+            <el-button v-if="scope.row.status === '0' || scope.row.status === '1'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-word"
+              @click="handleOpenInitialReport(scope.row)"
+            ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="打开归档Word报告" placement="top">
+            <el-button v-if="scope.row.archivedWord != null"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-bg-word"
+              @click="handleOpenArchivedWordReport(scope.row)"
+            ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="Word报告归档为PDF" placement="top">
+            <el-button v-if="scope.row.status === '3'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-bg-pdf"
+              @click="handleArchivedWordReportToPdf(scope.row)"
+            ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="打开归档PDF报告" placement="top">
+            <el-button  v-if="scope.row.status === '3'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-pdf1"
+              @click="handleOpenArchivedPdf(scope.row)"
+            ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="下载归档PDF报告" placement="top">
+            <el-button  v-if="scope.row.status === '3'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-download1"
+              @click="handleDownloadArchivedPDFReport(scope.row)"
+            ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="下载原始记录（电检）" placement="top">
+            <el-button v-if="projectType === '1' || projectType === '2'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-download"
+              @click="handleDownloadOriginalRecords(scope.row)"
+            ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="重置报告状态为“未审核”" placement="top">
+            <el-button v-if="scope.row.status !== '0' && workerRoleId === '2'"
+              size="medium"
+              type="text"
+              icon="iconfont iconfont-reload"
+              @click="handleResetStatus(scope.row)"
+            ></el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -173,7 +194,7 @@
 
     <el-dialog title="" :visible.sync="open" width="800px" append-to-body>
       <el-row>
-        <el-col :span="12">
+        <el-col :span="form.status !== '3'? 12 : 24">
           <el-timeline :data="reportLogs" v-for="(item,index) in reportLogs" >
             <el-timeline-item :timestamp="item.createTime" placement="top">
               <el-collapse accordion>
@@ -198,7 +219,7 @@
               <image-upload v-model="form.operationPic" />
             </el-form-item>
           </el-form>
-          <div>
+          <div style="padding-left: 100px;">
             <el-button type="primary" @click="handlePass">通过</el-button>
             <el-button v-if="form.status !== '0'" @click="handleNotPass">驳回</el-button>
           </div>
@@ -220,15 +241,30 @@ padding-bottom: 0px;
 }
 </style>
 <script>
-import { listReport, getReport, getReportLogs, passReport, notPassReport} from "@/api/report/report";
+import { listReport, getReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
+import { Notification, MessageBox, Message, Loading } from 'element-ui'
 
 export default {
   name: "OwnerUnit",
   dicts: ['high_risk_type', 'owner_unit_report_status'],
+  computed: {
+    workerRole() {
+      return this.$store.state.settings.workerRoleId;
+    },
+  },
+  watch: {
+    workerRole: {
+      handler(newVal, oldVal) {
+        if (!newVal || newVal == oldVal) return;
+        this.workerRoleId = newVal;
+      },
+      immediate: true,
+    },
+  },
   data() {
     return {
       // 遮罩层
@@ -250,10 +286,12 @@ export default {
       streetOptions: [],
       communityOptions: [],
       hamletOptions: [],
+      
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      workerRoleId: this.$store.state.settings.workerRoleId,
       projectInfo: {
 
       },
@@ -280,7 +318,8 @@ export default {
         ],
       },
       projectType: null,
-      reportLogs: []
+      reportLogs: [],
+      loadingInstance: null
     };
   },
   created() {
@@ -404,27 +443,124 @@ export default {
     handleAudit(row){
       this.reset();
       this.form.status = row.status;
-      this.queryReportForm = {
-        unitId: row.unitId,
-        type: '2'
-      }
-      getReport(this.queryReportForm).then(response => {
-        this.report = response.data;
-        this.form.reportId = this.report.id;
-        getReportLogs(this.report.id).then(response => {
+      if(row.reportId != null){
+        this.form.reportId = row.reportId;
+        getReportLogs(row.reportId).then(response => {
           this.reportLogs = response.data;
           this.open = true;
         });
-      });
-
+      } else {
+        this.queryReportForm = {
+          unitId: row.unitId,
+          type: '2'
+        }
+        getReport(this.queryReportForm).then(response => {
+          this.report = response.data;
+          this.form.reportId = this.report.id;
+          getReportLogs(this.report.id).then(response => {
+            this.reportLogs = response.data;
+            this.open = true;
+          });
+        });
+      }
     },
     handleUpdate(row){
 
     },
+    handleResetStatus(row){
+      this.$modal.confirm('确认重置业主单元"' + row.name + '"的复检报告状态为未审核吗？').then(function() {
+        return resetReportStatus(row.unitId, "2");
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("重置成功");
+      }).catch(() => {});
+    },
     handleChooseRow(row){
       const unitId = row.unitId;
       const params = {};
-      this.$tab.openPage("隐患数据汇总", '/report/danger/index/' + unitId, params);
+      this.$tab.openPage("隐患数据汇总", '/danger/list/index/' + unitId, params);
+    },
+    handleDownloadOriginalRecords(row){
+      if(row.reportId != null){
+        this.download('report/download/originalRecords/' + row.reportId, {}, `电检原始记录报告.docx`)
+      } else {
+        this.queryReportForm = {
+          unitId: row.unitId,
+          type: '1'
+        }
+        getReport(this.queryReportForm).then(response => {
+          this.download('report/download/originalRecords/' + this.report.id, {}, `电检原始记录报告.docx`)
+        });
+      }
+    },
+    handleOpenInitialReport(row){
+      this.loadingInstance = Loading.service({ text: "正在生成数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+      // 打开初检报告
+      if(row.reportId != null){
+
+        getWordReport(row.reportId).then(response => {
+
+          this.$tab.openPage("编辑Word报告", '/report/weboffice/weboffice/' + row.reportId + "/1");
+          //this.download('common/download/resource?resource=' + response.file, {})
+
+          this.loadingInstance.close();
+        }).catch((r) => {
+          this.$modal.msgError('生成报告出现错误，请联系管理员！')
+          this.loadingInstance.close();
+        });
+        
+      } else {
+        this.queryReportForm = {
+          unitId: row.unitId,
+          type: '2'
+        }
+        getReport(this.queryReportForm).then(response => {
+          getWordReport(this.report.id).then(response => {
+            this.$tab.openPage("编辑Word报告", '/report/weboffice/weboffice/' + row.reportId + "/1");
+            this.loadingInstance.close();
+          }).catch((r) => {
+            this.$modal.msgError('生成报告出现错误，请联系管理员！')
+            this.loadingInstance.close();
+          });
+          this.loadingInstance.close();
+        }).catch((r) => {
+          this.$modal.msgError('生成报告出现错误，请联系管理员！')
+          this.loadingInstance.close();
+        });
+      }
+    },
+    handleOpenArchivedPdf(row){
+      if(row.archivedPdf == null){
+        this.$modal.msgError("请先归档Word报告为PDF");
+      } else {
+        this.$tab.openPage("查看归档PDF报告", '/report/weboffice/weboffice/' + row.reportId + "/3");
+      }
+    },
+    handleDownloadArchivedPDFReport(row) {
+      if(row.archivedPdf == null){
+        this.$modal.msgError("请先归档Word报告为PDF");
+      } else {
+        this.$download.resource(row.archivedPdf, "归档PDF报告.pdf");
+        //this.$download.resource(row.archivedPdf);
+      }
+    },
+    handleOpenArchivedWordReport(row) {
+      if(row.archivedWord == null){
+        this.$modal.msgError("无归档Word报告");
+      } else {
+        this.$tab.openPage("编辑Word归档报告", '/report/weboffice/weboffice/' + row.reportId + "/2");
+      }
+    },
+    handleArchivedWordReportToPdf(row){
+      this.loading = true;
+      // word报告归档为pdf
+      archivedPdf(row.reportId).then(response => {
+        this.$modal.msgSuccess('归档成功')
+        this.loading = false;
+      }).catch((r) => {
+        //this.$modal.msgError("无归档Word报告");
+        this.loading = false;
+      });
     }
   }
 };

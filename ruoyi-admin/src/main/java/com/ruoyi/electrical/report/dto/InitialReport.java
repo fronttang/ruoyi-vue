@@ -66,6 +66,11 @@ public class InitialReport {
 	private List<UrbanVillageDanger> nconformb = new ArrayList<UrbanVillageDanger>();
 
 	/**
+	 * 符合项
+	 */
+	private List<UrbanVillageDanger> conform = new ArrayList<UrbanVillageDanger>();
+
+	/**
 	 * 不符合项
 	 */
 	private List<UrbanVillageDanger> nconform = new ArrayList<UrbanVillageDanger>();

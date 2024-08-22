@@ -158,4 +158,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
     
+    <resultMap type="com.ruoyi.electrical.vo.OwnerUnitReivewDateVo" id="OwnerUnitReivewDateVo">
+        <result property="endReviewDate"    column="end_review_date"    />
+        <result property="startReviewDate"    column="start_review_date"   />
+    </resultMap>
+    
+    <select id="getOwnerUnitReviewDate" parameterType="Long" resultMap="OwnerUnitReivewDateVo">
+    	select max(date(d.reviewer_date)) as end_review_date, min(date(d.reviewer_date)) as start_review_date from owner_unit_danger d where d.unit_id=#{unitId}
+    </select>
+    
+    <select id="getOwnerUnitReviewer" parameterType="Long" resultType="com.ruoyi.electrical.vo.OwnerUnitReivewDateVo">
+    	select GROUP_CONCAT(DISTINCT d.reviewer) as reviewer from owner_unit_danger d where d.unit_id=#{unitId}
+    </select>
+    
 </mapper>

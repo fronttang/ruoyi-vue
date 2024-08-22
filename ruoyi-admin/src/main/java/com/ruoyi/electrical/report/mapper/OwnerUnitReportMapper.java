@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.ruoyi.electrical.dto.OwnerUnitReportDto;
 import com.ruoyi.electrical.report.domain.OwnerUnitReport;
+import com.ruoyi.electrical.vo.OwnerUnitReivewDateVo;
 import com.ruoyi.electrical.vo.OwnerUnitReportVo;
 
 /**
@@ -44,5 +45,9 @@ public interface OwnerUnitReportMapper {
 			@Param("type") String type);
 
 	public OwnerUnitReport selectOwnerUnitReportById(Long id);
+
+	public OwnerUnitReivewDateVo getOwnerUnitReviewDate(@Param("unitId") Long unitId);
+
+	public OwnerUnitReivewDateVo getOwnerUnitReviewer(@Param("unitId") Long unitId);
 
 }

@@ -68,6 +68,11 @@ public class UrbanVillageDanger {
 	private String location;
 
 	/**
+	 * 整改图
+	 */
+	private List<String> rectificationPics = new ArrayList<String>();
+
+	/**
 	 * 隐患图片
 	 */
 	private List<String> pictures = new ArrayList<String>();
@@ -115,6 +120,26 @@ public class UrbanVillageDanger {
 		String localPath = RuoYiConfig.getProfile();
 		// 数据库资源地址
 		String filePath = localPath + StringUtils.substringAfter(this.pictures.get(1), Constants.RESOURCE_PREFIX);
+
+		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setScalePattern(WidthScalePattern.FIT);
+		qualification.setPictureStyle(pictureStyle);
+		return qualification;
+	}
+
+	@SuppressWarnings("unused")
+	private FilePictureRenderData rectificationPicture;
+
+	public FilePictureRenderData getRectificationPicture() {
+		if (CollUtil.isEmpty(this.rectificationPics)) {
+			return null;
+		}
+		// 本地资源路径
+		String localPath = RuoYiConfig.getProfile();
+		// 数据库资源地址
+		String filePath = localPath
+				+ StringUtils.substringAfter(this.rectificationPics.get(0), Constants.RESOURCE_PREFIX);
 
 		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();

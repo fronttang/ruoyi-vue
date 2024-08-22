@@ -333,4 +333,14 @@ public class OwnerUnitDanger extends BaseEntity {
 		return this.dangerPic;
 	}
 
+	public String getStatus() {
+		if ("B".equalsIgnoreCase(this.formType)) {
+			String result = getResult();
+			if (IFormbDangerHandler.QUALIFIED.equals(result)) {
+				// 完成
+				return "2";
+			}
+		}
+		return this.status;
+	}
 }

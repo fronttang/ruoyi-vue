@@ -20,14 +20,14 @@ export function getReport(query) {
 // 查询报告日志
 export function getWordReport(reportId) {
   return request({
-    url: '/report/download/initial/' + reportId,
+    url: '/report/download/' + reportId,
     method: 'get'
   })
 }
 
 export function archivedPdf(reportId) {
   return request({
-    url: '/report/download/initial/archived/pdf/' + reportId,
+    url: '/report/download/archived/pdf/' + reportId,
     method: 'get'
   })
 }

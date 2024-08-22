@@ -101,6 +101,11 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 	}
 
 	@Override
+	public int reviewReport(Long reportId) {
+		return 0;
+	}
+
+	@Override
 	public int initialReport(Long reportId) {
 
 		StationInitialReport report = getStationInitialReport(reportId);

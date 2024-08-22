@@ -1,5 +1,7 @@
 package com.ruoyi.electrical.report.dto.high;
 
+import java.util.List;
+
 import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.style.PictureStyle;
 import com.deepoove.poi.xwpf.WidthScalePattern;
@@ -7,6 +9,7 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
@@ -103,6 +106,14 @@ public class HighDangerInfo {
 	 */
 	private String status;
 
+	public String getStatus() {
+		if ("2".equalsIgnoreCase(this.status)) {
+			return "已整改";
+		} else {
+			return "未整改";
+		}
+	}
+
 	/**
 	 * 整体外观图
 	 */
@@ -119,6 +130,32 @@ public class HighDangerInfo {
 	private String rectificationPic;
 
 	@SuppressWarnings("unused")
+	private FilePictureRenderData rectificationPicture;
+
+	public FilePictureRenderData getRectificationPicture() {
+		if (StrUtil.isBlank(this.rectificationPic)) {
+			return null;
+		}
+
+		List<String> pics = StrUtil.split(this.rectificationPic, ",");
+
+		if (CollUtil.isEmpty(pics)) {
+			return null;
+		}
+
+		// 本地资源路径
+		String localPath = RuoYiConfig.getProfile();
+		// 数据库资源地址
+		String filePath = localPath + StringUtils.substringAfter(pics.get(0), Constants.RESOURCE_PREFIX);
+
+		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setScalePattern(WidthScalePattern.FIT);
+		qualification.setPictureStyle(pictureStyle);
+		return qualification;
+	}
+
+	@SuppressWarnings("unused")
 	private FilePictureRenderData dangerPicture;
 
 	public FilePictureRenderData getDangerPicture() {
@@ -126,16 +163,16 @@ public class HighDangerInfo {
 			return null;
 		}
 
-		String[] splitPic = this.dangerPic.split(",");
+		List<String> pics = StrUtil.split(this.dangerPic, ",");
 
-		if (splitPic == null || splitPic.length <= 0) {
+		if (CollUtil.isEmpty(pics)) {
 			return null;
 		}
 
 		// 本地资源路径
 		String localPath = RuoYiConfig.getProfile();
 		// 数据库资源地址
-		String filePath = localPath + StringUtils.substringAfter(splitPic[0], Constants.RESOURCE_PREFIX);
+		String filePath = localPath + StringUtils.substringAfter(pics.get(0), Constants.RESOURCE_PREFIX);
 
 		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();

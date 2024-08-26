@@ -38,9 +38,19 @@ public class OwnerUnitDanger extends BaseEntity {
 	private String buildingName;
 
 	/**
+	 * 楼栋类型
+	 */
+	private String buildingType;
+
+	/**
 	 * 公共区域/户名称
 	 */
 	private String areaName;
+
+	/**
+	 * 公共区域/户类型
+	 */
+	private String areaType;
 
 	/**
 	 * 充电桩名称

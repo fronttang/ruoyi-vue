@@ -2,17 +2,19 @@ package com.ruoyi.electrical.dto;
 
 import java.util.List;
 
-import com.ruoyi.electrical.dto.DangerExportRentalHouseDto.OwnerUnitDangerDataExportDto;
+import com.ruoyi.electrical.dto.DangerExportRentalHouseDto.OwnerUnitDangerFormExportDto;
 
 public interface IDangerExportDto {
 
-	List<OwnerUnitDangerDataExportDto> getDangers();
+	List<OwnerUnitDangerFormExportDto> getForms();
 
-	void setDangers(List<OwnerUnitDangerDataExportDto> dangers);
+	void setForms(List<OwnerUnitDangerFormExportDto> dangers);
 
 	void setBusinessLicense(byte[] businessLicense);
 
 	void setOpenStatus(String openStatus);
 
-	void setTotalScore(Double totalScore);
+	void setTotalScore(String totalScore);
+
+	// void setNo(String no);
 }

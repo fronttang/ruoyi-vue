@@ -32,8 +32,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="unitName"    column="unit_name"    />
         <result property="buildingId"    column="building_id"    />
         <result property="buildingName"    column="building_name"    />
+        <result property="buildingType"    column="building_type"    />
         <result property="unitAreaId"    column="unit_area_id"    />
         <result property="areaName"    column="area_name"    />
+        <result property="areaType"    column="area_type"    />
         <result property="chargingPileId"    column="charging_pile_id"    />
         <result property="chargingPileName"    column="charging_pile_name"    />
         <result property="rounds"    column="rounds"    />
@@ -70,14 +72,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectOwnerUnitDangerVo">
-        select d.id, d.unit_id, u.name as unit_name, u.detect_id, a.name as area_name, b.name as building_name, 
+        select d.id, d.unit_id, u.name as unit_name, u.detect_id, a.name as area_name, a.type as area_type, b.name as building_name, b.type as building_type,
         p.id as project_id, p.type as project_type,
         d.charging_pile_id, d.rounds,
         d.building_id, d.unit_area_id, d.danger_id, d.form_id, d.form_code, d.form_type, d.form_data_id, d.formb,
         d.level, d.description, d.suggestions, d.location, d.danger_pic, d.status, d.inspector, d.inspector_id, d.initial_time, 
         d.rectification, d.rectification_date, d.reviewer, d.reviewer_date, d.rectification_pic, d.reason, d.detect_pic, 
         d.create_by, d.create_time, d.update_by, d.update_time, 
-        ( select GROUP_CONCAT(cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name,
+        ( select GROUP_CONCAT(DISTINCT cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name,
         JSON_UNQUOTE(d.formb->'$.data.overallPic') as overall_pic,  JSON_UNQUOTE(d.formb->'$.data.inspectionPic') as inspection_pic  
         from owner_unit_danger d 
         left join owner_unit u on u.id = d.unit_id
@@ -100,7 +102,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             or b.name like concat('%', #{location}, '%')
             )
             </if>
-            <if test="rounds != null  and rounds != ''"> and d.rounds = #{rounds}</if>
+            <choose>
+				<when test="rounds != null and rounds != ''">
+					and d.rounds = #{rounds} 
+				</when>
+				<otherwise>
+					and d.rounds = u.rounds
+				</otherwise>
+			</choose>
             <if test="status != null  and status != ''"> and d.status = #{status}</if>
             <if test="projectId != null  and projectId != ''"> and u.project_id = #{projectId}</if>
             <if test="level != null  and level != ''"> and d.level = #{level}</if>
@@ -375,7 +384,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         d.building_id, d.unit_area_id, d.danger_id, d.form_id, d.form_code, d.form_type, d.form_data_id,
         d.level, d.description, d.suggestions, d.location,
         idd.first_code, idd.weights_c_es, idd.weights_c_nes, idd.weights_d_es, idd.weights_d_nes,
-        ( select GROUP_CONCAT(cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name
+        ( select GROUP_CONCAT(DISTINCT cp.name) from charging_pile cp where cp.id member of(d.charging_pile_id) and cp.unit_id = d.unit_id ) as charging_pile_name
         from owner_unit_danger d 
         left join owner_unit u on u.id = d.unit_id and u.rounds = d.rounds
         left join project p on p.id = u.project_id

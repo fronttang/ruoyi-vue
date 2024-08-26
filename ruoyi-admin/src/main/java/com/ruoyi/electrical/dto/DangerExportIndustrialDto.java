@@ -2,7 +2,7 @@ package com.ruoyi.electrical.dto;
 
 import java.util.List;
 
-import com.ruoyi.electrical.dto.DangerExportRentalHouseDto.OwnerUnitDangerDataExportDto;
+import com.ruoyi.electrical.dto.DangerExportRentalHouseDto.OwnerUnitDangerFormExportDto;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.annotation.ExcelCollection;
@@ -87,12 +87,12 @@ public class DangerExportIndustrialDto implements IDangerExportDto {
 	 * 总分
 	 */
 	@Excel(name = "总得分", orderNum = "12", needMerge = true)
-	private Double totalScore;
+	private String totalScore;
 
 	/**
 	 * 隐患列表
 	 */
 	@ExcelCollection(name = "扣分标准", orderNum = "13")
-	private List<OwnerUnitDangerDataExportDto> dangers;
+	private List<OwnerUnitDangerFormExportDto> forms;
 
 }

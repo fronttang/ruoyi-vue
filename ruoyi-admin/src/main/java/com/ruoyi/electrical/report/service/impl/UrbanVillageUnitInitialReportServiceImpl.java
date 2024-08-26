@@ -481,21 +481,22 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			List<UrbanVillageDanger> conformb = initialReport.getNconformb();
 
 			// B表不符合项且需要汇总
-			List<OwnerUnitDanger> conformbDangers = unitDangerList
-					.stream().filter((d) -> "B".equals(d.getFormType())
-							&& IFormbDangerHandler.FAILURE.equals(d.getResult()) && d.isSummary())
-					.collect(Collectors.toList());
+			List<OwnerUnitDanger> conformbDangers = unitDangerList.stream()
+					.filter((d) -> "B".equals(d.getFormType()) && IFormbDangerHandler.FAILURE.equals(d.getResult())
+							&& d.isSummary())
+					.filter((d) -> StrUtil.isNotBlank(d.getDescription())).collect(Collectors.toList());
 			if (CollUtil.isNotEmpty(conformbDangers)) {
 
 				Map<String, UrbanVillageDanger> conformbMap = new HashMap<String, UrbanVillageDanger>();
 				conformbDangers.forEach((data) -> {
-					UrbanVillageDanger danger = conformbMap.get(data.getFormCode());
+					String key = data.getDescription();
+					UrbanVillageDanger danger = conformbMap.get(key);
 					if (danger == null) {
 						danger = new UrbanVillageDanger();
 						danger.setDescription(data.getDescription());
 						danger.setSuggestions(data.getSuggestions());
 
-						conformbMap.put(data.getFormCode(), danger);
+						conformbMap.put(key, danger);
 					}
 					danger.getLocations().add(data.getReportLocation());
 
@@ -518,25 +519,21 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			List<UrbanVillageDanger> conform = initialReport.getNconform();
 
 			List<OwnerUnitDanger> dangers = unitDangerList.stream().filter((d) -> !"B".equals(d.getFormType()))
-					.collect(Collectors.toList());
+					.filter((d) -> StrUtil.isNotBlank(d.getDescription())).collect(Collectors.toList());
 			if (CollUtil.isNotEmpty(dangers)) {
 
 				// 按检测项汇总
-				Map<Long, UrbanVillageDanger> dangerMap = new HashMap<Long, UrbanVillageDanger>();
+				Map<String, UrbanVillageDanger> dangerMap = new HashMap<String, UrbanVillageDanger>();
 				dangers.forEach((data) -> {
+					String key = data.getDescription();
 
-					Long dangerId = data.getDangerId();
-					if (dangerId == null) {
-						dangerId = IdUtil.getSnowflakeNextId();
-					}
-
-					UrbanVillageDanger danger = dangerMap.get(dangerId);
+					UrbanVillageDanger danger = dangerMap.get(key);
 					if (danger == null) {
 						danger = new UrbanVillageDanger();
 						danger.setDescription(data.getDescription());
 						danger.setSuggestions(data.getSuggestions());
 
-						dangerMap.put(dangerId, danger);
+						dangerMap.put(key, danger);
 					}
 					danger.getLocations().add(data.getReportLocation());
 

@@ -109,6 +109,8 @@ public class MissDeviceController extends BaseController {
 		if (CollUtil.isNotEmpty(rentalHouse)) {
 			ExportParams rentalHouseParams = new ExportParams();
 			rentalHouseParams.setSheetName("出租屋");
+			rentalHouseParams.setStyle(DangerExcelExportStylerImpl.class);
+
 			Map<String, Object> rentalHouseMap = new HashMap<String, Object>();
 			rentalHouseMap.put("title", rentalHouseParams);
 			rentalHouseMap.put("data", rentalHouse);
@@ -119,6 +121,8 @@ public class MissDeviceController extends BaseController {
 		if (CollUtil.isNotEmpty(small)) {
 			ExportParams smallParams = new ExportParams();
 			smallParams.setSheetName("三小场所");
+			smallParams.setStyle(DangerExcelExportStylerImpl.class);
+
 			Map<String, Object> smallMap = new HashMap<String, Object>();
 			smallMap.put("title", smallParams);
 			smallMap.put("data", small);

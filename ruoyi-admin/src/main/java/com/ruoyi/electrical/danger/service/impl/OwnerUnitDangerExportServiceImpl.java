@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.mapper.OwnerUnitDangerExportMapper;
 import com.ruoyi.electrical.danger.mapper.OwnerUnitDangerMapper;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerExportService;
 import com.ruoyi.electrical.dto.DangerExportQueryDto;
+import com.ruoyi.electrical.dto.DangerExportUrbanVillageQueryDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 
 import cn.hutool.core.collection.CollUtil;
@@ -45,6 +47,34 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 			});
 		}
 		return exportByUnitId;
+	}
+
+	@Override
+	public List<DangerExportUrbanVillageQueryDto> exportUrbanVillageByQuery(OwnerUnitDangerGroupDetailDto data) {
+		List<DangerExportUrbanVillageQueryDto> exportData = dangerExportMapper.exportUrbanVillageByQuery(data);
+		if (CollUtil.isNotEmpty(exportData)) {
+
+			exportData.forEach((d) -> {
+				OwnerUnitDanger query = new OwnerUnitDanger();
+				query.setUnitId(d.getId());
+				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerList(query));
+			});
+		}
+		return exportData;
+	}
+
+	@Override
+	public List<DangerExportUrbanVillageQueryDto> exportUrbanVillageByUnitId(Long[] unitIds) {
+		List<DangerExportUrbanVillageQueryDto> exportData = dangerExportMapper.exportUrbanVillageByUnitId(unitIds);
+		if (CollUtil.isNotEmpty(exportData)) {
+
+			exportData.forEach((d) -> {
+				OwnerUnitDanger query = new OwnerUnitDanger();
+				query.setUnitId(d.getId());
+				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerList(query));
+			});
+		}
+		return exportData;
 	}
 
 }

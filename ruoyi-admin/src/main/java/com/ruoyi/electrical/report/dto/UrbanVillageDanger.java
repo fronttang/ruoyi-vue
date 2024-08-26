@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.deepoove.poi.data.FilePictureRenderData;
@@ -12,6 +13,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
 @Data
@@ -83,7 +85,7 @@ public class UrbanVillageDanger {
 	private List<String> locations = new ArrayList<String>();
 
 	public String getLocation() {
-
+		locations = locations.stream().filter((d) -> StrUtil.isNotBlank(d)).collect(Collectors.toList());
 		if (CollUtil.isNotEmpty(locations)) {
 			this.location = String.join("、", locations);
 		}
@@ -104,6 +106,7 @@ public class UrbanVillageDanger {
 
 		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setHeight(200);
 		pictureStyle.setScalePattern(WidthScalePattern.FIT);
 		qualification.setPictureStyle(pictureStyle);
 		return qualification;
@@ -123,6 +126,7 @@ public class UrbanVillageDanger {
 
 		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setHeight(200);
 		pictureStyle.setScalePattern(WidthScalePattern.FIT);
 		qualification.setPictureStyle(pictureStyle);
 		return qualification;
@@ -143,6 +147,7 @@ public class UrbanVillageDanger {
 
 		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();
+		pictureStyle.setHeight(200);
 		pictureStyle.setScalePattern(WidthScalePattern.FIT);
 		qualification.setPictureStyle(pictureStyle);
 		return qualification;

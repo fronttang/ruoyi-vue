@@ -85,22 +85,39 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 	 * 总分
 	 */
 	@Excel(name = "总得分", orderNum = "12", needMerge = true)
-	private Double totalScore;
+	private String totalScore;
 
 	/**
 	 * 隐患列表
 	 */
 	@ExcelCollection(name = "扣分标准", orderNum = "13")
-	private List<OwnerUnitDangerDataExportDto> dangers;
+	private List<OwnerUnitDangerFormExportDto> forms;
 
 	@Data
-	public static class OwnerUnitDangerDataExportDto {
+	public static class OwnerUnitDangerFormExportDto {
 
 		/**
 		 * 扣分标准
 		 */
 		@Excel(name = "扣分标准", orderNum = "11", needMerge = true)
-		private Double maxScore;
+		private String maxScore;
+
+		/**
+		 * 扣分项
+		 */
+		@ExcelCollection(name = "扣分值", orderNum = "12")
+		private List<OwnerUnitDangerFormDataExportDto> formDatas;
+
+	}
+
+	@Data
+	public static class OwnerUnitDangerFormDataExportDto {
+
+		/**
+		 * 扣分值
+		 */
+		@Excel(name = "扣分值", orderNum = "11", needMerge = true)
+		private String score;
 
 		/**
 		 * 隐患

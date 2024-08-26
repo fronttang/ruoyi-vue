@@ -84,4 +84,6 @@ public interface IOwnerUnitDangerService {
 
 	public List<OwnerUnitDangerGroupDetailVo> ownerUnitBuildingDangerGroupList(OwnerUnitDangerGroupDetailDto data);
 
+	public int resetDangerStatus(Long[] ids, String status);
+
 }

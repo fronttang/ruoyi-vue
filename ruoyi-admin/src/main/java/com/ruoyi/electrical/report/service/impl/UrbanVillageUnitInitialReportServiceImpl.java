@@ -68,9 +68,7 @@ import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
 import com.ruoyi.electrical.role.service.IDetectUnitService;
-import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
-import com.ruoyi.electrical.template.service.IIntuitiveDetectDangerService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
 import com.ruoyi.electrical.vo.OwnerUnitReivewDateVo;
 import com.ruoyi.system.service.ISysDictDataService;
@@ -79,7 +77,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -105,8 +102,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 	@Autowired
 	private IIntuitiveDetectDataService intuitiveDetectDataService;
 
-	@Autowired
-	private IIntuitiveDetectDangerService intuitiveDetectDangerService;
+	// @Autowired
+	// private IIntuitiveDetectDangerService intuitiveDetectDangerService;
 
 	@Autowired
 	private IDetectDeviceService detectDeviceService;
@@ -468,7 +465,6 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 							danger.getPictures().addAll(split);
 						}
 					}
-
 				});
 				conformb.addAll(new ArrayList<UrbanVillageDanger>(conformbMap.values()));
 			}
@@ -574,19 +570,10 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					// formData.setFirstContent(new TextRenderData(data.getFirstContent(), style));
 					formData.setMerge(true);
 				}
+				formData.setLevel(data.getLevel());
+				formData.setDecide(data.getDanger() != null && data.getDanger() > 0 ? "不符合" : "符合");
+				formData.setResult("√");
 
-				if ("2".equalsIgnoreCase(data.getType())) {
-
-					List<IntuitiveDetectDanger> detectDangers = intuitiveDetectDangerService
-							.selectIntuitiveDetectDangersByDataId(data.getId());
-
-					if (CollUtil.isNotEmpty(detectDangers)) {
-						formData.setLevel(detectDangers.get(0).getLevel());
-					}
-
-					formData.setDecide(data.getDanger() != null && data.getDanger() > 0 ? "不符合" : "符合");
-					formData.setResult("√");
-				}
 				formDatas.add(formData);
 			});
 		}
@@ -700,7 +687,11 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
 		BeanUtils.copyProperties(report, reportInfo, "detectData");
-		reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+		if (Objects.nonNull(report.getDetectData())) {
+			reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+		} else {
+			reportInfo.setDetectData(DateUtil.format(new Date(), DatePattern.CHINESE_DATE_FORMATTER));
+		}
 
 		OwnerUnitReivewDateVo ownerUnitReviewDate = ownerUnitReportMapper.getOwnerUnitReviewDate(ownerUnit.getId());
 		OwnerUnitReivewDateVo ownerUnitReviewer = ownerUnitReportMapper.getOwnerUnitReviewer(ownerUnit.getId());
@@ -748,20 +739,24 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 			List<UrbanVillageDanger> conform = initialReport.getConform();
 
-			List<OwnerUnitDanger> dangers = unitDangerList.stream().filter((d) -> "2".equals(d.getStatus()))
-					.collect(Collectors.toList());
+			List<OwnerUnitDanger> dangers = unitDangerList.stream()
+					.filter((d) -> !"B".equalsIgnoreCase(d.getFormType()) || ("B".equalsIgnoreCase(d.getFormType())
+							&& IFormbDangerHandler.FAILURE.equalsIgnoreCase(d.getResult())))
+					.filter((d) -> "2".equals(d.getStatus())).collect(Collectors.toList());
 			buildReviewDanger(conform, dangers);
 		}
 	}
 
-	// 复检符合项
+	// 复检不符合项
 	private void buildReivewNConform(InitialReport initialReport, List<OwnerUnitDanger> unitDangerList) {
 		if (CollUtil.isNotEmpty(unitDangerList)) {
 
 			List<UrbanVillageDanger> nconform = initialReport.getNconform();
 
-			List<OwnerUnitDanger> dangers = unitDangerList.stream().filter((d) -> !"2".equals(d.getStatus()))
-					.collect(Collectors.toList());
+			List<OwnerUnitDanger> dangers = unitDangerList.stream()
+					.filter((d) -> !"B".equalsIgnoreCase(d.getFormType()) || ("B".equalsIgnoreCase(d.getFormType())
+							&& IFormbDangerHandler.FAILURE.equalsIgnoreCase(d.getResult())))
+					.filter((d) -> !"2".equals(d.getStatus())).collect(Collectors.toList());
 			buildReviewDanger(nconform, dangers);
 		}
 	}
@@ -769,25 +764,22 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 	private void buildReviewDanger(List<UrbanVillageDanger> nconform, List<OwnerUnitDanger> dangers) {
 		if (CollUtil.isNotEmpty(dangers)) {
 
-			List<OwnerUnitDanger> acFormDanger = dangers.stream().filter((d) -> !"B".equalsIgnoreCase(d.getFormType()))
+			List<OwnerUnitDanger> acFormDanger = dangers.stream().filter((d) -> StrUtil.isNotBlank(d.getDescription()))
 					.collect(Collectors.toList());
 
 			// 按检测项汇总
-			Map<Long, UrbanVillageDanger> dangerMap = new HashMap<Long, UrbanVillageDanger>();
+			Map<String, UrbanVillageDanger> dangerMap = new HashMap<String, UrbanVillageDanger>();
 			acFormDanger.forEach((data) -> {
 
-				Long dangerId = data.getDangerId();
-				if (dangerId == null) {
-					dangerId = IdUtil.getSnowflakeNextId();
-				}
+				String key = data.getDescription();
 
-				UrbanVillageDanger danger = dangerMap.get(dangerId);
+				UrbanVillageDanger danger = dangerMap.get(key);
 				if (danger == null) {
 					danger = new UrbanVillageDanger();
 					danger.setDescription(data.getDescription());
 					danger.setSuggestions(data.getSuggestions());
 
-					dangerMap.put(dangerId, danger);
+					dangerMap.put(key, danger);
 				}
 				danger.getLocations().add(data.getReportLocation());
 
@@ -809,44 +801,6 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 			});
 			nconform.addAll(new ArrayList<UrbanVillageDanger>(dangerMap.values()));
-
-			List<OwnerUnitDanger> bFormDanger = dangers.stream().filter((d) -> "B".equalsIgnoreCase(d.getFormType()))
-					.collect(Collectors.toList());
-
-			// 按检测项汇总
-			Map<String, UrbanVillageDanger> dangerBMap = new HashMap<String, UrbanVillageDanger>();
-			bFormDanger.forEach((data) -> {
-
-				String formCode = data.getFormCode();
-
-				UrbanVillageDanger danger = dangerBMap.get(formCode);
-				if (danger == null) {
-					danger = new UrbanVillageDanger();
-					danger.setDescription(data.getDescription());
-					danger.setSuggestions(data.getSuggestions());
-
-					dangerBMap.put(formCode, danger);
-				}
-				danger.getLocations().add(data.getReportLocation());
-
-				String picture = data.getPicture();
-				if (StrUtil.isNotBlank(picture)) {
-					List<String> split = StrUtil.split(picture, ",");
-					if (CollUtil.isNotEmpty(split)) {
-						danger.getPictures().addAll(split);
-					}
-				}
-
-				String rectificationPic = data.getRectificationPic();
-				if (StrUtil.isNotBlank(rectificationPic)) {
-					List<String> split = StrUtil.split(rectificationPic, ",");
-					if (CollUtil.isNotEmpty(split)) {
-						danger.getRectificationPics().addAll(split);
-					}
-				}
-
-			});
-			nconform.addAll(new ArrayList<UrbanVillageDanger>(dangerBMap.values()));
 		}
 	}
 

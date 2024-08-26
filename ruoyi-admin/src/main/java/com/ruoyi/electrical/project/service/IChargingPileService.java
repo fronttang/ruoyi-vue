@@ -2,6 +2,7 @@ package com.ruoyi.electrical.project.service;
 
 import java.util.List;
 import com.ruoyi.electrical.project.domain.ChargingPile;
+import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
 
 /**
  * 充电桩Service接口
@@ -59,4 +60,6 @@ public interface IChargingPileService {
 	public int deleteChargingPileById(Long id);
 
 	public Integer countChargingPileDangers(Long pileId, Long formDataId);
+
+	public List<ChargingPileInfo> selectStationPileList(Long unitId);
 }

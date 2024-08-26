@@ -107,4 +107,6 @@ public class IntuitiveDetectData extends BaseEntity {
 
 	private Integer danger;
 
+	private String level;
+
 }

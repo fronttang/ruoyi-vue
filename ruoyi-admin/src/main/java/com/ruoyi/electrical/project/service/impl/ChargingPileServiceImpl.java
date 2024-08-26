@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.electrical.project.mapper.ChargingPileMapper;
 import com.ruoyi.electrical.project.domain.ChargingPile;
 import com.ruoyi.electrical.project.service.IChargingPileService;
+import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
 
 /**
  * 充电桩Service业务层处理
@@ -90,5 +91,10 @@ public class ChargingPileServiceImpl implements IChargingPileService {
 	@Override
 	public Integer countChargingPileDangers(Long pileId, Long formDataId) {
 		return chargingPileMapper.countChargingPileDangers(pileId, formDataId);
+	}
+
+	@Override
+	public List<ChargingPileInfo> selectStationPileList(Long unitId) {
+		return chargingPileMapper.selectStationPileList(unitId);
 	}
 }

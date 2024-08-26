@@ -394,4 +394,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where d.unit_id = #{unitId} and u.rounds = d.rounds
     </select>
     
+    <update id="resetDangerStatus">
+        update owner_unit_danger set status = #{status} where id in 
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    
 </mapper>

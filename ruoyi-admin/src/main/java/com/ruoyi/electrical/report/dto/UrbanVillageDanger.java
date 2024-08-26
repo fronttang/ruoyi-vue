@@ -1,8 +1,13 @@
 package com.ruoyi.electrical.report.dto;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.deepoove.poi.data.FilePictureRenderData;
@@ -99,17 +104,7 @@ public class UrbanVillageDanger {
 		if (CollUtil.isEmpty(this.pictures)) {
 			return null;
 		}
-		// 本地资源路径
-		String localPath = RuoYiConfig.getProfile();
-		// 数据库资源地址
-		String filePath = localPath + StringUtils.substringAfter(this.pictures.get(0), Constants.RESOURCE_PREFIX);
-
-		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
-		PictureStyle pictureStyle = new PictureStyle();
-		pictureStyle.setHeight(200);
-		pictureStyle.setScalePattern(WidthScalePattern.FIT);
-		qualification.setPictureStyle(pictureStyle);
-		return qualification;
+		return buildFITFilePictureRenderData(this.pictures.get(0));
 	}
 
 	@SuppressWarnings("unused")
@@ -119,17 +114,17 @@ public class UrbanVillageDanger {
 		if (CollUtil.isEmpty(this.pictures) || this.pictures.size() <= 1) {
 			return null;
 		}
-		// 本地资源路径
-		String localPath = RuoYiConfig.getProfile();
-		// 数据库资源地址
-		String filePath = localPath + StringUtils.substringAfter(this.pictures.get(1), Constants.RESOURCE_PREFIX);
+		return buildFITFilePictureRenderData(this.pictures.get(1));
+	}
 
-		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
-		PictureStyle pictureStyle = new PictureStyle();
-		pictureStyle.setHeight(200);
-		pictureStyle.setScalePattern(WidthScalePattern.FIT);
-		qualification.setPictureStyle(pictureStyle);
-		return qualification;
+	@SuppressWarnings("unused")
+	private FilePictureRenderData picture3;
+
+	public FilePictureRenderData getPicture3() {
+		if (CollUtil.isEmpty(this.pictures)) {
+			return null;
+		}
+		return buildFilePictureRenderData(this.pictures.get(0));
 	}
 
 	@SuppressWarnings("unused")
@@ -139,17 +134,49 @@ public class UrbanVillageDanger {
 		if (CollUtil.isEmpty(this.rectificationPics)) {
 			return null;
 		}
+		return buildFITFilePictureRenderData(this.rectificationPics.get(0));
+	}
+
+	private FilePictureRenderData buildFITFilePictureRenderData(String filePath) {
+
 		// 本地资源路径
 		String localPath = RuoYiConfig.getProfile();
 		// 数据库资源地址
-		String filePath = localPath
-				+ StringUtils.substringAfter(this.rectificationPics.get(0), Constants.RESOURCE_PREFIX);
+		filePath = localPath + StringUtils.substringAfter(filePath, Constants.RESOURCE_PREFIX);
 
-		FilePictureRenderData qualification = new FilePictureRenderData(filePath);
+		FilePictureRenderData readerData = new FilePictureRenderData(filePath);
 		PictureStyle pictureStyle = new PictureStyle();
-		pictureStyle.setHeight(200);
+		// pictureStyle.setHeight(300);
+		// pictureStyle.setWidth(sourceImg.getWidth() * 300 / sourceImg.getHeight());
 		pictureStyle.setScalePattern(WidthScalePattern.FIT);
-		qualification.setPictureStyle(pictureStyle);
-		return qualification;
+		readerData.setPictureStyle(pictureStyle);
+
+		return readerData;
+
+	}
+
+	private FilePictureRenderData buildFilePictureRenderData(String filePath) {
+
+		// 本地资源路径
+		String localPath = RuoYiConfig.getProfile();
+		// 数据库资源地址
+		filePath = localPath + StringUtils.substringAfter(filePath, Constants.RESOURCE_PREFIX);
+
+		File picture = new File(filePath);
+		try {
+			BufferedImage sourceImg = ImageIO.read(picture);
+
+			FilePictureRenderData readerData = new FilePictureRenderData(filePath);
+			PictureStyle pictureStyle = new PictureStyle();
+			pictureStyle.setHeight(150);
+			pictureStyle.setWidth(sourceImg.getWidth() * 150 / sourceImg.getHeight());
+			// pictureStyle.setScalePattern(WidthScalePattern.FIT);
+			readerData.setPictureStyle(pictureStyle);
+
+			return readerData;
+
+		} catch (IOException e) {
+		}
+		return null;
 	}
 }

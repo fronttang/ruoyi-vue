@@ -1,5 +1,7 @@
 package com.ruoyi.electrical.role.controller;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +20,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -26,6 +29,9 @@ import com.ruoyi.electrical.project.service.IProjectService;
 import com.ruoyi.electrical.role.domain.DetectUnitUser;
 import com.ruoyi.electrical.role.service.IDetectUnitUserService;
 import com.ruoyi.system.service.ISysUserService;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 用户账号Controller
@@ -47,6 +53,9 @@ public class UserController extends BaseController {
 
 	@Autowired
 	private IProjectService projectService;
+
+	@Autowired
+	private RedisCache redisCache;
 
 	/**
 	 * 查询账号列表
@@ -139,6 +148,21 @@ public class UserController extends BaseController {
 	@GetMapping("/dict")
 	public AjaxResult dict() {
 		return success(detectUnitUserService.sysUserDict());
+	}
+
+	@Log(title = "下线", businessType = BusinessType.OTHER)
+	@GetMapping("/logout/{userIds}")
+	public AjaxResult logout(@PathVariable Long[] userIds) {
+
+		List<Long> userList = Arrays.asList(userIds);
+		if (CollUtil.isNotEmpty(userList)) {
+			for (Long userId : userList) {
+
+				Collection<String> keys = redisCache.keys(StrUtil.format("CUST:{}:TOKEN:*", userId));
+				redisCache.deleteObject(keys);
+			}
+		}
+		return success();
 	}
 
 }

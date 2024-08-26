@@ -115,4 +115,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+    
+    <resultMap type="com.ruoyi.electrical.report.dto.station.ChargingPileInfo" id="StationPileResult">
+        <result property="id"    column="id"    />
+        <result property="unitId"    column="unit_id"    />
+        <result property="type"    column="type"    />
+        <result property="brand"    column="brand"    />
+        <result property="model"    column="model"    />
+        <result property="power"    column="power"    />
+        <result property="quantity"    column="quantity"    />
+    </resultMap>
+    
+    <select id="selectStationPileList" parameterType="Long" resultMap="StationPileResult">
+       select id,unit_id,type,brand,model,power,quantity from station_charging_pile 
+       where unit_id = #{unitId}
+    </select>
 </mapper>

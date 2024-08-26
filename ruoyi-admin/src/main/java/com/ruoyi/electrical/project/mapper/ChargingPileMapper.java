@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.ruoyi.electrical.project.domain.ChargingPile;
+import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
 
 /**
  * 充电桩Mapper接口
@@ -62,4 +63,6 @@ public interface ChargingPileMapper {
 	public int deleteChargingPileByIds(Long[] ids);
 
 	public Integer countChargingPileDangers(@Param("pileId") Long pileId, @Param("formDataId") Long formDataId);
+
+	public List<ChargingPileInfo> selectStationPileList(@Param("unitId") Long unitId);
 }

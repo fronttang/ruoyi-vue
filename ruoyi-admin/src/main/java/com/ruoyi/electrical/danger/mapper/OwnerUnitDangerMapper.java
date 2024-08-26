@@ -92,4 +92,6 @@ public interface OwnerUnitDangerMapper {
 
 	public List<StationDanger> stationReportDangerList(@Param("unitId") Long unitId);
 
+	public int resetDangerStatus(@Param("ids") Long[] ids, @Param("status") String status);
+
 }

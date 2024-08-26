@@ -218,19 +218,8 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		List<ChargingPileInfo> piles = BeanUtil.copyToList(chargingPiles, ChargingPileInfo.class);
 		data.setPiles(piles);
 
-		Map<String, ChargingPileInfo> mapPiles = new HashMap<String, ChargingPileInfo>();
-
-		for (ChargingPileInfo pile : piles) {
-
-			String key = StrUtil.format("{}/{}/{}", pile.getType(), pile.getModel(), pile.getPower());
-			ChargingPileInfo chargingPile = mapPiles.get(key);
-			if (chargingPile == null) {
-				chargingPile = pile;
-				mapPiles.put(key, chargingPile);
-			}
-			chargingPile.setCount(chargingPile.getCount() + 1);
-		}
-		data.setPileGroup(new ArrayList<ChargingPileInfo>(mapPiles.values()));
+		List<ChargingPileInfo> pileGroup = chargingPileService.selectStationPileList(ownerUnit.getId());
+		data.setPileGroup(pileGroup);
 
 		List<StationForm> forms = new ArrayList<StationForm>();
 

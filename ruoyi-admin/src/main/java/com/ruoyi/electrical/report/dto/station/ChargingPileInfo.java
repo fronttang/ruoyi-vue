@@ -58,6 +58,6 @@ public class ChargingPileInfo {
 	/**
 	 * 数量
 	 */
-	private Integer count = 0;
+	private Long quantity = 0L;
 
 }

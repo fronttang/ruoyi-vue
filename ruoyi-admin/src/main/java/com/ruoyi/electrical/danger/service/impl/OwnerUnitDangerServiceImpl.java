@@ -130,4 +130,9 @@ public class OwnerUnitDangerServiceImpl implements IOwnerUnitDangerService {
 		return ownerUnitDangerMapper.ownerUnitBuildingDangerGroupList(data);
 	}
 
+	@Override
+	public int resetDangerStatus(Long[] ids, String status) {
+		return ownerUnitDangerMapper.resetDangerStatus(ids, status);
+	}
+
 }

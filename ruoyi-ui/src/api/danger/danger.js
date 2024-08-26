@@ -48,3 +48,10 @@ export function exportMissDevice(query) {
     method: 'get'
   })
 }
+
+export function resetStatus(ids, status){
+  return request({
+    url: '/danger/reset/' + ids + '/' + status,
+    method: 'get'
+  })
+}

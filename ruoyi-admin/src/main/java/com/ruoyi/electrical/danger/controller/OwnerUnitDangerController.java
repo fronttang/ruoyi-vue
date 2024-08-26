@@ -88,4 +88,9 @@ public class OwnerUnitDangerController extends BaseController {
 		return AjaxResult.success(dict);
 	}
 
+	@GetMapping("/reset/{ids}/{status}")
+	public AjaxResult reset(@PathVariable Long[] ids, @PathVariable String status) {
+		return AjaxResult.success(ownerUnitDangerService.resetDangerStatus(ids, status));
+	}
+
 }

@@ -108,6 +108,13 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['projectrole:detectUnitUser:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-user"
+            @click="handleLogout(scope.row)"
+            v-hasPermi="['projectrole:detectUnitUser:edit']"
+          >下线</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -158,7 +165,7 @@
 </template>
 
 <script>
-import { listDetectUnitUser, getDetectUnitUser, delDetectUnitUser, addDetectUnitUser, updateDetectUnitUser } from "@/api/projectrole/detectUnitUser";
+import { listDetectUnitUser, getDetectUnitUser, delDetectUnitUser, addDetectUnitUser, updateDetectUnitUser, userLogout } from "@/api/projectrole/detectUnitUser";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { changeUserStatus } from "@/api/system/user";
 
@@ -307,6 +314,15 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改工作人员";
+      });
+    },
+    handleLogout(row){
+      const ids = row.id || this.ids;
+      this.$modal.confirm('确认要强制下线编号为' + ids + '的用户吗？').then(function() {
+        return userLogout(ids);
+      }).then(() => {
+        this.$modal.msgSuccess("下线成功");
+      }).catch(function() {
       });
     },
     // 用户状态修改

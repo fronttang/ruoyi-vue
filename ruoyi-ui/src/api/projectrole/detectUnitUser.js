@@ -58,3 +58,10 @@ export function getDetectUnitUserDict() {
     method: 'get'
   })
 }
+
+export function userLogout(userId) {
+  return request({
+    url: '/electrical/user/logout/' + userId,
+    method: 'get'
+  })
+}

@@ -84,7 +84,7 @@
           <image-preview :src="scope.row.detectPic" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -92,6 +92,18 @@
             icon="el-icon-edit"
             @click="handleView(scope.row)"
           >查看</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-refresh-left"
+            @click="handleStatus(scope.row, '0')"
+          >重置待整改</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-refresh-left"
+            @click="handleStatus(scope.row, '1')"
+          >重置待复检</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -867,7 +879,7 @@
 }
 </style>
 <script>
-import { listDanger, getDanger} from "@/api/danger/danger";
+import { listDanger, getDanger, resetStatus} from "@/api/danger/danger";
 import { getProject } from "@/api/project/project";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 
@@ -1074,12 +1086,23 @@ export default {
         return this.selectDictLabel(this.dict.type.hazard_level, row.level);
       }
     },
+    handleStatus(row, status){
+      let text = status === "0" ? "待整改" : "待复检";
+      const ids = row.id || this.ids;
+      this.$modal.confirm('确认要重置编号为' + ids + '的隐患的状态为' + text + '吗？').then(function() {
+        return resetStatus(ids, status);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("重置成功");
+      }).catch(function() {
+      });
+    },
     dangerStatusFormat(row){
-      if(row.formType === 'B'){
-        return "/";
-      } else{
+      //if(row.formType === 'B'){
+      //  return "/";
+      //} else{
         return this.selectDictLabel(this.dict.type.again_test_status, row.status);
-      }
+      //}
     },
     handleView(row){
       this.reset();

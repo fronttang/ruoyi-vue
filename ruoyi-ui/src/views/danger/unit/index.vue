@@ -85,6 +85,33 @@
       </el-form-item>
 
       <el-row :gutter="10" class="mb8">
+        <el-col :span="1.5" v-if="this.projectType == '1'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportDangerType1"
+          >导出初检隐患台账</el-button>
+        </el-col>
+        <el-col :span="1.5" v-if="this.projectType == '1'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportReviewDanger"
+          >导出复检隐患台账</el-button>
+        </el-col>
+        <el-col :span="1.5" v-if="this.projectType == '2'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportDangerType2"
+          >导出隐患台账</el-button>
+        </el-col>
         <el-col :span="1.5" v-if="this.projectType == '3'">
           <el-button
             type="warning"
@@ -338,6 +365,27 @@ export default {
       this.download('/owner/unit/danger/export', {
         ...this.queryParams
       }, `高风险隐患台账.xlsx`)
+    },
+    handleExportDangerType1(row){
+      this.queryParams.ids = this.ids;
+
+      this.download('/owner/unit/danger/export', {
+        ...this.queryParams
+      }, `城中村初检隐患台账.xlsx`)
+    },
+    handleExportReviewDanger(row){
+      this.queryParams.ids = this.ids;
+
+      this.download('/owner/unit/danger/export/review', {
+        ...this.queryParams
+      }, `城中村复检隐患台账.xlsx`)
+    },
+    handleExportDangerType2(row){
+      this.queryParams.ids = this.ids;
+
+      this.download('/owner/unit/danger/export', {
+        ...this.queryParams
+      }, `工业园初检隐患台账.xlsx`)
     }
   }
 };

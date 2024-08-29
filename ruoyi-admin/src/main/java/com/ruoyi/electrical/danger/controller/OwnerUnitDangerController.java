@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.danger.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,10 @@ import com.ruoyi.electrical.project.domain.OwnerUnit;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.vo.DictVO;
 import com.ruoyi.electrical.vo.OwnerUnitDangerGroupDetailVo;
+import com.ruoyi.electrical.vo.OwnerUnitDangerPicturesVo;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 隐患数据Controller
@@ -91,6 +96,46 @@ public class OwnerUnitDangerController extends BaseController {
 	@GetMapping("/reset/{ids}/{status}")
 	public AjaxResult reset(@PathVariable Long[] ids, @PathVariable String status) {
 		return AjaxResult.success(ownerUnitDangerService.resetDangerStatus(ids, status));
+	}
+
+	@GetMapping("/pictures/{unitId}")
+	public AjaxResult pictures(@PathVariable Long unitId) {
+
+		OwnerUnitDanger query = new OwnerUnitDanger();
+		query.setUnitId(unitId);
+		return buildOwnerUnitDangerPicturesVo(query);
+	}
+
+	@GetMapping("/pictures/{unitId}/{buildingId}")
+	public AjaxResult pictures(@PathVariable Long unitId, @PathVariable Long buildingId) {
+
+		OwnerUnitDanger query = new OwnerUnitDanger();
+		query.setUnitId(unitId);
+		query.setBuildingId(buildingId);
+
+		return buildOwnerUnitDangerPicturesVo(query);
+	}
+
+	private AjaxResult buildOwnerUnitDangerPicturesVo(OwnerUnitDanger query) {
+		List<OwnerUnitDanger> dangers = ownerUnitDangerService.ownerUnitDangerList(query);
+		List<OwnerUnitDangerPicturesVo> result = new ArrayList<OwnerUnitDangerPicturesVo>();
+		if (CollUtil.isNotEmpty(dangers)) {
+			for (OwnerUnitDanger danger : dangers) {
+				String dangerPic = danger.getPicture();
+				if (StrUtil.isNotBlank(dangerPic)) {
+					List<String> pictures = StrUtil.split(dangerPic, ",");
+					if (CollUtil.isNotEmpty(pictures)) {
+						for (String picture : pictures) {
+							OwnerUnitDangerPicturesVo vo = new OwnerUnitDangerPicturesVo();
+							vo.setName(danger.getReportLocation());
+							vo.setPicture(picture);
+							result.add(vo);
+						}
+					}
+				}
+			}
+		}
+		return AjaxResult.success(result);
 	}
 
 }

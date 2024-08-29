@@ -18,6 +18,11 @@ public class OwnerUnitDangerGroupDetailVo {
 	/**
 	 * 业主单元名称
 	 */
+	private String unitName;
+
+	/**
+	 * 楼栋名称
+	 */
 	private String name;
 
 	/**

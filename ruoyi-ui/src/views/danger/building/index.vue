@@ -58,7 +58,7 @@
       <el-table-column label="待复检数" align="center" prop="reexaminations" width="100" />
       <el-table-column label="完成数" align="center" prop="finishs" width="100" />
 
-      <el-table-column label="操作" align="center" fixed="right"  width="80" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" fixed="right"  width="120" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -66,6 +66,12 @@
             icon="el-icon-edit"
             @click="handleViewDangers(scope.row)"
           >查看</el-button>
+          <el-button 
+            size="mini"
+            type="text"
+            icon="el-icon-picture"
+            @click="handlePictures(scope.row)"
+          >图片</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,11 +84,60 @@
       @pagination="getList"
     />
 
+    <!-- 隐患数据详情对话框 -->
+    <el-dialog :title="title" class="showAll_dialog" :visible.sync="open" width="860px" height="600px" append-to-body style="overflow:auto" lock-scroll>
+      <el-row :gutter="20">
+        <el-col :span="6" v-for="pic in pictures" style="padding-top: 10px;">
+          <el-card  :body-style="{ padding: '0px' }" style="width:200px">
+            <el-image style="width: 200px; height: 150px"
+              :src="buildImg(pic.picture)"
+              :preview-src-list="buildImgList(pic.picture)">
+            </el-image>
+            <div id="text" :title="pic.name">
+                <span>{{ pic.name }}</span>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-dialog>
+
   </div>
 </template>
-
+<style lang="scss" scoped>
+  #text{
+    padding: 5px;
+    text-align:center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .showAll_dialog {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    ::v-deep .el-dialog {
+      margin: 0 auto !important;
+      height: 80%;
+      overflow: hidden;
+      .el-dialog__body {
+        position: absolute;
+        left: 0;
+        top: 60px;
+        bottom: 10px;
+        right: 0;
+        padding: 0;
+        z-index: 1;
+        overflow: hidden;
+        overflow-y: auto;
+        line-height: 30px;
+        padding: 0 15px;
+      }
+    }
+  }
+</style>
 <script>
-import { listUnitBuildingDanger} from "@/api/danger/danger";
+import { listUnitBuildingDanger, unitBuildingPictures} from "@/api/danger/danger";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
@@ -133,7 +188,8 @@ export default {
       // 检测单位字典选项
       detectUnitDict: [],
       projectAreaDict: [],
-      projectType: null
+      projectType: null,
+      pictures:[]
     };
   },
   created() {
@@ -161,6 +217,23 @@ export default {
         
       };
       this.resetForm("form");
+      this.pictures = [];
+    },
+    buildImg(url){
+      return process.env.VUE_APP_BASE_API + url;
+    },
+    buildImgList(url){
+      return [process.env.VUE_APP_BASE_API + url]
+    },
+    handlePictures(row){
+      this.reset();
+      this.loading = true;
+      unitBuildingPictures(row.unitId, row.id).then(response => {
+        this.pictures = response.data;
+        this.title = row.unitName + row.name + " 图片列表";
+        this.open = true;
+        this.loading = false;
+      })
     },
     /** 搜索按钮操作 */
     handleQuery() {

@@ -130,6 +130,15 @@
             @click="handleExportMissDevice"
           >导出缺失设备台账</el-button>
         </el-col>
+        <el-col :span="1.5" v-if="this.projectType == '4'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportStationDanger"
+          >导出隐患台账</el-button>
+        </el-col>
         <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
       </el-row>
 
@@ -164,7 +173,7 @@
       <el-table-column label="待复检数" align="center" prop="reexaminations" width="100" />
       <el-table-column label="完成数" align="center" prop="finishs" width="100" />
 
-      <el-table-column label="操作" align="center" fixed="right"  width="80" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" fixed="right"  width="120" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -172,6 +181,12 @@
             icon="el-icon-edit"
             @click="handleView(scope.row)"
           >查看</el-button>
+          <el-button v-if="projectType !== '2'" 
+            size="mini"
+            type="text"
+            icon="el-icon-picture"
+            @click="handlePictures(scope.row)"
+          >图片</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -184,11 +199,61 @@
       @pagination="getList"
     />
 
+
+    <!-- 隐患数据详情对话框 -->
+    <el-dialog :title="title" class="showAll_dialog" :visible.sync="open" width="860px" height="600px" append-to-body style="overflow:auto" lock-scroll>
+      <el-row :gutter="20">
+        <el-col :span="6" v-for="pic in pictures" style="padding-top: 10px;">
+          <el-card  :body-style="{ padding: '0px' }" style="width:200px">
+            <el-image style="width: 200px; height: 150px"
+              :src="buildImg(pic.picture)"
+              :preview-src-list="buildImgList(pic.picture)">
+            </el-image>
+            <div id="text" :title="pic.name">
+                <span>{{ pic.name }}</span>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-dialog>
+
   </div>
 </template>
-
+<style lang="scss" scoped>
+  #text{
+    padding: 5px;
+    text-align:center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .showAll_dialog {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    ::v-deep .el-dialog {
+      margin: 0 auto !important;
+      height: 80%;
+      overflow: hidden;
+      .el-dialog__body {
+        position: absolute;
+        left: 0;
+        top: 60px;
+        bottom: 10px;
+        right: 0;
+        padding: 0;
+        z-index: 1;
+        overflow: hidden;
+        overflow-y: auto;
+        line-height: 30px;
+        padding: 0 15px;
+      }
+    }
+  }
+</style>
 <script>
-import { listUnitDanger} from "@/api/danger/danger";
+import { listUnitDanger, unitPictures} from "@/api/danger/danger";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
@@ -250,7 +315,8 @@ export default {
       // 检测单位字典选项
       detectUnitDict: [],
       projectAreaDict: [],
-      projectType: null
+      projectType: null,
+      pictures:[]
     };
   },
   created() {
@@ -304,6 +370,13 @@ export default {
         
       };
       this.resetForm("form");
+      this.pictures = [];
+    },
+    buildImg(url){
+      return process.env.VUE_APP_BASE_API + url;
+    },
+    buildImgList(url){
+      return [process.env.VUE_APP_BASE_API + url]
     },
     areaFormat(row) {
       var area = [];
@@ -352,6 +425,16 @@ export default {
         this.$tab.openPage("隐患列表", '/danger/list/index/' + unitId, params);
       }
     },
+    handlePictures(row){
+      this.reset();
+      this.loading = true;
+      unitPictures(row.id).then(response => {
+        this.pictures = response.data;
+        this.title = row.name + " 图片列表";
+        this.open = true;
+        this.loading = false;
+      })
+    },
     handleExportMissDevice(row){
       this.queryParams.ids = this.ids;
 
@@ -386,6 +469,13 @@ export default {
       this.download('/owner/unit/danger/export', {
         ...this.queryParams
       }, `工业园初检隐患台账.xlsx`)
+    },
+    handleExportStationDanger(row){
+      this.queryParams.ids = this.ids;
+
+      this.download('/owner/unit/danger/export', {
+        ...this.queryParams
+      }, `充电站隐患台账.xlsx`)
     }
   }
 };

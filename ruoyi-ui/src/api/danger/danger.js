@@ -55,3 +55,17 @@ export function resetStatus(ids, status){
     method: 'get'
   })
 }
+
+export function unitPictures(unitId){
+  return request({
+    url: '/danger/pictures/' + unitId,
+    method: 'get'
+  })
+}
+
+export function unitBuildingPictures(unitId, buildingId){
+  return request({
+    url: '/danger/pictures/' + unitId + '/' + buildingId,
+    method: 'get'
+  })
+}

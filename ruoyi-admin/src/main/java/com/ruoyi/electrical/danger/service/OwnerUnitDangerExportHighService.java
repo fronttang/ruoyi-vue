@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.electrical.danger.controller.DangerExcelExportStylerImpl;
@@ -32,6 +33,7 @@ import com.ruoyi.electrical.dto.DangerExportSmallDto;
 import com.ruoyi.electrical.dto.IDangerExportDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
+import com.ruoyi.system.service.ISysDictTypeService;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.collection.CollUtil;
@@ -44,13 +46,10 @@ public class OwnerUnitDangerExportHighService {
 	@Autowired
 	private IOwnerUnitDangerExportService dangerExportService;
 
-	private static final Map<String, String> LEVEL_MAP = new HashMap<String, String>();
-	static {
-		LEVEL_MAP.put("1", "低风险");
-		LEVEL_MAP.put("2", "中风险");
-		LEVEL_MAP.put("3", "高风险");
-		LEVEL_MAP.put("4", "无等级");
-	}
+	@Autowired
+	private ISysDictTypeService dictTypeService;
+
+	private final Map<String, String> LEVEL_MAP = new HashMap<String, String>();
 
 	public List<Map<String, Object>> exportDanger(OwnerUnitDangerGroupDetailDto data) {
 
@@ -60,6 +59,13 @@ public class OwnerUnitDangerExportHighService {
 			exportData.addAll(dangerExportService.exportByUnitId(data.getIds()));
 		} else {
 			exportData.addAll(dangerExportService.exportByQuery(data));
+		}
+
+		List<SysDictData> levels = dictTypeService.selectDictDataByType("hazard_level_high");
+		if (CollUtil.isNotEmpty(levels)) {
+			for (SysDictData level : levels) {
+				LEVEL_MAP.put(level.getDictValue(), level.getDictLabel());
+			}
 		}
 
 		// 出租屋

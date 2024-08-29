@@ -3,13 +3,21 @@ package com.ruoyi.electrical.danger.controller;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +28,11 @@ import com.ruoyi.electrical.danger.service.DangerReportExcelExportService;
 import com.ruoyi.electrical.danger.service.OwnerUnitDangerExportHighService;
 import com.ruoyi.electrical.danger.service.OwnerUnitDangerExportIndustrialService;
 import com.ruoyi.electrical.danger.service.OwnerUnitDangerExportReviewUrbanVillageService;
+import com.ruoyi.electrical.danger.service.OwnerUnitDangerExportStationService;
 import com.ruoyi.electrical.danger.service.OwnerUnitDangerExportUrbanVillageService;
+import com.ruoyi.electrical.danger.service.StationDangerReportExcelExportService;
+import com.ruoyi.electrical.dto.DangerExportStationDto;
+import com.ruoyi.electrical.dto.DangerExportStationDto.DangerExportStationDangerDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.service.IProjectService;
@@ -28,6 +40,8 @@ import com.ruoyi.electrical.project.service.IProjectService;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.afterturn.easypoi.exception.excel.ExcelExportException;
+import cn.afterturn.easypoi.util.PoiMergeCellUtil;
+import cn.hutool.core.collection.CollUtil;
 
 @RestController
 @RequestMapping("/owner/unit/danger")
@@ -44,6 +58,9 @@ public class OwnerUnitDangerExportController extends BaseController {
 
 	@Autowired
 	private OwnerUnitDangerExportIndustrialService exportIndustrialService;
+
+	@Autowired
+	private OwnerUnitDangerExportStationService exportStationService;
 
 	@Autowired
 	private IProjectService projectService;
@@ -71,7 +88,87 @@ public class OwnerUnitDangerExportController extends BaseController {
 			downLoadExcel("高风险隐患台账", response, exportList);
 		} else if ("4".equalsIgnoreCase(projectType)) {
 			// 充电站
+			List<DangerExportStationDto> exportDatas = exportStationService.exportDanger(data);
+
+			LinkedList<DangerExportStationDto> exportDataList = new LinkedList<DangerExportStationDto>(exportDatas);
+
+			ExportParams exportParams = new ExportParams();
+			// rentalHouseParams.setCreateHeadRows(false);
+			exportParams.setSheetName("隐患台账");
+			exportParams.setTitle("充电站隐患台账");
+
+			Workbook workbook = getWorkbook(ExcelType.XSSF, 0);
+			StationDangerReportExcelExportService service = new StationDangerReportExcelExportService();
+			service.createSheet(workbook, exportParams, DangerExportStationDto.class, exportDatas);
+
+			Sheet sheet = workbook.getSheetAt(0);
+			int index = 4;
+			for (int i = 0; i < exportDataList.size(); i++) {
+				DangerExportStationDto exportData = exportDataList.get(i);
+
+				int size = 1;
+
+				if (CollUtil.isNotEmpty(exportData.getDangers())) {
+
+					List<DangerExportStationDangerDto> dangers = exportData.getDangers();
+
+					size = dangers.size();
+
+					PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 7, 7);
+					PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 8, 8);
+					PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 9, 9);
+					PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 10, 10);
+
+					// PoiMergeCellUtil.mergeCells(sheet, mergeMap, 7, 10);
+
+					// PoiMergeCellUtil.mergeCells(sheet, 7, exportData.getDangers().size());
+					// PoiMergeCellUtil.mergeCells(sheet, 8, exportData.getDangers().size());
+					// PoiMergeCellUtil.mergeCells(sheet, 9, exportData.getDangers().size());
+					// PoiMergeCellUtil.mergeCells(sheet, 10, exportData.getDangers().size());
+
+					for (int j = 0; j < dangers.size(); j++) {
+						DangerExportStationDangerDto danger = dangers.get(j);
+						Row row = sheet.getRow(index + j);
+						row.getCell(16).setCellStyle(getStationDangerStyle(workbook));
+						row.getCell(17).setCellStyle(getStationDangerStyle(workbook));
+						row.getCell(18).setCellStyle(getStationDangerStyle(workbook));
+						row.getCell(19).setCellStyle(getStationDangerStyle(workbook));
+						row.getCell(20).setCellStyle(getStationDangerStyle(workbook));
+						row.getCell(21).setCellStyle(getStationDangerStyle(workbook));
+
+						if ("true".equalsIgnoreCase(danger.getLevel())) {
+							CellRangeAddress region = new CellRangeAddress(index + j, index + j, 16, 21);
+							sheet.addMergedRegion(region);
+							row.getCell(16).setCellStyle(getStationDangerTitleStyle(workbook));
+						}
+					}
+				}
+				index = index + size;
+			}
+
+			downLoadExcel("充电站隐患台账", response, workbook);
 		}
+	}
+
+	private CellStyle getStationDangerTitleStyle(Workbook workbook) {
+		CellStyle style = workbook.createCellStyle();
+		style.setAlignment(HorizontalAlignment.LEFT);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+		style.setWrapText(true);
+
+		Font font = workbook.createFont();
+		font.setBold(true);
+
+		style.setFont(font);
+		return style;
+	}
+
+	private CellStyle getStationDangerStyle(Workbook workbook) {
+		CellStyle style = workbook.createCellStyle();
+		style.setAlignment(HorizontalAlignment.LEFT);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+		style.setWrapText(true);
+		return style;
 	}
 
 	@RequestMapping("/export/review")

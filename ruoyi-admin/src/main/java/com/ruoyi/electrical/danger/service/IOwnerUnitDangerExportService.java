@@ -3,6 +3,7 @@ package com.ruoyi.electrical.danger.service;
 import java.util.List;
 
 import com.ruoyi.electrical.dto.DangerExportQueryDto;
+import com.ruoyi.electrical.dto.DangerExportStationQueryDto;
 import com.ruoyi.electrical.dto.DangerExportUrbanVillageQueryDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 
@@ -15,5 +16,9 @@ public interface IOwnerUnitDangerExportService {
 	List<DangerExportUrbanVillageQueryDto> exportUrbanVillageByQuery(OwnerUnitDangerGroupDetailDto data);
 
 	List<DangerExportUrbanVillageQueryDto> exportUrbanVillageByUnitId(Long[] unitIds);
+
+	List<DangerExportStationQueryDto> exportStationByQuery(OwnerUnitDangerGroupDetailDto data);
+
+	List<DangerExportStationQueryDto> exportStationByUnitId(Long[] unitIds);
 
 }

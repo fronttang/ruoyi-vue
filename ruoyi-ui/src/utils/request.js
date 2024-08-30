@@ -17,7 +17,7 @@ const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: process.env.VUE_APP_BASE_API,
   // 超时
-  timeout: 60000
+  timeout: 300000
 })
 
 // request拦截器
@@ -135,6 +135,42 @@ export function download(url, params, filename, config) {
     if (isBlob) {
       const blob = new Blob([data])
       saveAs(blob, filename)
+    } else {
+      const resText = await data.text();
+      const rspObj = JSON.parse(resText);
+      const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode['default']
+      Message.error(errMsg);
+    }
+    downloadLoadingInstance.close();
+  }).catch((r) => {
+    console.error(r)
+    Message.error('下载文件出现错误，请联系管理员！')
+    downloadLoadingInstance.close();
+  })
+}
+
+// 通用下载方法
+export function download1(url, params, filename, config) {
+  downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+  return service.post(url, params, {
+    transformRequest: [(params) => { return tansParams(params) }],
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
+    ...config
+  }).then(async (data) => {
+    const isBlob = blobValidate(data);
+    if (isBlob) {
+      let URL = window.URL || window.webkitURL;
+      let objectUrl = URL.createObjectURL(data);
+      let a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename; //这步要注意 filename要写成 '文件名.xlsx'
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      //const blob = new Blob([data])
+      //saveAs(blob, filename)
     } else {
       const resText = await data.text();
       const rspObj = JSON.parse(resText);

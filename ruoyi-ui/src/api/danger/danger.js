@@ -69,3 +69,20 @@ export function unitBuildingPictures(unitId, buildingId){
     method: 'get'
   })
 }
+
+export function dangerExport(query){
+  return request({
+    url: '/owner/unit/danger/export',
+    method: 'get',
+    params: query
+  })
+}
+
+
+export function dangerReivewExport(query){
+  return request({
+    url: '/owner/unit/danger/export/review',
+    method: 'get',
+    params: query
+  })
+}

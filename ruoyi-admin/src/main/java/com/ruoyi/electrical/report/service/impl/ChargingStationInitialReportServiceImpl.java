@@ -235,7 +235,11 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		List<StationDanger> stationDangerList = ownerUnitDangerMapper.stationReportDangerList(ownerUnit.getId());
 
 		if (CollUtil.isNotEmpty(formDatas)) {
+
+			scoreDatas.addAll(formDatas.stream().filter((d) -> d.getDangers() > 0).collect(Collectors.toList()));
+
 			String detectModule = ownerUnit.getDetectModule();
+
 			if (StrUtil.isNotBlank(detectModule)) {
 				String[] modules = detectModule.split(",");
 				if (modules != null) {
@@ -255,13 +259,6 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 									.filter((d) -> module.equalsIgnoreCase(d.getDetectModule()))
 									.collect(Collectors.toList());
 							form.setData(formData);
-
-							// 把有隐患的检测项放到list
-							if (CollUtil.isNotEmpty(formData)) {
-								scoreDatas.addAll(formData.stream().filter((d) -> d.getDangers() > 0)
-										.collect(Collectors.toList()));
-							}
-
 							forms.add(form);
 						}
 
@@ -299,7 +296,6 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 								dangers.addAll(new ArrayList<StationDanger>(dangerMap.values()));
 							}
 						}
-
 					}
 				}
 			}

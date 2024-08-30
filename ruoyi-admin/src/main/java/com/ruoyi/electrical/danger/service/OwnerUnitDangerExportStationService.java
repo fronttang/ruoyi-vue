@@ -16,28 +16,42 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.dto.DangerExportStationDto;
 import com.ruoyi.electrical.dto.DangerExportStationDto.DangerExportStationDangerDto;
 import com.ruoyi.electrical.dto.DangerExportStationDto.StationPileInfo;
 import com.ruoyi.electrical.dto.DangerExportStationQueryDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
+import com.ruoyi.electrical.project.domain.Project;
 import com.ruoyi.electrical.project.service.IChargingPileService;
+import com.ruoyi.electrical.project.service.IProjectService;
 import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
+import com.ruoyi.electrical.report.dto.station.StationFormData;
+import com.ruoyi.electrical.template.mapper.IntuitiveDetectDataMapper;
+import com.ruoyi.electrical.util.PicUtils;
 import com.ruoyi.system.service.ISysDictTypeService;
 
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.util.PoiMergeCellUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -53,10 +67,16 @@ public class OwnerUnitDangerExportStationService {
 	@Autowired
 	private ISysDictTypeService dictTypeService;
 
+	@Autowired
+	private IntuitiveDetectDataMapper detectDataMapper;
+
+	@Autowired
+	private IProjectService projectService;
+
 	private final Map<String, String> LEVEL_MAP = new HashMap<String, String>();
 	private final Map<String, String> DETECT_MODULE = new HashMap<String, String>();
 
-	public List<DangerExportStationDto> exportDanger(OwnerUnitDangerGroupDetailDto data) {
+	public Workbook exportDanger(OwnerUnitDangerGroupDetailDto data) {
 
 		List<DangerExportStationQueryDto> exportData = new ArrayList<DangerExportStationQueryDto>();
 
@@ -79,19 +99,143 @@ public class OwnerUnitDangerExportStationService {
 			}
 		}
 
-		List<DangerExportStationDto> datas = buildExportStationDto(exportData);
+		List<DangerExportStationDto> exportDatas = buildExportStationDto(exportData);
 
-		// List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		LinkedList<DangerExportStationDto> exportDataList = new LinkedList<DangerExportStationDto>(exportDatas);
 
-		// exportParams.setStyle(DangerExcelExportStylerImpl.class);
+		ExportParams exportParams = new ExportParams();
+		// rentalHouseParams.setCreateHeadRows(false);
+		exportParams.setSheetName("隐患台账");
+		exportParams.setTitle("充电站隐患台账");
+		exportParams.setStyle(StationDangerExcelExportStylerImpl.class);
 
-//		Map<String, Object> stationMap = new HashMap<String, Object>();
-//		stationMap.put("title", exportParams);
-//		stationMap.put("data", datas);
-//		stationMap.put("entity", DangerExportStationDto.class);
-//		list.add(stationMap);
+		Workbook workbook = new XSSFWorkbook();
+		StationDangerReportExcelExportService service = new StationDangerReportExcelExportService();
+		service.createSheet(workbook, exportParams, DangerExportStationDto.class, exportDatas);
 
-		return datas;
+		StationDangerExcelExportStylerImpl styleImpl = new StationDangerExcelExportStylerImpl(workbook);
+
+		Sheet sheet = workbook.getSheetAt(0);
+		int index = 4;
+		for (int i = 0; i < exportDataList.size(); i++) {
+			DangerExportStationDto stationData = exportDataList.get(i);
+
+			int size = 1;
+
+			Row row1 = sheet.getRow(index);
+			row1.getCell(23).setCellStyle(getLevelCellStyle(workbook, stationData));
+
+			if (CollUtil.isNotEmpty(stationData.getDangers())) {
+
+				List<DangerExportStationDangerDto> dangers = stationData.getDangers();
+
+				size = dangers.size();
+
+				row1.getCell(7).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+				row1.getCell(8).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+				row1.getCell(9).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+				row1.getCell(10).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+
+				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 7, 7);
+				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 8, 8);
+				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 9, 9);
+				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 10, 10);
+
+				// row1.getCell(7).setCellStyle(getDefaultCellStyle(workbook));
+				// row1.getCell(8).setCellStyle(getDefaultCellStyle(workbook));
+				// row1.getCell(9).setCellStyle(getDefaultCellStyle(workbook));
+				// row1.getCell(10).setCellStyle(getDefaultCellStyle(workbook));
+
+				// PoiMergeCellUtil.mergeCells(sheet, mergeMap, 7, 10);
+
+				// PoiMergeCellUtil.mergeCells(sheet, 7, exportData.getDangers().size());
+				// PoiMergeCellUtil.mergeCells(sheet, 8, exportData.getDangers().size());
+				// PoiMergeCellUtil.mergeCells(sheet, 9, exportData.getDangers().size());
+				// PoiMergeCellUtil.mergeCells(sheet, 10, exportData.getDangers().size());
+
+				for (int j = 0; j < dangers.size(); j++) {
+					DangerExportStationDangerDto danger = dangers.get(j);
+					Row row = sheet.getRow(index + j);
+					row.getCell(16).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(17).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(18).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(19).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(20).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(21).setCellStyle(getStationDangerStyle(workbook));
+
+					if ("true".equalsIgnoreCase(danger.getLevel())) {
+						PoiMergeCellUtil.addMergedRegion(sheet, index + j, index + j, 16, 21);
+						row.getCell(16).setCellStyle(getStationDangerTitleStyle(workbook));
+					}
+				}
+			}
+			index = index + size;
+		}
+
+		Row titleRow3 = sheet.getRow(3);
+		for (int i = 0; i <= 24; i++) {
+			if (i == 7 || i == 8 || i == 9 || i == 10) {
+				continue;
+			}
+			titleRow3.createCell(i).setCellStyle(styleImpl.getTitleStyle((short) 0));
+		}
+
+		return workbook;
+	}
+
+	private CellStyle getLevelCellStyle(Workbook workbook, DangerExportStationDto station) {
+		CellStyle style = workbook.createCellStyle();
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+		style.setWrapText(true);
+		if ("蓝色风险".equalsIgnoreCase(station.getLevel())) {
+			style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.SKY_BLUE.getIndex());
+		} else if ("黄色风险".equalsIgnoreCase(station.getLevel())) {
+			style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.LIGHT_YELLOW.getIndex());
+		} else if ("橙色风险".equalsIgnoreCase(station.getLevel())) {
+			style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.LIGHT_ORANGE.getIndex());
+		} else if ("红色风险".equalsIgnoreCase(station.getLevel())) {
+			style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.RED.getIndex());
+		}
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		return style;
+	}
+
+	private CellStyle getStationDangerTitleStyle(Workbook workbook) {
+		CellStyle style = workbook.createCellStyle();
+		style.setAlignment(HorizontalAlignment.LEFT);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+		style.setWrapText(true);
+
+		Font font = workbook.createFont();
+		font.setBold(true);
+
+		style.setFont(font);
+
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		return style;
+	}
+
+	private CellStyle getStationDangerStyle(Workbook workbook) {
+		CellStyle style = workbook.createCellStyle();
+		style.setAlignment(HorizontalAlignment.LEFT);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+		style.setWrapText(true);
+
+		Font font = workbook.createFont();
+		font.setFontHeightInPoints((short) 10);
+
+		style.setFont(font);
+
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+
+		return style;
 	}
 
 	private List<DangerExportStationDto> buildExportStationDto(List<DangerExportStationQueryDto> exportData) {
@@ -109,9 +253,34 @@ public class OwnerUnitDangerExportStationService {
 				export.setDetectDate(DateUtil.format(data.getInitialDate(), DatePattern.CHINESE_DATE_PATTERN));
 			}
 
+			Project project = projectService.selectProjectById(data.getProjectId());
+			if (project != null) {
+
+				List<StationFormData> formDatas = detectDataMapper.selectStationDetectData(project.getTemplateId(),
+						data.getId());
+
+				if (formDatas != null) {
+
+					formDatas = formDatas.stream().filter((d) -> d.getDangers() > 0).collect(Collectors.toList());
+					ComputeStationScoreService stationScoreService = new ComputeStationScoreService();
+					BigDecimal compute = stationScoreService.compute(data.getDetectModule(), data.getStationType(),
+							formDatas);
+					compute = compute.setScale(2, RoundingMode.HALF_UP);
+
+					export.setScore(compute.toPlainString());
+					export.setLevel(getResult(compute.doubleValue()));
+				}
+			}
+
+			List<DangerExportStationDangerDto> exportDangers = new LinkedList<DangerExportStationDangerDto>();
+			buildExportDanger(exportDangers, dangers, data);
+			if (CollUtil.isEmpty(exportDangers)) {
+				exportDangers.add(new DangerExportStationDangerDto());
+			}
+
 			List<ChargingPileInfo> stationPiles = chargingPileService.selectStationPileList(data.getId());
+			StationPileInfo pileInfo = new StationPileInfo();
 			if (CollUtil.isNotEmpty(stationPiles)) {
-				StationPileInfo pileInfo = new StationPileInfo();
 
 				Optional<BigDecimal> quantity1 = stationPiles.stream()
 						.filter((d) -> "非车载充电桩".equalsIgnoreCase(d.getType()))
@@ -152,15 +321,32 @@ public class OwnerUnitDangerExportStationService {
 				} else {
 					pileInfo.setStationPilePower("");
 				}
-				export.setPileInfo(Arrays.asList(pileInfo));
 			}
 
-			List<DangerExportStationDangerDto> exportDangers = new LinkedList<DangerExportStationDangerDto>();
-			buildExportDanger(exportDangers, dangers, data);
+			export.getPileInfo().add(pileInfo);
+
+			for (int i = 0; i < exportDangers.size() - 1; i++) {
+				export.getPileInfo().add(new StationPileInfo());
+			}
+
 			export.setDangers(exportDangers);
 			result.add(export);
 		}
 		return result;
+	}
+
+	private String getResult(Double score) {
+
+		if (score > 95) {
+			return "蓝色风险";
+		} else if (score <= 95 && score > 90) {
+			return "黄色风险";
+		} else if (score <= 90 && score > 80) {
+			return "橙色风险";
+		} else if (score <= 80) {
+			return "红色风险";
+		}
+		return "";
 	}
 
 	private void buildExportDanger(List<DangerExportStationDangerDto> exportDangers, List<OwnerUnitDanger> dangers,
@@ -212,17 +398,26 @@ public class OwnerUnitDangerExportStationService {
 									.filter((d) -> StrUtil.isNotBlank(d.getLocation()))
 									.map(OwnerUnitDanger::getLocation).distinct().collect(Collectors.toList());
 
+							long count = descDangers.stream().filter(
+									(d) -> "0".equalsIgnoreCase(d.getStatus()) || "1".equalsIgnoreCase(d.getStatus()))
+									.count();
+
+							if (count > 0) {
+								danger.setStatus("0");
+							} else {
+								danger.setStatus("2");
+							}
+
 							danger.setDescription(StrUtil.format("{}、{}{}", dangerIndex++, String.join(",", locations),
 									ownerUnitDanger.getDescription()));
 							danger.setLevel(LEVEL_MAP.get(ownerUnitDanger.getLevel()));
 							danger.setSuggestions(ownerUnitDanger.getSuggestions());
-							danger.setStatus(ownerUnitDanger.getStatus());
 
 							List<String> dangerPics = descDangers.stream()
 									.filter((d) -> StrUtil.isNotBlank(d.getDangerPic())).map((d) -> d.getDangerPic())
 									.flatMap(str -> Arrays.stream(str.split(","))).collect(Collectors.toList());
 							if (CollUtil.isNotEmpty(dangerPics)) {
-								danger.setDangerPicture(readFileByte(dangerPics.get(0)));
+								danger.setDangerPicture(PicUtils.readFileByte(dangerPics.get(0)));
 							}
 
 							List<String> rectificationPics = descDangers.stream()
@@ -230,7 +425,7 @@ public class OwnerUnitDangerExportStationService {
 									.map((d) -> d.getRectificationPic()).flatMap(str -> Arrays.stream(str.split(",")))
 									.collect(Collectors.toList());
 							if (CollUtil.isNotEmpty(rectificationPics)) {
-								danger.setRectificationPicture(readFileByte(rectificationPics.get(0)));
+								danger.setRectificationPicture(PicUtils.readFileByte(rectificationPics.get(0)));
 							}
 
 							exportDangers.add(danger);
@@ -246,18 +441,5 @@ public class OwnerUnitDangerExportStationService {
 				}
 			}
 		}
-	}
-
-	private byte[] readFileByte(String pic) {
-		try {
-			// 本地资源路径
-			String localPath = RuoYiConfig.getProfile();
-			// 数据库资源地址
-			String filePath = localPath + StringUtils.substringAfter(pic, Constants.RESOURCE_PREFIX);
-			return FileUtil.readBytes(filePath);
-		} catch (Exception e) {
-
-		}
-		return null;
 	}
 }

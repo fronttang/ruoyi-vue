@@ -218,7 +218,7 @@ public class DangerExportUrbanVillageDto {
 	 * 楼栋检测工作照
 	 */
 	@Excel(name = "楼栋检测工作照", orderNum = "37", needMerge = true, type = 2, imageType = 2)
-	private byte[] inspectionPicture;
+	private byte[] inspectionPicture = null;
 
 	/**
 	 * 备注

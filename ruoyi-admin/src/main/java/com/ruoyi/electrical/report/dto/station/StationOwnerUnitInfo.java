@@ -15,6 +15,7 @@ import com.deepoove.poi.xwpf.WidthScalePattern;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.electrical.danger.service.ComputeStationScoreService;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -245,54 +246,12 @@ public class StationOwnerUnitInfo {
 	private List<StationFormData> scoreDatas;
 
 	public Double getScore() {
-		if (CollUtil.isNotEmpty(scoreDatas)) {
 
-			String detectModule = this.getDetectModule();
-			if (StrUtil.isNotBlank(detectModule)) {
-				String[] modules = detectModule.split(",");
-				if (modules != null) {
+		ComputeStationScoreService compute = new ComputeStationScoreService();
+		BigDecimal result = compute.compute(this.detectModule, this.stationType, scoreDatas);
 
-					List<String> moduleList = Arrays.asList(modules);
-					// 储能
-					final boolean es = moduleList.contains("4");
-
-					// 集中式
-					final boolean concentrated = "1".equalsIgnoreCase(this.getStationType());
-					// 分散式
-					final boolean dispersion = "2".equalsIgnoreCase(this.getStationType());
-
-					Optional<BigDecimal> reduce = scoreDatas.stream().map((d) -> {
-
-						if (es) {
-							if (concentrated && Objects.nonNull(d.getWeightsCEs())) {
-								return new BigDecimal(100).multiply(new BigDecimal(0.99))
-										.multiply(new BigDecimal(d.getWeightsCEs()));
-							} else if (dispersion && Objects.nonNull(d.getWeightsDEs())) {
-								return new BigDecimal(100).multiply(new BigDecimal(0.99))
-										.multiply(new BigDecimal(d.getWeightsDEs()));
-							}
-						} else {
-							if (concentrated && Objects.nonNull(d.getWeightsCNes())) {
-								return new BigDecimal(100).multiply(new BigDecimal(0.99))
-										.multiply(new BigDecimal(d.getWeightsCNes()));
-							} else if (dispersion && Objects.nonNull(d.getWeightsDNes())) {
-								return new BigDecimal(100).multiply(new BigDecimal(0.99))
-										.multiply(new BigDecimal(d.getWeightsDNes()));
-							}
-						}
-						return BigDecimal.ZERO;
-					}).reduce(BigDecimal::add);
-
-					if (reduce.isPresent()) {
-						BigDecimal score = reduce.get();
-						score = new BigDecimal(100).subtract(score);
-						score = score.setScale(4, RoundingMode.HALF_DOWN);
-						return score.doubleValue();
-					}
-				}
-			}
-		}
-		return 100D;
+		result = result.setScale(2, RoundingMode.HALF_UP);
+		return result.doubleValue();
 	}
 
 }

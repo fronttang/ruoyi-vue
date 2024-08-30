@@ -158,13 +158,13 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 		 * 隐患图片
 		 */
 		@Excel(name = "隐患图片1", orderNum = "16", type = 2, imageType = 2)
-		private byte[] dangerPic1;
+		private byte[] dangerPic1 = null;
 
 		/**
 		 * 隐患图片
 		 */
 		@Excel(name = "隐患图片2", orderNum = "17", type = 2, imageType = 2)
-		private byte[] dangerPic2;
+		private byte[] dangerPic2 = null;
 
 		/**
 		 * 整改情况
@@ -176,19 +176,19 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 		 * 整改图
 		 */
 		@Excel(name = "整改照片1", orderNum = "19", type = 2, imageType = 2)
-		private byte[] rectificationPic1;
+		private byte[] rectificationPic1 = null;
 
 		/**
 		 * 整改图
 		 */
 		@Excel(name = "整改照片2", orderNum = "20", type = 2, imageType = 2)
-		private byte[] rectificationPic2;
+		private byte[] rectificationPic2 = null;
 
 		/**
 		 * 整体外观图
 		 */
 		@Excel(name = "整体照片", orderNum = "21", type = 2, imageType = 2)
-		private byte[] overallPic1;
+		private byte[] overallPic1 = null;
 
 	}
 }

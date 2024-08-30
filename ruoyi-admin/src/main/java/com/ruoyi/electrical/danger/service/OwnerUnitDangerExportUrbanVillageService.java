@@ -3,7 +3,6 @@ package com.ruoyi.electrical.danger.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,26 +11,30 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.electrical.danger.controller.DangerExcelExportStylerImpl;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 import com.ruoyi.electrical.dto.DangerExportUrbanVillageDto;
 import com.ruoyi.electrical.dto.DangerExportUrbanVillageDto.DangerExportUrbanVillageDangerDto;
 import com.ruoyi.electrical.dto.DangerExportUrbanVillageQueryDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
+import com.ruoyi.electrical.util.PicUtils;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 
 @Service
@@ -40,7 +43,7 @@ public class OwnerUnitDangerExportUrbanVillageService {
 	@Autowired
 	private IOwnerUnitDangerExportService dangerExportService;
 
-	public List<Map<String, Object>> exportDanger(OwnerUnitDangerGroupDetailDto data) {
+	public Workbook exportDanger(OwnerUnitDangerGroupDetailDto data) {
 
 		List<DangerExportUrbanVillageQueryDto> exportData = new ArrayList<DangerExportUrbanVillageQueryDto>();
 
@@ -52,21 +55,53 @@ public class OwnerUnitDangerExportUrbanVillageService {
 
 		List<DangerExportUrbanVillageDto> datas = buildUrbanVillageDto(exportData);
 
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-
 		ExportParams exportParams = new ExportParams();
 		// rentalHouseParams.setCreateHeadRows(false);
 		exportParams.setSheetName("隐患台账");
 		exportParams.setTitle("城中村出租屋用电安全隐患台账明细表");
 		exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-		Map<String, Object> rentalHouseMap = new HashMap<String, Object>();
-		rentalHouseMap.put("title", exportParams);
-		rentalHouseMap.put("data", datas);
-		rentalHouseMap.put("entity", DangerExportUrbanVillageDto.class);
-		list.add(rentalHouseMap);
+		Workbook workbook = new XSSFWorkbook();
+		DangerReportExcelExportService service = new DangerReportExcelExportService();
+		service.createSheet(workbook, exportParams, DangerExportUrbanVillageDto.class, datas);
 
-		return list;
+		for (Sheet sheet : workbook) {
+			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+				row.getCell(10).setCellStyle(getCellStyleBorder(workbook));
+				row.getCell(11).setCellStyle(getCellStyleBorder(workbook));
+				row.getCell(12).setCellStyle(getCellStyleLeft(workbook));
+				row.getCell(13).setCellStyle(getCellStyleLeft(workbook));
+
+				row.getCell(37).setCellStyle(getCellStyleBorder(workbook));
+			}
+		}
+
+		return workbook;
+	}
+
+	private CellStyle getCellStyleBorder(Workbook workbook) {
+
+		CellStyle cellStyle = workbook.createCellStyle();
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+		cellStyle.setBorderRight(BorderStyle.THIN);
+
+		cellStyle.setAlignment(HorizontalAlignment.CENTER);
+		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+		return cellStyle;
+	}
+
+	private CellStyle getCellStyleLeft(Workbook workbook) {
+
+		CellStyle style = getCellStyleBorder(workbook);
+
+		style.setAlignment(HorizontalAlignment.LEFT);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+		return style;
 	}
 
 	private List<DangerExportUrbanVillageDto> buildUrbanVillageDto(List<DangerExportUrbanVillageQueryDto> exportData) {
@@ -131,7 +166,7 @@ public class OwnerUnitDangerExportUrbanVillageService {
 			if (StrUtil.isNotBlank(data.getInspectionPic())) {
 				List<String> pics = StrUtil.split(",", data.getInspectionPic());
 				if (CollUtil.isNotEmpty(pics)) {
-					export.setInspectionPicture(readFileByte(pics.get(0)));
+					export.setInspectionPicture(PicUtils.readFileByte(pics.get(0)));
 				}
 			}
 
@@ -145,6 +180,10 @@ public class OwnerUnitDangerExportUrbanVillageService {
 								&& IFormbDangerHandler.FAILURE.equalsIgnoreCase(d.getResult())))
 						.collect(Collectors.groupingBy(OwnerUnitDanger::getDescription, Collectors.toList()));
 				buildExportDanger(exportDangers, dangerGroupMap);
+			}
+
+			if (CollUtil.isEmpty(exportDangers)) {
+				exportDangers.add(new DangerExportUrbanVillageDangerDto());
 			}
 
 			export.setDangers(exportDangers);
@@ -185,16 +224,4 @@ public class OwnerUnitDangerExportUrbanVillageService {
 		}
 	}
 
-	private byte[] readFileByte(String pic) {
-		try {
-			// 本地资源路径
-			String localPath = RuoYiConfig.getProfile();
-			// 数据库资源地址
-			String filePath = localPath + StringUtils.substringAfter(pic, Constants.RESOURCE_PREFIX);
-			return FileUtil.readBytes(filePath);
-		} catch (Exception e) {
-
-		}
-		return null;
-	}
 }

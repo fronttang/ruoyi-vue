@@ -3,7 +3,6 @@ package com.ruoyi.electrical.danger.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +11,18 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ruoyi.electrical.danger.controller.DangerExcelExportStylerImpl;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 import com.ruoyi.electrical.dto.DangerExportUrbanVillageQueryDto;
@@ -36,7 +42,7 @@ public class OwnerUnitDangerExportReviewUrbanVillageService {
 	@Autowired
 	private IOwnerUnitDangerExportService dangerExportService;
 
-	public List<Map<String, Object>> exportDanger(OwnerUnitDangerGroupDetailDto data) {
+	public Workbook exportDanger(OwnerUnitDangerGroupDetailDto data) {
 
 		List<DangerExportUrbanVillageQueryDto> exportData = new ArrayList<DangerExportUrbanVillageQueryDto>();
 
@@ -48,21 +54,54 @@ public class OwnerUnitDangerExportReviewUrbanVillageService {
 
 		List<DangerReviewExportUrbanVillageDto> datas = buildUrbanVillageDto(exportData);
 
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-
 		ExportParams exportParams = new ExportParams();
 		// rentalHouseParams.setCreateHeadRows(false);
 		exportParams.setSheetName("隐患台账");
 		exportParams.setTitle("城中村出租屋用电安全隐患台账明细表");
 		exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-		Map<String, Object> rentalHouseMap = new HashMap<String, Object>();
-		rentalHouseMap.put("title", exportParams);
-		rentalHouseMap.put("data", datas);
-		rentalHouseMap.put("entity", DangerReviewExportUrbanVillageDto.class);
-		list.add(rentalHouseMap);
+		Workbook workbook = new XSSFWorkbook();
+		DangerReportExcelExportService service = new DangerReportExcelExportService();
+		service.createSheet(workbook, exportParams, DangerReviewExportUrbanVillageDto.class, datas);
 
-		return list;
+		for (Sheet sheet : workbook) {
+			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+				row.getCell(6).setCellStyle(getCellStyleBorder(workbook));
+				row.getCell(7).setCellStyle(getCellStyleBorder(workbook));
+				row.getCell(8).setCellStyle(getCellStyleLeft(workbook));
+				row.getCell(9).setCellStyle(getCellStyleLeft(workbook));
+				row.getCell(10).setCellStyle(getCellStyleLeft(workbook));
+				row.getCell(11).setCellStyle(getCellStyleLeft(workbook));
+				row.getCell(12).setCellStyle(getCellStyleLeft(workbook));
+			}
+		}
+
+		return workbook;
+	}
+
+	private CellStyle getCellStyleBorder(Workbook workbook) {
+
+		CellStyle cellStyle = workbook.createCellStyle();
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+		cellStyle.setBorderRight(BorderStyle.THIN);
+
+		cellStyle.setAlignment(HorizontalAlignment.CENTER);
+		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+		return cellStyle;
+	}
+
+	private CellStyle getCellStyleLeft(Workbook workbook) {
+
+		CellStyle style = getCellStyleBorder(workbook);
+
+		style.setAlignment(HorizontalAlignment.LEFT);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+		return style;
 	}
 
 	private List<DangerReviewExportUrbanVillageDto> buildUrbanVillageDto(
@@ -148,6 +187,10 @@ public class OwnerUnitDangerExportReviewUrbanVillageService {
 								&& IFormbDangerHandler.FAILURE.equalsIgnoreCase(d.getResult())))
 						.collect(Collectors.groupingBy(OwnerUnitDanger::getDescription, Collectors.toList()));
 				buildExportDanger(exportDangers, dangerGroupMap);
+			}
+
+			if (CollUtil.isEmpty(exportDangers)) {
+				exportDangers.add(new DangerReivewExportUrbanVillageDangerDto());
 			}
 
 			export.setDangers(exportDangers);

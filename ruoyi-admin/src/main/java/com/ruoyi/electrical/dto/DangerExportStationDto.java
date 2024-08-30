@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
@@ -55,7 +56,7 @@ public class DangerExportStationDto {
 	 * 充电桩数量
 	 */
 	@ExcelCollection(name = "充电桩数量", orderNum = "7")
-	private List<StationPileInfo> pileInfo;
+	private List<StationPileInfo> pileInfo = new ArrayList<StationPileInfo>();
 
 	@Data
 	public static class StationPileInfo {

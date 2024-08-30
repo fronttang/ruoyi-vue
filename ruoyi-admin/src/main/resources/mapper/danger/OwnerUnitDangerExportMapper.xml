@@ -200,7 +200,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
 		r1.is_danger_notice, su.nick_name as gridman, su.user_name as gridman_phone,
 		du.name as detect_name, o.test_start_date, o.test_end_date,o.inspection_pic,
-		r1.code as initial_code, r2.code as reivew_code
+		r1.code as initial_code, r2.code as reivew_code,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
@@ -273,17 +273,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="communityName"    column="community_name"    />
         <result property="hamlet"    column="hamlet"    />
         <result property="hamletName"    column="hamlet_name"    />
+        <result property="projectId"    column="project_id"    />
         <result property="initialDate"    column="initial_date"    />        
         <result property="operatingDate"    column="operating_date"    />        
         <result property="detectModule"    column="detect_module"    />        
+        <result property="stationType"    column="station_type"    />        
     </resultMap>
     
     <select id="exportStationByQuery" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="DangerExportStationQueryDto">
-    	select t.* from (select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
+    	select t.* from (select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone, o.project_id,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
 		r1.is_danger_notice, su.nick_name as gridman, su.user_name as gridman_phone,
 		du.name as detect_name, o.test_start_date, o.test_end_date,o.inspection_pic,
-		o.operating,o.operating_date,o.vehicles,o.lounge,o.remark,o.details,o.detect_module,
+		o.operating,o.operating_date,o.vehicles,o.lounge,o.remark,o.details,o.detect_module,o.station_type,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
@@ -316,11 +318,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     
     <select id="exportStationByUnitId" parameterType="Long" resultMap="DangerExportStationQueryDto">
-    	select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
+    	select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone, o.project_id,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
 		r1.is_danger_notice, su.nick_name as gridman, su.user_name as gridman_phone,
 		du.name as detect_name, o.test_start_date, o.test_end_date,o.inspection_pic,
-		o.operating,o.operating_date,o.vehicles,o.lounge,o.remark,o.details,o.detect_module,
+		o.operating,o.operating_date,o.vehicles,o.lounge,o.remark,o.details,o.detect_module,o.station_type,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,

@@ -253,11 +253,12 @@
   }
 </style>
 <script>
-import { listUnitDanger, unitPictures} from "@/api/danger/danger";
+import { listUnitDanger, unitPictures, dangerExport, dangerReivewExport} from "@/api/danger/danger";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
+import { Loading } from 'element-ui'
 
 export default {
   name: "OwnerUnitDanger",
@@ -316,7 +317,8 @@ export default {
       detectUnitDict: [],
       projectAreaDict: [],
       projectType: null,
-      pictures:[]
+      pictures:[],
+      downloadLoadingInstance: null
     };
   },
   created() {
@@ -438,44 +440,84 @@ export default {
     handleExportMissDevice(row){
       this.queryParams.ids = this.ids;
 
-      this.download('/miss/device/export', {
+      this.download1('/miss/device/export', {
         ...this.queryParams
       }, `缺失设备台账.xlsx`)
     },
     handleExportDanger(row){
       this.queryParams.ids = this.ids;
 
-      this.download('/owner/unit/danger/export', {
-        ...this.queryParams
-      }, `高风险隐患台账.xlsx`)
+      this.downloadDangerExport(this.queryParams, '高风险隐患台账.xlsx')
+
+      //this.download1('/owner/unit/danger/export', {
+      //  ...this.queryParams
+      //}, `高风险隐患台账.xlsx`)
     },
     handleExportDangerType1(row){
       this.queryParams.ids = this.ids;
 
-      this.download('/owner/unit/danger/export', {
-        ...this.queryParams
-      }, `城中村初检隐患台账.xlsx`)
+      this.downloadDangerExport(this.queryParams, '城中村初检隐患台账.xlsx')
+
+      //this.download1('/owner/unit/danger/export', {
+      //  ...this.queryParams
+      //}, `城中村初检隐患台账.xlsx`)
     },
     handleExportReviewDanger(row){
       this.queryParams.ids = this.ids;
 
-      this.download('/owner/unit/danger/export/review', {
-        ...this.queryParams
-      }, `城中村复检隐患台账.xlsx`)
+      this.downloadReviewDangerExport(this.queryParams, '城中村复检隐患台账.xlsx');
+
+      //this.download1('/owner/unit/danger/export/review', {
+      //  ...this.queryParams
+      //}, `城中村复检隐患台账.xlsx`)
     },
     handleExportDangerType2(row){
       this.queryParams.ids = this.ids;
 
-      this.download('/owner/unit/danger/export', {
-        ...this.queryParams
-      }, `工业园初检隐患台账.xlsx`)
+      this.downloadDangerExport(this.queryParams, '工业园初检隐患台账.xlsx')
+
+      //this.download1('/owner/unit/danger/export', {
+      //  ...this.queryParams
+      //}, `工业园初检隐患台账.xlsx`)
     },
     handleExportStationDanger(row){
       this.queryParams.ids = this.ids;
 
-      this.download('/owner/unit/danger/export', {
-        ...this.queryParams
-      }, `充电站隐患台账.xlsx`)
+      this.downloadDangerExport(this.queryParams, '充电站隐患台账.xlsx')
+
+      //this.download1('/owner/unit/danger/export', {
+      //  ...this.queryParams
+      //}, `充电站隐患台账.xlsx`)
+    },
+    downloadDangerExport(data, fileName){
+      this.downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+      dangerExport(data).then(response => {
+        let a = document.createElement("a");
+        a.href = process.env.VUE_APP_BASE_API + response.data;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        this.downloadLoadingInstance.close();
+      }).catch((r) => {
+        this.$modal.msgError('生成文件出现错误，请联系管理员！')
+        this.downloadLoadingInstance.close();
+      });
+    },
+    downloadReviewDangerExport(data, fileName){
+      this.downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+      dangerReivewExport(data).then(response => {
+        let a = document.createElement("a");
+        a.href = process.env.VUE_APP_BASE_API + response.data;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        this.downloadLoadingInstance.close();
+      }).catch((r) => {
+        this.$modal.msgError('生成文件出现错误，请联系管理员！')
+        this.downloadLoadingInstance.close();
+      });
     }
   }
 };

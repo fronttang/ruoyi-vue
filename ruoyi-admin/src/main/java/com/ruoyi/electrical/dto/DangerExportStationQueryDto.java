@@ -185,6 +185,16 @@ public class DangerExportStationQueryDto {
 	private String details;
 
 	/**
+	 * 充电站类型
+	 */
+	private String stationType;
+
+	/**
+	 * 项目ID
+	 */
+	private Long projectId;
+
+	/**
 	 * 隐患列表
 	 */
 	private List<OwnerUnitDanger> dangers = new ArrayList<OwnerUnitDanger>();

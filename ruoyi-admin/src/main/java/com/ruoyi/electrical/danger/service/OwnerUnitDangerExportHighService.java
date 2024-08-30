@@ -12,17 +12,21 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
-import com.ruoyi.electrical.danger.controller.DangerExcelExportStylerImpl;
 import com.ruoyi.electrical.dto.DangerExportIndustrialDto;
 import com.ruoyi.electrical.dto.DangerExportQueryDto;
 import com.ruoyi.electrical.dto.DangerExportRentalHouseDto;
@@ -33,13 +37,15 @@ import com.ruoyi.electrical.dto.DangerExportSmallDto;
 import com.ruoyi.electrical.dto.IDangerExportDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
+import com.ruoyi.electrical.util.PicUtils;
 import com.ruoyi.system.service.ISysDictTypeService;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class OwnerUnitDangerExportHighService {
 
@@ -51,7 +57,7 @@ public class OwnerUnitDangerExportHighService {
 
 	private final Map<String, String> LEVEL_MAP = new HashMap<String, String>();
 
-	public List<Map<String, Object>> exportDanger(OwnerUnitDangerGroupDetailDto data) {
+	public Workbook exportDanger(OwnerUnitDangerGroupDetailDto data) {
 
 		List<DangerExportQueryDto> exportData = new ArrayList<DangerExportQueryDto>();
 
@@ -69,42 +75,51 @@ public class OwnerUnitDangerExportHighService {
 		}
 
 		// 出租屋
+		AtomicLong index = new AtomicLong(1);
 		List<DangerExportRentalHouseDto> rentalHouse = exportData.stream()
 				.filter((d) -> "1".equalsIgnoreCase(d.getHighRiskType())).map((d) -> {
-					return buildRentalHouseExportData(d, DangerExportRentalHouseDto.class);
+					return buildRentalHouseExportData(d, DangerExportRentalHouseDto.class, index);
 				}).collect(Collectors.toList());
 
 		// 三小场所
+		AtomicLong index1 = new AtomicLong(1);
 		List<DangerExportSmallDto> small = exportData.stream().filter((d) -> "2".equalsIgnoreCase(d.getHighRiskType()))
 				.map((d) -> {
-					return buildRentalHouseExportData(d, DangerExportSmallDto.class);
+					return buildRentalHouseExportData(d, DangerExportSmallDto.class, index1);
 				}).collect(Collectors.toList());
 
 		// 住宅小区
+		AtomicLong index2 = new AtomicLong(1);
 		List<DangerExportSmallDto> residential = exportData.stream()
 				.filter((d) -> "3".equalsIgnoreCase(d.getHighRiskType())).map((d) -> {
-					return buildRentalHouseExportData(d, DangerExportSmallDto.class);
+					return buildRentalHouseExportData(d, DangerExportSmallDto.class, index2);
 				}).collect(Collectors.toList());
 
 		// 工业企业
+		AtomicLong index3 = new AtomicLong(1);
 		List<DangerExportIndustrialDto> industrial = exportData.stream()
 				.filter((d) -> "4".equalsIgnoreCase(d.getHighRiskType())).map((d) -> {
-					return buildRentalHouseExportData(d, DangerExportIndustrialDto.class);
+					return buildRentalHouseExportData(d, DangerExportIndustrialDto.class, index3);
 				}).collect(Collectors.toList());
 
 		// 公共场所
+		AtomicLong index4 = new AtomicLong(1);
 		List<DangerExportIndustrialDto> publicPlaces = exportData.stream()
 				.filter((d) -> "5".equalsIgnoreCase(d.getHighRiskType())).map((d) -> {
-					return buildRentalHouseExportData(d, DangerExportIndustrialDto.class);
+					return buildRentalHouseExportData(d, DangerExportIndustrialDto.class, index4);
 				}).collect(Collectors.toList());
 
 		// 大型综合体
+		AtomicLong index5 = new AtomicLong(1);
 		List<DangerExportIndustrialDto> complex = exportData.stream()
 				.filter((d) -> "6".equalsIgnoreCase(d.getHighRiskType())).map((d) -> {
-					return buildRentalHouseExportData(d, DangerExportIndustrialDto.class);
+					return buildRentalHouseExportData(d, DangerExportIndustrialDto.class, index5);
 				}).collect(Collectors.toList());
 
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Workbook workbook = new XSSFWorkbook();
+		DangerReportExcelExportService service = new DangerReportExcelExportService();
+
+		DangerExcelExportStylerImpl styleImpl = new DangerExcelExportStylerImpl(workbook);
 
 		if (CollUtil.isNotEmpty(rentalHouse)) {
 			ExportParams exportParams = new ExportParams();
@@ -113,11 +128,7 @@ public class OwnerUnitDangerExportHighService {
 			exportParams.setTitle("出租屋火灾隐患排查表");
 			exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-			Map<String, Object> rentalHouseMap = new HashMap<String, Object>();
-			rentalHouseMap.put("title", exportParams);
-			rentalHouseMap.put("data", rentalHouse);
-			rentalHouseMap.put("entity", DangerExportRentalHouseDto.class);
-			list.add(rentalHouseMap);
+			service.createSheet(workbook, exportParams, DangerExportRentalHouseDto.class, rentalHouse);
 		}
 
 		if (CollUtil.isNotEmpty(small)) {
@@ -126,11 +137,7 @@ public class OwnerUnitDangerExportHighService {
 			exportParams.setTitle("三小场所火灾隐患排查表");
 			exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-			Map<String, Object> smallMap = new HashMap<String, Object>();
-			smallMap.put("title", exportParams);
-			smallMap.put("data", small);
-			smallMap.put("entity", DangerExportSmallDto.class);
-			list.add(smallMap);
+			service.createSheet(workbook, exportParams, DangerExportSmallDto.class, small);
 		}
 
 		if (CollUtil.isNotEmpty(residential)) {
@@ -139,11 +146,7 @@ public class OwnerUnitDangerExportHighService {
 			exportParams.setTitle("住宅小区火灾隐患排查表");
 			exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-			Map<String, Object> residentialMap = new HashMap<String, Object>();
-			residentialMap.put("title", exportParams);
-			residentialMap.put("data", residential);
-			residentialMap.put("entity", DangerExportSmallDto.class);
-			list.add(residentialMap);
+			service.createSheet(workbook, exportParams, DangerExportSmallDto.class, residential);
 		}
 
 		if (CollUtil.isNotEmpty(industrial)) {
@@ -152,11 +155,7 @@ public class OwnerUnitDangerExportHighService {
 			exportParams.setTitle("工业企业火灾隐患排查表");
 			exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-			Map<String, Object> industrialMap = new HashMap<String, Object>();
-			industrialMap.put("title", exportParams);
-			industrialMap.put("data", industrial);
-			industrialMap.put("entity", DangerExportIndustrialDto.class);
-			list.add(industrialMap);
+			service.createSheet(workbook, exportParams, DangerExportIndustrialDto.class, industrial);
 		}
 
 		if (CollUtil.isNotEmpty(publicPlaces)) {
@@ -165,11 +164,7 @@ public class OwnerUnitDangerExportHighService {
 			exportParams.setTitle("公共场所火灾隐患排查表");
 			exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-			Map<String, Object> publicPlacesMap = new HashMap<String, Object>();
-			publicPlacesMap.put("title", exportParams);
-			publicPlacesMap.put("data", publicPlaces);
-			publicPlacesMap.put("entity", DangerExportIndustrialDto.class);
-			list.add(publicPlacesMap);
+			service.createSheet(workbook, exportParams, DangerExportIndustrialDto.class, publicPlaces);
 		}
 
 		if (CollUtil.isNotEmpty(complex)) {
@@ -178,16 +173,34 @@ public class OwnerUnitDangerExportHighService {
 			exportParams.setTitle("大型综合体火灾隐患排查表");
 			exportParams.setStyle(DangerExcelExportStylerImpl.class);
 
-			Map<String, Object> complexMap = new HashMap<String, Object>();
-			complexMap.put("title", exportParams);
-			complexMap.put("data", complex);
-			complexMap.put("entity", DangerExportIndustrialDto.class);
-			list.add(complexMap);
+			service.createSheet(workbook, exportParams, DangerExportIndustrialDto.class, complex);
 		}
-		return list;
+
+		for (Sheet sheet : workbook) {
+			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+				for (int j = 0; j <= 24; j++) {
+					if (row.getCell(j) == null) {
+						row.createCell(j).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+					} else {
+						row.getCell(j).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+					}
+
+					if (j == 15 || j == 18) {
+						CellStyle cellStyle = styleImpl.stringSeptailStyle(workbook, true);
+						cellStyle.setAlignment(HorizontalAlignment.LEFT);
+						cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+						row.getCell(j).setCellStyle(cellStyle);
+					}
+				}
+			}
+		}
+
+		return workbook;
 	}
 
-	private <T extends IDangerExportDto> T buildRentalHouseExportData(DangerExportQueryDto data, Class<T> clazz) {
+	private <T extends IDangerExportDto> T buildRentalHouseExportData(DangerExportQueryDto data, Class<T> clazz,
+			AtomicLong index) {
 		T dto;
 		try {
 			dto = clazz.newInstance();
@@ -200,6 +213,7 @@ public class OwnerUnitDangerExportHighService {
 				// 无法检测
 				dto.setOpenStatus(StrUtil.format("无法检测({})", data.getIsTestReason()));
 			}
+			dto.setId(index.getAndIncrement());
 
 		} catch (Exception e) {
 			return null;
@@ -209,7 +223,7 @@ public class OwnerUnitDangerExportHighService {
 
 		Map<Long, OwnerUnitDangerFormExportDto> formExportMap = new HashMap<Long, OwnerUnitDangerFormExportDto>();
 
-		BigDecimal totalScore = BigDecimal.ZERO;
+		BigDecimal score = BigDecimal.ZERO;
 		if (CollUtil.isNotEmpty(dangers)) {
 
 			// ComputeHighScoreService compute = new ComputeHighScoreService();
@@ -249,16 +263,18 @@ public class OwnerUnitDangerExportHighService {
 
 				if (formMaxScore.compareTo(BigDecimal.ZERO) > 0 && formScore.compareTo(formMaxScore) >= 0) {
 					formExport.setMaxScore(formMaxScore.setScale(0, RoundingMode.HALF_UP).toPlainString());
-					totalScore = totalScore.add(formMaxScore);
+					score = score.add(formMaxScore);
 				} else {
 					formExport.setMaxScore(formScore.setScale(0, RoundingMode.HALF_UP).toPlainString());
-					totalScore = totalScore.add(formScore);
+					score = score.add(formScore);
 				}
 			}
-			totalScore = new BigDecimal(100).subtract(totalScore);
-			if (totalScore.compareTo(BigDecimal.ZERO) <= 0) {
-				totalScore = BigDecimal.ZERO;
-			}
+
+		}
+
+		BigDecimal totalScore = new BigDecimal(100).subtract(score);
+		if (totalScore.compareTo(BigDecimal.ZERO) <= 0) {
+			totalScore = BigDecimal.ZERO;
 		}
 		totalScore.setScale(0, RoundingMode.HALF_UP);
 
@@ -458,7 +474,7 @@ public class OwnerUnitDangerExportHighService {
 			if (rectificationPicArr != null) {
 				infoExport.setRectificationPic1(readFileByte(rectificationPicArr[0]));
 				if (rectificationPicArr.length > 1) {
-					infoExport.setRectificationPic1(readFileByte(rectificationPicArr[1]));
+					infoExport.setRectificationPic2(readFileByte(rectificationPicArr[1]));
 				}
 			}
 		}
@@ -467,13 +483,10 @@ public class OwnerUnitDangerExportHighService {
 
 	private byte[] readFileByte(String pic) {
 		try {
-			// 本地资源路径
-			String localPath = RuoYiConfig.getProfile();
-			// 数据库资源地址
-			String filePath = localPath + StringUtils.substringAfter(pic, Constants.RESOURCE_PREFIX);
-			return FileUtil.readBytes(filePath);
+			return PicUtils.readFileByte(pic);
+			// return PicUtils.compressPicForScale(PicUtils.readFileByte(pic), 100);
 		} catch (Exception e) {
-
+			log.error("", e);
 		}
 		return null;
 	}

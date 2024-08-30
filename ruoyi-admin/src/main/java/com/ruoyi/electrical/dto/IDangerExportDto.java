@@ -16,5 +16,5 @@ public interface IDangerExportDto {
 
 	void setTotalScore(String totalScore);
 
-	// void setNo(String no);
+	void setId(Long id);
 }

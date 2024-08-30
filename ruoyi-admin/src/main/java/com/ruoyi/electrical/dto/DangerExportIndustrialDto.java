@@ -75,7 +75,7 @@ public class DangerExportIndustrialDto implements IDangerExportDto {
 	 * 网络照片
 	 */
 	@Excel(name = "营业执照", orderNum = "10", type = 2, imageType = 2, needMerge = true)
-	private byte[] businessLicense;
+	private byte[] businessLicense = null;
 
 	/**
 	 * 经营状态

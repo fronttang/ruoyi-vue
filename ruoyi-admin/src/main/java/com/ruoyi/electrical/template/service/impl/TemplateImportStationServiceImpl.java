@@ -89,6 +89,11 @@ public class TemplateImportStationServiceImpl implements ITemplateImportStationS
 					dangers = new ArrayList<IntuitiveDetectDanger>();
 					fromData.setDangers(dangers);
 				}
+
+				if (StrUtil.isBlank(importData.getDescription()) && StrUtil.isBlank(importData.getSuggestions())) {
+					continue;
+				}
+
 				IntuitiveDetectDanger danger = new IntuitiveDetectDanger();
 				BeanUtils.copyProperties(importData, danger);
 				danger.setTemplateId(templateId);

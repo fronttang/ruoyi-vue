@@ -79,7 +79,11 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 	public int insertOwnerUnit(OwnerUnit ownerUnit) {
 		// ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
 		if (StrUtil.isBlank(ownerUnit.getCreateBy())) {
-			ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+			if (SecurityUtils.getUserId() == 1) {
+				ownerUnit.setCreateBy("admin");
+			} else {
+				ownerUnit.setCreateBy(String.valueOf(SecurityUtils.getUserId()));
+			}
 		}
 		ownerUnit.setCreateTime(DateUtils.getNowDate());
 		ownerUnit.setUpdateTime(DateUtils.getNowDate());

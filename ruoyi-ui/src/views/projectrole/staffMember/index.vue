@@ -73,8 +73,8 @@
 
     <el-table v-loading="loading" :data="detectUnitUserList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column fixed label="ID" align="center" width="60" prop="id" />
-      <el-table-column fixed label="姓名" align="center" width="120" prop="name" />
+      <el-table-column label="ID" align="center" width="60" prop="id" />
+      <el-table-column label="姓名" align="center" width="120" prop="name" />
       <el-table-column label="检测单位" align="center" min-width="300" prop="detectName" :show-overflow-tooltip="true" />
       <el-table-column label="账号" align="center" width="120" prop="account" />
       <el-table-column label="状态" align="center" prop="status" width="60">
@@ -92,7 +92,7 @@
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" align="center" width="160" class-name="small-padding fixed-width">
+      <el-table-column fixed="right" label="操作" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

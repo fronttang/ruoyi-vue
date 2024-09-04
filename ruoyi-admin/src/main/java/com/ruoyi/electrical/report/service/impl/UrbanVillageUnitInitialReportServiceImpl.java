@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Struct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
+import com.ruoyi.electrical.danger.service.DangerLocationBuilder;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
 import com.ruoyi.electrical.project.domain.DetectDevice;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
@@ -444,31 +446,46 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					.stream().filter((d) -> "B".equals(d.getFormType())
 							&& IFormbDangerHandler.QUALIFIED.equals(d.getResult()) && d.isSummary())
 					.collect(Collectors.toList());
+
 			if (CollUtil.isNotEmpty(conformbDangers)) {
-
-				Map<String, UrbanVillageDanger> conformbMap = new HashMap<String, UrbanVillageDanger>();
-				conformbDangers.forEach((data) -> {
-					UrbanVillageDanger danger = conformbMap.get(data.getFormCode());
-					if (danger == null) {
-						danger = new UrbanVillageDanger();
-						danger.setDescription(data.getDescription());
-						danger.setSuggestions(data.getSuggestions());
-
-						conformbMap.put(data.getFormCode(), danger);
-					}
-					danger.getLocations().add(data.getReportLocation());
-
-					String picture = data.getPicture();
-					if (StrUtil.isNotBlank(picture)) {
-						List<String> split = StrUtil.split(picture, ",");
-						if (CollUtil.isNotEmpty(split)) {
-							danger.getPictures().addAll(split);
-						}
-					}
-				});
-				conformb.addAll(new ArrayList<UrbanVillageDanger>(conformbMap.values()));
+				buildDanger(conformb, conformbDangers);
 			}
 		}
+	}
+
+	private void buildDanger(List<UrbanVillageDanger> conformb, List<OwnerUnitDanger> conformbDangers) {
+
+		Map<String, List<OwnerUnitDanger>> groupDangerMap = conformbDangers.stream()
+				.filter((d) -> StrUtil.isNotBlank(d.getDescription()))
+				.collect(Collectors.groupingBy(OwnerUnitDanger::getDescription, Collectors.toList()));
+
+		groupDangerMap.forEach((description, dangers) -> {
+			UrbanVillageDanger danger = new UrbanVillageDanger();
+
+			OwnerUnitDanger firstDanger = dangers.get(0);
+			danger.setDescription(firstDanger.getDescription());
+			danger.setSuggestions(firstDanger.getSuggestions());
+
+			List<String> dangerPics = dangers.stream().filter((d) -> StrUtil.isNotBlank(d.getDangerPic()))
+					.map((d) -> d.getDangerPic()).flatMap(str -> Arrays.stream(str.split(",")))
+					.collect(Collectors.toList());
+
+			if (CollUtil.isNotEmpty(dangerPics)) {
+				danger.getPictures().addAll(dangerPics);
+			}
+
+			List<String> rectificationPics = dangers.stream().filter((d) -> StrUtil.isNotBlank(d.getRectificationPic()))
+					.map((d) -> d.getRectificationPic()).flatMap(str -> Arrays.stream(str.split(",")))
+					.collect(Collectors.toList());
+			if (CollUtil.isNotEmpty(rectificationPics)) {
+				danger.getRectificationPics().addAll(rectificationPics);
+			}
+
+			List<String> locations = DangerLocationBuilder.build(dangers);
+			danger.setLocations(locations);
+
+			conformb.add(danger);
+		});
 	}
 
 	private void buildNConformb(InitialReport initialReport, List<OwnerUnitDanger> unitDangerList) {
@@ -482,29 +499,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 							&& d.isSummary())
 					.filter((d) -> StrUtil.isNotBlank(d.getDescription())).collect(Collectors.toList());
 			if (CollUtil.isNotEmpty(conformbDangers)) {
-
-				Map<String, UrbanVillageDanger> conformbMap = new HashMap<String, UrbanVillageDanger>();
-				conformbDangers.forEach((data) -> {
-					String key = data.getDescription();
-					UrbanVillageDanger danger = conformbMap.get(key);
-					if (danger == null) {
-						danger = new UrbanVillageDanger();
-						danger.setDescription(data.getDescription());
-						danger.setSuggestions(data.getSuggestions());
-
-						conformbMap.put(key, danger);
-					}
-					danger.getLocations().add(data.getReportLocation());
-
-					String picture = data.getPicture();
-					if (StrUtil.isNotBlank(picture)) {
-						List<String> split = StrUtil.split(picture, ",");
-						if (CollUtil.isNotEmpty(split)) {
-							danger.getPictures().addAll(split);
-						}
-					}
-				});
-				conformb.addAll(new ArrayList<UrbanVillageDanger>(conformbMap.values()));
+				buildDanger(conformb, conformbDangers);
 			}
 		}
 	}
@@ -517,31 +512,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			List<OwnerUnitDanger> dangers = unitDangerList.stream().filter((d) -> !"B".equals(d.getFormType()))
 					.filter((d) -> StrUtil.isNotBlank(d.getDescription())).collect(Collectors.toList());
 			if (CollUtil.isNotEmpty(dangers)) {
-
-				// 按检测项汇总
-				Map<String, UrbanVillageDanger> dangerMap = new HashMap<String, UrbanVillageDanger>();
-				dangers.forEach((data) -> {
-					String key = data.getDescription();
-
-					UrbanVillageDanger danger = dangerMap.get(key);
-					if (danger == null) {
-						danger = new UrbanVillageDanger();
-						danger.setDescription(data.getDescription());
-						danger.setSuggestions(data.getSuggestions());
-
-						dangerMap.put(key, danger);
-					}
-					danger.getLocations().add(data.getReportLocation());
-
-					String picture = data.getPicture();
-					if (StrUtil.isNotBlank(picture)) {
-						List<String> split = StrUtil.split(picture, ",");
-						if (CollUtil.isNotEmpty(split)) {
-							danger.getPictures().addAll(split);
-						}
-					}
-				});
-				conform.addAll(new ArrayList<UrbanVillageDanger>(dangerMap.values()));
+				buildDanger(conform, dangers);
 			}
 		}
 	}
@@ -743,7 +714,9 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					.filter((d) -> !"B".equalsIgnoreCase(d.getFormType()) || ("B".equalsIgnoreCase(d.getFormType())
 							&& IFormbDangerHandler.FAILURE.equalsIgnoreCase(d.getResult())))
 					.filter((d) -> "2".equals(d.getStatus())).collect(Collectors.toList());
-			buildReviewDanger(conform, dangers);
+			if (CollUtil.isNotEmpty(dangers)) {
+				buildDanger(conform, dangers);
+			}
 		}
 	}
 
@@ -757,50 +730,9 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					.filter((d) -> !"B".equalsIgnoreCase(d.getFormType()) || ("B".equalsIgnoreCase(d.getFormType())
 							&& IFormbDangerHandler.FAILURE.equalsIgnoreCase(d.getResult())))
 					.filter((d) -> !"2".equals(d.getStatus())).collect(Collectors.toList());
-			buildReviewDanger(nconform, dangers);
-		}
-	}
-
-	private void buildReviewDanger(List<UrbanVillageDanger> nconform, List<OwnerUnitDanger> dangers) {
-		if (CollUtil.isNotEmpty(dangers)) {
-
-			List<OwnerUnitDanger> acFormDanger = dangers.stream().filter((d) -> StrUtil.isNotBlank(d.getDescription()))
-					.collect(Collectors.toList());
-
-			// 按检测项汇总
-			Map<String, UrbanVillageDanger> dangerMap = new HashMap<String, UrbanVillageDanger>();
-			acFormDanger.forEach((data) -> {
-
-				String key = data.getDescription();
-
-				UrbanVillageDanger danger = dangerMap.get(key);
-				if (danger == null) {
-					danger = new UrbanVillageDanger();
-					danger.setDescription(data.getDescription());
-					danger.setSuggestions(data.getSuggestions());
-
-					dangerMap.put(key, danger);
-				}
-				danger.getLocations().add(data.getReportLocation());
-
-				String picture = data.getPicture();
-				if (StrUtil.isNotBlank(picture)) {
-					List<String> split = StrUtil.split(picture, ",");
-					if (CollUtil.isNotEmpty(split)) {
-						danger.getPictures().addAll(split);
-					}
-				}
-
-				String rectificationPic = data.getRectificationPic();
-				if (StrUtil.isNotBlank(rectificationPic)) {
-					List<String> split = StrUtil.split(rectificationPic, ",");
-					if (CollUtil.isNotEmpty(split)) {
-						danger.getRectificationPics().addAll(split);
-					}
-				}
-
-			});
-			nconform.addAll(new ArrayList<UrbanVillageDanger>(dangerMap.values()));
+			if (CollUtil.isNotEmpty(dangers)) {
+				buildDanger(nconform, dangers);
+			}
 		}
 	}
 

@@ -93,7 +93,9 @@ public class FormB14DangerHandler implements IFormbDangerHandler {
 	public String getReportLocation(OwnerUnitDanger vo) {
 
 		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
-		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+		// String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ?
+		// vo.getBuildingName() : "";
+		String buildingName = "";
 
 		return StrUtil.format("{}{}", buildingName, unitAreaName);
 

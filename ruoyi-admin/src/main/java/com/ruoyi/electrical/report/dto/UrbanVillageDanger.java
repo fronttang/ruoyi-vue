@@ -92,7 +92,7 @@ public class UrbanVillageDanger {
 	public String getLocation() {
 		locations = locations.stream().filter((d) -> StrUtil.isNotBlank(d)).collect(Collectors.toList());
 		if (CollUtil.isNotEmpty(locations)) {
-			this.location = String.join("、", locations);
+			this.location = String.join(";", locations);
 		}
 		return this.location;
 	}

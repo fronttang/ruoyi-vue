@@ -216,32 +216,57 @@ public class OwnerUnitDangerExportReviewUrbanVillageService {
 					DangerReivewExportUrbanVillageDangerDto exportDanger = new DangerReivewExportUrbanVillageDangerDto();
 					OwnerUnitDanger oud = dangerList.get(0);
 
-					List<String> locations = dangerList.stream().map((d) -> d.getReportLocation())
-							.filter((d) -> StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+					// List<String> locations = dangerList.stream().map((d) ->
+					// d.getReportLocation())
+					// .filter((d) ->
+					// StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+
+					String location = DangerLocationBuilder.buildString(dangerList);
 
 					exportDanger.setLevel(oud.getLevel());
 					exportDanger.setNo(String.valueOf(dangerIndex++));
 					exportDanger.setSuggestions(oud.getSuggestions());
-					exportDanger
-							.setDescription(StrUtil.format("{}{}", String.join("、", locations), oud.getDescription()));
+					exportDanger.setDescription(StrUtil.format("{} {}", location, oud.getDescription()));
 
 					// 已整改隐患区域
-					List<String> finishLocations = dangerList.stream()
-							.filter((d) -> "2".equalsIgnoreCase(d.getStatus())).map((d) -> d.getReportLocation())
-							.filter((d) -> StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
-					exportDanger.setFinishLocation(String.join("、", finishLocations));
+					// List<String> finishLocations = dangerList.stream()
+					// .filter((d) -> "2".equalsIgnoreCase(d.getStatus())).map((d) ->
+					// d.getReportLocation())
+					// .filter((d) ->
+					// StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+					// exportDanger.setFinishLocation(String.join("、", finishLocations));
+
+					List<OwnerUnitDanger> finishDanger = dangerList.stream()
+							.filter((d) -> "2".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
+
+					String finishLocation = DangerLocationBuilder.buildString(finishDanger);
+					exportDanger.setFinishLocation(finishLocation);
 
 					// 须整改隐患区域
-					List<String> unFinishLocations = dangerList.stream()
-							.filter((d) -> !"2".equalsIgnoreCase(d.getStatus())).map((d) -> d.getReportLocation())
-							.filter((d) -> StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
-					exportDanger.setUnFinishLocation(String.join("、", unFinishLocations));
+					// List<String> unFinishLocations = dangerList.stream()
+					// .filter((d) -> !"2".equalsIgnoreCase(d.getStatus())).map((d) ->
+					// d.getReportLocation())
+					// .filter((d) ->
+					// StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+					// exportDanger.setUnFinishLocation(String.join("、", unFinishLocations));
+
+					List<OwnerUnitDanger> unFinishDangers = dangerList.stream()
+							.filter((d) -> !"2".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
+					String unFinishLocation = DangerLocationBuilder.buildString(unFinishDangers);
+					exportDanger.setUnFinishLocation(unFinishLocation);
 
 					// 复查区域
-					List<String> reivewLocations = dangerList.stream()
-							.filter((d) -> "1".equalsIgnoreCase(d.getStatus())).map((d) -> d.getReportLocation())
-							.filter((d) -> StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
-					exportDanger.setReviewLocation(String.join("、", reivewLocations));
+					// List<String> reivewLocations = dangerList.stream()
+					// .filter((d) -> "1".equalsIgnoreCase(d.getStatus())).map((d) ->
+					// d.getReportLocation())
+					// .filter((d) ->
+					// StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+					// exportDanger.setReviewLocation(String.join("、", reivewLocations));
+
+					List<OwnerUnitDanger> reivewDangers = dangerList.stream()
+							.filter((d) -> "1".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
+					String reivewLocation = DangerLocationBuilder.buildString(reivewDangers);
+					exportDanger.setReviewLocation(reivewLocation);
 
 					// 整改情况
 					long finishDangers = dangerList.stream().filter((d) -> "2".equalsIgnoreCase(d.getStatus())).count();

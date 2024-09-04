@@ -209,14 +209,16 @@ public class OwnerUnitDangerExportUrbanVillageService {
 					DangerExportUrbanVillageDangerDto exportDanger = new DangerExportUrbanVillageDangerDto();
 					OwnerUnitDanger oud = dangerList.get(0);
 
-					List<String> locations = dangerList.stream().map((d) -> d.getReportLocation()).distinct()
-							.collect(Collectors.toList());
+					// List<String> locations = dangerList.stream().map((d) ->
+					// d.getReportLocation()).distinct()
+					// .collect(Collectors.toList());
+
+					String location = DangerLocationBuilder.buildString(dangerList);
 
 					exportDanger.setLevel(oud.getLevel());
 					exportDanger.setNo(String.valueOf(dangerIndex++));
 					exportDanger.setSuggestions(oud.getSuggestions());
-					exportDanger
-							.setDescription(StrUtil.format("{}{}", String.join("、", locations), oud.getDescription()));
+					exportDanger.setDescription(StrUtil.format("{} {}", location, oud.getDescription()));
 
 					exportDangers.add(exportDanger);
 				}

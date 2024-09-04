@@ -233,8 +233,10 @@ public class OwnerUnitDanger extends BaseEntity {
 				}
 			}
 		}
-
-		return this.location;
+		String unitAreaName = StrUtil.isNotBlank(this.areaName) ? this.areaName : "";
+		// String buildingName = StrUtil.isNotBlank(this.buildingName) ?
+		// this.buildingName : "";
+		return StrUtil.format("{}{}", unitAreaName, this.location);
 	}
 
 	/**

@@ -180,14 +180,17 @@ public class OwnerUnitDangerExportIndustrialService {
 					DangerExportIndustrialAreaDangerDto exportDanger = new DangerExportIndustrialAreaDangerDto();
 					OwnerUnitDanger oud = dangerList.get(0);
 
-					List<String> locations = dangerList.stream().map((d) -> d.getReportLocation())
-							.filter((d) -> StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+					// List<String> locations = dangerList.stream().map((d) ->
+					// d.getReportLocation())
+					// .filter((d) ->
+					// StrUtil.isNotBlank(d)).distinct().collect(Collectors.toList());
+					String location = DangerLocationBuilder.buildString(dangerList);
 
 					exportDanger.setLevel(oud.getLevel());
 					exportDanger.setNo(String.valueOf(index++));
 					exportDanger.setSuggestions(oud.getSuggestions());
 					exportDanger.setDescription(oud.getDescription());
-					exportDanger.setLocation(String.join("、", locations));
+					exportDanger.setLocation(location);
 
 					List<String> pics = dangerList.stream().filter((d) -> StrUtil.isNotBlank(d.getDangerPic()))
 							.map((d) -> d.getDangerPic()).flatMap(str -> Arrays.stream(str.split(",")))

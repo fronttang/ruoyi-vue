@@ -68,7 +68,9 @@ public class FormBB1DangerHandler implements IFormbDangerHandler {
 		if (formb != null) {
 
 			String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
-			String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+			// String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ?
+			// vo.getBuildingName() : "";
+			String buildingName = "";
 			String deviceName = StrUtil.isNotBlank(formb.getDeviceName()) ? formb.getDeviceName() : "";
 
 			location = StrUtil.format("{}{}{}", buildingName, unitAreaName, deviceName);

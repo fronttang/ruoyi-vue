@@ -349,8 +349,12 @@ public class OwnerUnitDanger extends BaseEntity {
 		if ("B".equalsIgnoreCase(this.formType)) {
 			String result = getResult();
 			if (IFormbDangerHandler.QUALIFIED.equals(result)) {
-				// 完成
-				return "2";
+				// 非隐患
+				return "9";
+			} else if (IFormbDangerHandler.FAILURE.equals(result)) {
+				return this.status;
+			} else {
+				return "";
 			}
 		}
 		return this.status;

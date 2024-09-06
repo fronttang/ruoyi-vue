@@ -9,6 +9,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.electrical.danger.domain.ChargeInfrared;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
+import com.ruoyi.electrical.danger.handler.IFormbDangerHandler;
 import com.ruoyi.electrical.danger.mapper.ChargeInfraredMapper;
 import com.ruoyi.electrical.danger.service.IChargeInfraredService;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
@@ -83,6 +84,11 @@ public class ChargeInfraredServiceImpl implements IChargeInfraredService {
 					OwnerUnitDanger update = new OwnerUnitDanger();
 					update.setId(chargeInfrared.getId());
 					update.setFormb(formb);
+
+					if (IFormbDangerHandler.QUALIFIED.equals(chargeInfrared.getResult())) {
+						// 合格变成非隐患
+						update.setStatus("9");
+					}
 
 					return unitDangerService.updateOwnerUnitDanger(update);
 				}

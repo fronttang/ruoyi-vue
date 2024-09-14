@@ -15,6 +15,11 @@ public class DetectForm {
 	private DetectUnit detect;
 
 	/**
+	 * 业主单元信息
+	 */
+	private OwnerUnitInfo unit;
+
+	/**
 	 * 检测表名称
 	 */
 	private String name;

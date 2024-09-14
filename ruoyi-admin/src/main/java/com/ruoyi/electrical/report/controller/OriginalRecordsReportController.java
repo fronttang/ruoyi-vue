@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +18,13 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -29,10 +36,16 @@ import com.alibaba.fastjson2.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
+import com.deepoove.poi.data.CellRenderData;
+import com.deepoove.poi.data.Cells;
 import com.deepoove.poi.data.TextRenderData;
+import com.deepoove.poi.data.style.CellStyle;
+import com.deepoove.poi.data.style.ParagraphStyle;
 import com.deepoove.poi.data.style.Style;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
+import com.deepoove.poi.policy.TableRenderPolicy;
 import com.deepoove.poi.util.PoitlIOUtils;
+import com.deepoove.poi.util.TableTools;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.entity.SysDictData;
@@ -49,14 +62,13 @@ import com.ruoyi.electrical.report.dto.DetectFormData;
 import com.ruoyi.electrical.report.dto.OriginalRecords;
 import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
+import com.ruoyi.electrical.report.formb.FormB14;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
 import com.ruoyi.electrical.role.service.IDetectUnitService;
 import com.ruoyi.electrical.template.domain.IntuitiveDetect;
-import com.ruoyi.electrical.template.domain.IntuitiveDetectDanger;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
 import com.ruoyi.electrical.template.dto.IntuitiveDetectQuery;
-import com.ruoyi.electrical.template.service.IIntuitiveDetectDangerService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectService;
 import com.ruoyi.system.service.ISysDictDataService;
@@ -96,10 +108,54 @@ public class OriginalRecordsReportController extends BaseController {
 	private IIntuitiveDetectDataService intuitiveDetectDataService;
 
 	@Autowired
-	private IIntuitiveDetectDangerService intuitiveDetectDangerService;
-
-	@Autowired
 	private IOwnerUnitDangerService ownerUnitDangerService;
+
+	private static Set<Class<?>> allFormbBeans = new HashSet<Class<?>>();
+
+	static {
+		Reflections reflections = new Reflections(new ConfigurationBuilder()
+				.forPackages("com.ruoyi.electrical.report.formb")
+				.filterInputsBy(new FilterBuilder().includePackage("BOOT-INF.classes.com.ruoyi.electrical.report.formb")
+						.includePackage("com.ruoyi.electrical.report.formb"))
+				.setScanners(Scanners.TypesAnnotated));
+
+		allFormbBeans = reflections.getTypesAnnotatedWith(Formb.class);
+	}
+
+	private class FormLoopRowTableRenderPolicy extends LoopRowTableRenderPolicy {
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void afterloop(XWPFTable table, Object data) {
+
+			List<DetectFormData> formDatas = (List<DetectFormData>) data;
+
+			for (int i = 1; i <= formDatas.size(); i++) {
+
+				DetectFormData formData = formDatas.get(i - 1);
+
+				if (formData.isMerge()) {
+
+					XWPFTableRow row = table.getRow(i);
+					TableTools.mergeCellsHorizonal(table, i, 1, 3);
+
+					CellRenderData cellRenderData = Cells.of(String.valueOf(formData.getFirstContent())).create();
+					XWPFTableCell cell = row.getCell(1);
+
+					try {
+						CellStyle cellStyle = new CellStyle();
+						ParagraphStyle paragraphStyle = ParagraphStyle.builder()
+								.withDefaultTextStyle(Style.builder().buildBold().build()).build();
+						cellStyle.setDefaultParagraphStyle(paragraphStyle);
+
+						TableRenderPolicy.Helper.renderCell(cell, cellRenderData, cellStyle);
+					} catch (Exception e) {
+						log.error("", e);
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * 原始记录 unit.nature=='1'?'':''
@@ -117,11 +173,12 @@ public class OriginalRecordsReportController extends BaseController {
 		log.info("originalRecords : " + originalRecords);
 
 		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
-		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("data", policy)
-				.bind("formb.B1", policy).bind("formb.BB1", policy).bind("formb.B2", policy).bind("formb.B3", policy)
-				.bind("formb.B4", policy).bind("formb.B5", policy).bind("formb.B6", policy).bind("formb.B7", policy)
-				.bind("formb.B8", policy).bind("formb.B9", policy).bind("formb.B10", policy).bind("formb.B11", policy)
-				.bind("formb.B12", policy).bind("formb.B13", policy).bind("formb.B14", policy)
+		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL()
+				.bind("data", new FormLoopRowTableRenderPolicy()).bind("formb.B1", policy).bind("formb.BB1", policy)
+				.bind("formb.B2", policy).bind("formb.B3", policy).bind("formb.B4", policy).bind("formb.B5", policy)
+				.bind("formb.B6", policy).bind("formb.B7", policy).bind("formb.B8", policy).bind("formb.B9", policy)
+				.bind("formb.B10", policy).bind("formb.B11", policy).bind("formb.B12", policy).bind("formb.B13", policy)
+				.bind("formb.B14", policy).bind("formb.B14A", policy).bind("formb.B14B", policy)
 				.bind("formb.B15", policy);
 		Configure config = configureBuilder.build();
 		try {
@@ -155,6 +212,7 @@ public class OriginalRecordsReportController extends BaseController {
 					InputStream formInputStream = ClassPathResource.class.getClassLoader()
 							.getResourceAsStream("report/originalRecords/OriginalRecords_Form.docx");
 					form.setDetect(originalRecords.getDetect());
+					form.setUnit(originalRecords.getUnit());
 
 					Map<String, Object> formDataMap = BeanUtil.beanToMap(form);
 
@@ -245,9 +303,6 @@ public class OriginalRecordsReportController extends BaseController {
 
 		List<SysDictData> formbDict = dictDataService.selectDictDataList(query);
 
-		Reflections reflections = new Reflections("com.ruoyi.electrical.report.formb");
-		Set<Class<?>> allFormbBeans = reflections.getTypesAnnotatedWith(Formb.class);
-
 		Map<String, Class<?>> frombMap = allFormbBeans.stream().collect(Collectors.toMap((clazz) -> {
 
 			Formb annotation = clazz.getAnnotation(Formb.class);
@@ -256,14 +311,16 @@ public class OriginalRecordsReportController extends BaseController {
 		}, Function.identity()));
 
 		formbDict.forEach((dict) -> {
-			Class<?> formbClass = frombMap.get(dict.getDictValue());
+			// Class<?> formbClass = frombMap.get(dict.getDictValue());
 
 			try {
-				formb.put(dict.getDictValue(), Arrays.asList(formbClass.newInstance()));
-			} catch (InstantiationException | IllegalAccessException e) {
+				formb.put(dict.getDictValue(), Arrays.asList());
+			} catch (Exception e) {
 				log.error("", e);
 			}
 		});
+		formb.put("B14A", Arrays.asList());
+		formb.put("B14B", Arrays.asList());
 
 		// 查所有formb的隐患数据
 		OwnerUnitDanger danger = new OwnerUnitDanger();
@@ -277,16 +334,55 @@ public class OriginalRecordsReportController extends BaseController {
 			Map<String, List<Object>> collect = dangers.stream()
 					.collect(Collectors.groupingBy(OwnerUnitDanger::getFormCode, Collectors.mapping((dang) -> {
 						JSONObject formbJson = dang.getFormb();
-						if (frombMap.get(dang.getFormCode()) != null) {
-							if (Objects.nonNull(formb)) {
+						if (Objects.nonNull(formbJson) && frombMap.get(dang.getFormCode()) != null) {
+							try {
 								JSONObject formbData = formbJson.getJSONObject("data");
 								if (Objects.nonNull(formbData)) {
-									return formbData.toJavaObject(frombMap.get(dang.getFormCode()));
+									Object formbBean = formbData.toJavaObject(frombMap.get(dang.getFormCode()));
+									// BeanUtils.copyProperties(formbBean, newInstance);
+									BeanUtil.setFieldValue(formbBean, "temperature", ownerUnit.getTemperature());
+									BeanUtil.setFieldValue(formbBean, "humidity", ownerUnit.getHumidity());
+									String detectDate = DateUtil.format(dang.getInitialTime(),
+											DatePattern.CHINESE_DATE_FORMATTER);
+									BeanUtil.setFieldValue(formbBean, "detectDate", detectDate);
+
+									if ("B1".equalsIgnoreCase(dang.getFormCode())
+											|| "BB1".equalsIgnoreCase(dang.getFormCode())) {
+										BeanUtil.setFieldValue(formbBean, "weather", ownerUnit.getWeather());
+										BeanUtil.setFieldValue(formbBean, "windSpeed", ownerUnit.getWindSpeed());
+									}
+
+									return formbBean;
 								}
+							} catch (Exception e) {
+								log.error("", e);
 							}
 						}
 						return formbJson;
 					}, Collectors.toList())));
+
+			if (CollUtil.isNotEmpty(collect)) {
+
+				collect.forEach((key, value) -> {
+					if ("B14".equalsIgnoreCase(key)) {
+						List<Object> residualCurrents = value.stream().filter((d) -> {
+							FormB14 b14 = (FormB14) d;
+							return FormB14.TYPE_RESIDUALCURRENT.equalsIgnoreCase(b14.getType());
+						}).collect(Collectors.toList());
+
+						formb.put("B14A", residualCurrents);
+
+						List<Object> alarmTimes = value.stream().filter((d) -> {
+							FormB14 b14 = (FormB14) d;
+							return FormB14.TYPE_ALARMTIME.equalsIgnoreCase(b14.getType());
+						}).collect(Collectors.toList());
+
+						formb.put("B14B", alarmTimes);
+					} else {
+						formb.put(key, value);
+					}
+				});
+			}
 
 			formb.putAll(collect);
 
@@ -303,18 +399,24 @@ public class OriginalRecordsReportController extends BaseController {
 
 		List<DetectForm> forms = new ArrayList<DetectForm>();
 
+		List<IntuitiveDetectData> detectDatas = intuitiveDetectDataService
+				.selectReportIntuitiveDetectDataList(project.getTemplateId(), ownerUnit.getId());
+
+		Map<Long, List<IntuitiveDetectData>> formDataMap = new HashMap<Long, List<IntuitiveDetectData>>();
+
+		if (CollUtil.isNotEmpty(detectDatas)) {
+			formDataMap.putAll(detectDatas.stream().filter((d) -> Objects.nonNull(d.getDetectTitle()))
+					.collect(Collectors.groupingBy(IntuitiveDetectData::getDetectTitle, Collectors.toList())));
+		}
+
 		if (intuitiveDetect != null) {
 			intuitiveDetect.forEach((detect) -> {
 				DetectForm form = new DetectForm();
 				form.setName(detect.getName());
 
-				IntuitiveDetectData dataQuery = new IntuitiveDetectData();
-				dataQuery.setDetectTitle(detect.getId());
-
 				List<DetectFormData> formDatas = new ArrayList<DetectFormData>();
 
-				List<IntuitiveDetectData> detectData = intuitiveDetectDataService
-						.selectIntuitiveDetectDataList(dataQuery);
+				List<IntuitiveDetectData> detectData = formDataMap.get(detect.getId());
 				if (detectData != null) {
 
 					detectData.forEach((data) -> {
@@ -324,23 +426,14 @@ public class OriginalRecordsReportController extends BaseController {
 						formData.setFirstContent(data.getFirstContent());
 
 						if ("1".equalsIgnoreCase(data.getType())) {
-							Style style = Style.builder().buildBold().build();
-							formData.setFirstContent(new TextRenderData(data.getFirstContent(), style));
+							// Style style = Style.builder().buildBold().build();
+							// formData.setFirstContent(new TextRenderData(data.getFirstContent(), style));
+							formData.setMerge(true);
 						}
-
-						if ("2".equalsIgnoreCase(data.getType())) {
-
-							List<IntuitiveDetectDanger> detectDangers = intuitiveDetectDangerService
-									.selectIntuitiveDetectDangersByDataId(data.getId());
-
-							if (CollUtil.isNotEmpty(detectDangers)) {
-								formData.setLevel(detectDangers.get(0).getLevel());
-							}
-
-							Long dangers = intuitiveDetectDangerService.countDangersByDataIdAndUnitId(data.getId(),
-									ownerUnit.getId());
-							formData.setResult(dangers != null && dangers > 0 ? "不符合" : "符合");
-						}
+						formData.setLevel(data.getLevel());
+						// formData.setDecide(data.getDanger() != null && data.getDanger() > 0 ? "不符合" :
+						// "符合");
+						formData.setResult(data.getDanger() != null && data.getDanger() > 0 ? "不符合" : "符合");
 
 						formDatas.add(formData);
 
@@ -387,7 +480,7 @@ public class OriginalRecordsReportController extends BaseController {
 
 		List<SysDictData> natureDict = dictDataService.selectDictDataList(query);
 		if (natureDict == null || StrUtil.isBlank(ownerUnit.getTestContent())) {
-			for (int i = 1; i <= 10; i++) {
+			for (int i = 1; i <= 12; i++) {
 				detectContent.put("item" + i, new TextRenderData("\u00A3", new Style("Wingdings 2", 12)));
 			}
 		} else {

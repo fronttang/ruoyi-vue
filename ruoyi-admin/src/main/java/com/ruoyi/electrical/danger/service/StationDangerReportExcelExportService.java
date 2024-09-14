@@ -114,4 +114,15 @@ public class StationDangerReportExcelExportService extends ExcelExportService {
 		}
 		return cellIndex;
 	}
+
+	@SuppressWarnings("unchecked")
+	public Object getCellValue(ExcelExportEntity entity, Object obj) throws Exception {
+		Object value = super.getCellValue(entity, obj);
+
+		if (needHandlerList != null && needHandlerList.contains(String.valueOf(entity.getKey()))) {
+			value = dataHandler.exportHandler(obj, entity.getName(), value);
+		}
+
+		return value == null ? "" : value.toString();
+	}
 }

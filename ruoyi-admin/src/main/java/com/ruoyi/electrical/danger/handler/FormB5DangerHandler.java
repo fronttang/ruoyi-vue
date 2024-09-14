@@ -9,6 +9,10 @@ import cn.hutool.core.util.StrUtil;
 @FormbDangerHandler("B5")
 public class FormB5DangerHandler implements IFormbDangerHandler {
 
+	private static final String VENUE_TYPE_1 = "浴室";
+
+	private static final String VENUE_TYPE_OTHER = "其他";
+
 	@Override
 	public String getLevel(OwnerUnitDanger vo) {
 
@@ -27,10 +31,16 @@ public class FormB5DangerHandler implements IFormbDangerHandler {
 
 		String description = null;
 		String result = getResult(vo);
-		if (QUALIFIED.equalsIgnoreCase(result)) {
-			description = "安装高度检测结果，符合要求；";
-		} else if (FAILURE.equalsIgnoreCase(result)) {
-			description = "等潮湿场所插座安装高度低于1.5m，不符合要求。";
+		String venueType = getVenueType(vo);
+
+		if (VENUE_TYPE_1.equalsIgnoreCase(venueType)) {
+			if (QUALIFIED.equalsIgnoreCase(result)) {
+				description = "安装高度检测结果，符合要求；";
+			} else if (FAILURE.equalsIgnoreCase(result)) {
+				description = "等潮湿场所插座安装高度低于1.5m，不符合要求。";
+			}
+		} else if (VENUE_TYPE_OTHER.equalsIgnoreCase(venueType)) {
+			description = "";
 		}
 		return description;
 	}
@@ -40,10 +50,15 @@ public class FormB5DangerHandler implements IFormbDangerHandler {
 
 		String suggestions = null;
 		String result = getResult(vo);
-		if (QUALIFIED.equalsIgnoreCase(result)) {
-			suggestions = "/";
-		} else if (FAILURE.equalsIgnoreCase(result)) {
-			suggestions = "等潮湿场所插座应采用密封型并带保护接地线触头的保护型插座，安装高度不低于1.5m";
+		String venueType = getVenueType(vo);
+		if (VENUE_TYPE_1.equalsIgnoreCase(venueType)) {
+			if (QUALIFIED.equalsIgnoreCase(result)) {
+				suggestions = "/";
+			} else if (FAILURE.equalsIgnoreCase(result)) {
+				suggestions = "等潮湿场所插座应采用密封型并带保护接地线触头的保护型插座，安装高度不低于1.5m";
+			}
+		} else if (VENUE_TYPE_OTHER.equalsIgnoreCase(venueType)) {
+			suggestions = "";
 		}
 		return suggestions;
 	}
@@ -116,5 +131,13 @@ public class FormB5DangerHandler implements IFormbDangerHandler {
 		}
 
 		return location;
+	}
+
+	private String getVenueType(OwnerUnitDanger vo) {
+		FormB5 formb = getFormb(vo);
+		if (formb != null) {
+			return formb.getVenueType();
+		}
+		return null;
 	}
 }

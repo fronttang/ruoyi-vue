@@ -130,4 +130,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
        select id,unit_id,type,brand,model,power,quantity from station_charging_pile 
        where unit_id = #{unitId}
     </select>
+    
+    <resultMap type="com.ruoyi.electrical.report.dto.station.StationPeprePic" id="StationPeprePicResult">
+        <result property="id"    column="id"    />
+        <result property="unitId"    column="unit_id"    />
+        <result property="code"    column="code"    />
+        <result property="rounds"    column="rounds"    />
+        <result property="picture"    column="picture"    />
+    </resultMap>
+    
+    <select id="getStationPeprePicture"  resultMap="StationPeprePicResult">
+       select id,unit_id,code,rounds,picture from owner_unit_station_pepre_pic
+       where unit_id = #{unitId} and rounds = #{rounds}
+    </select>
 </mapper>

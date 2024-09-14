@@ -8,6 +8,7 @@ import com.ruoyi.electrical.project.mapper.ChargingPileMapper;
 import com.ruoyi.electrical.project.domain.ChargingPile;
 import com.ruoyi.electrical.project.service.IChargingPileService;
 import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
+import com.ruoyi.electrical.report.dto.station.StationPeprePic;
 
 /**
  * 充电桩Service业务层处理
@@ -96,5 +97,10 @@ public class ChargingPileServiceImpl implements IChargingPileService {
 	@Override
 	public List<ChargingPileInfo> selectStationPileList(Long unitId) {
 		return chargingPileMapper.selectStationPileList(unitId);
+	}
+
+	@Override
+	public List<StationPeprePic> getStationPeprePicture(Long unitId, Long rounds) {
+		return chargingPileMapper.getStationPeprePicture(unitId, rounds);
 	}
 }

@@ -95,6 +95,11 @@ public class StationDanger {
 	private boolean merge = false;
 
 	/**
+	 * 隐患图片
+	 */
+	private String dangerPic;
+
+	/**
 	 * 位置合集
 	 */
 	private List<String> locations = new ArrayList<String>();

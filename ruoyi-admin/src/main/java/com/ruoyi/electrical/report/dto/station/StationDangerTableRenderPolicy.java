@@ -50,6 +50,7 @@ public class StationDangerTableRenderPolicy extends LoopRowTableRenderPolicy {
 			}
 		}
 
+		// 分数填充
 		try {
 			int scoreRowIdx = 2 + dangers.size();
 			XWPFTableRow row = table.getRow(scoreRowIdx);

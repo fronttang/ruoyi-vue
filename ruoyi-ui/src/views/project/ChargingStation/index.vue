@@ -674,7 +674,7 @@ export default {
           if(this.rounds.steps != null ) {
             this.rounds.start = this.rounds.steps.length > 0;
             this.rounds.active = this.rounds.steps.length - 1;
-            if(this.rounds.steps.length === 4 || this.rounds.status === 'error'){
+            if(this.rounds.steps.length === 5 || this.rounds.status === 'error'){
               this.rounds.active = this.rounds.steps.length;
               clearInterval(this.timer);
             } else {

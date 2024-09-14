@@ -84,15 +84,39 @@ public class DangerExportSmallDto implements IDangerExportDto {
 	private String openStatus = "正常";
 
 	/**
+	 * 门头照
+	 */
+	@Excel(name = "整体照片", orderNum = "12", type = 2, imageType = 2, needMerge = true)
+	private byte[] doorPicture = null;
+
+	/**
+	 * 检测人员
+	 */
+	@Excel(name = "检测人员", orderNum = "13", needMerge = true)
+	private String inspector;
+
+	/**
+	 * 检测日期
+	 */
+	@Excel(name = "检测日期", orderNum = "14", needMerge = true)
+	private String inspectorDate;
+
+	/**
+	 * 整改二维码
+	 */
+	@Excel(name = "整改二维码", orderNum = "15", type = 2, imageType = 2, needMerge = true)
+	private byte[] mngQrcodePicture = null;
+
+	/**
 	 * 总分
 	 */
-	@Excel(name = "总得分", orderNum = "12", needMerge = true)
+	@Excel(name = "总得分", orderNum = "16", needMerge = true)
 	private String totalScore;
 
 	/**
 	 * 隐患列表
 	 */
-	@ExcelCollection(name = "扣分标准", orderNum = "13")
+	@ExcelCollection(name = "扣分标准", orderNum = "17")
 	private List<OwnerUnitDangerFormExportDto> forms;
 
 }

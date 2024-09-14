@@ -25,7 +25,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.electrical.dto.DangerExportIndustrialDto;
 import com.ruoyi.electrical.dto.DangerExportQueryDto;
@@ -37,11 +41,14 @@ import com.ruoyi.electrical.dto.DangerExportSmallDto;
 import com.ruoyi.electrical.dto.IDangerExportDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
-import com.ruoyi.electrical.util.PicUtils;
 import com.ruoyi.system.service.ISysDictTypeService;
+import com.ruoyi.system.service.ISysUserService;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +61,12 @@ public class OwnerUnitDangerExportHighService {
 
 	@Autowired
 	private ISysDictTypeService dictTypeService;
+
+	@Autowired
+	private OwnerUnitQrcodeService ownerUnitQrcodeService;
+
+	@Autowired
+	private ISysUserService sysUserService;
 
 	private final Map<String, String> LEVEL_MAP = new HashMap<String, String>();
 
@@ -179,14 +192,14 @@ public class OwnerUnitDangerExportHighService {
 		for (Sheet sheet : workbook) {
 			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
 				Row row = sheet.getRow(i);
-				for (int j = 0; j <= 24; j++) {
+				for (int j = 0; j <= 27; j++) {
 					if (row.getCell(j) == null) {
 						row.createCell(j).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
 					} else {
 						row.getCell(j).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
 					}
 
-					if (j == 15 || j == 18) {
+					if (j == 19 || j == 22) {
 						CellStyle cellStyle = styleImpl.stringSeptailStyle(workbook, true);
 						cellStyle.setAlignment(HorizontalAlignment.LEFT);
 						cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -208,12 +221,36 @@ public class OwnerUnitDangerExportHighService {
 			if (StrUtil.isNotBlank(data.getBusinessLicense())) {
 				dto.setBusinessLicense(readFileByte(data.getBusinessLicense()));
 			}
+			if (StrUtil.isNotBlank(data.getDoorPic())) {
+				dto.setDoorPicture(readFileByte(data.getDoorPic()));
+			}
+			// 整改二维码
+			String mngQrcode = ownerUnitQrcodeService.getOwnerUnitMngQrcode(data.getId(), data.getMngQrcode());
+			dto.setMngQrcodePicture(readFileByte(mngQrcode));
 
 			if ("1".equalsIgnoreCase(data.getInitialStatus())) {
 				// 无法检测
 				dto.setOpenStatus(StrUtil.format("无法检测({})", data.getIsTestReason()));
 			}
 			dto.setId(index.getAndIncrement());
+
+			if (Objects.nonNull(data.getInspectorId())) {
+				SysUser sysUser = sysUserService.selectUserById(data.getInspectorId());
+
+				if (sysUser != null) {
+					List<String> inspector = new ArrayList<String>();
+					if (StrUtil.isNotBlank(sysUser.getNickName())) {
+						inspector.add(sysUser.getNickName());
+					}
+					if (StrUtil.isNotBlank(sysUser.getRecorder())) {
+						inspector.add(sysUser.getRecorder());
+					}
+					dto.setInspector(String.join(",", inspector));
+				}
+			}
+			if (Objects.nonNull(data.getInitialDate())) {
+				dto.setInspectorDate(DateUtil.format(data.getInitialDate(), DatePattern.CHINESE_DATE_FORMATTER));
+			}
 
 		} catch (Exception e) {
 			return null;
@@ -464,9 +501,9 @@ public class OwnerUnitDangerExportHighService {
 			}
 		}
 
-		if (StrUtil.isNotBlank(danger.getOverallPic())) {
-			infoExport.setOverallPic1(readFileByte(danger.getOverallPic()));
-		}
+		// if (StrUtil.isNotBlank(danger.getOverallPic())) {
+		// infoExport.setOverallPic1(readFileByte(danger.getOverallPic()));
+		// }
 
 		String rectificationPic = danger.getRectificationPic();
 		if (StrUtil.isNotBlank(rectificationPic)) {
@@ -481,13 +518,33 @@ public class OwnerUnitDangerExportHighService {
 		return infoExport;
 	}
 
-	private byte[] readFileByte(String pic) {
+	private byte[] readFileByte(String picture) {
 		try {
-			return PicUtils.readFileByte(pic);
+			if (StrUtil.isNotBlank(picture)) {
+				List<String> pictures = StrUtil.split(picture, ",");
+				if (CollUtil.isNotEmpty(pictures)) {
+
+					String pic = pictures.get(0);
+					// 本地资源路径
+					String localPath = RuoYiConfig.getProfile();
+					// 数据库资源地址
+					String filePath = localPath + StringUtils.substringAfter(pic, Constants.RESOURCE_PREFIX);
+
+					String compressedFile = StrUtil.subBefore(filePath, ".", true) + "_compressed."
+							+ FileUtil.getSuffix(filePath);
+
+					if (FileUtil.exist(compressedFile)) {
+						return FileUtil.readBytes(compressedFile);
+					}
+
+					return FileUtil.readBytes(pic);
+				}
+			}
 			// return PicUtils.compressPicForScale(PicUtils.readFileByte(pic), 100);
 		} catch (Exception e) {
 			log.error("", e);
 		}
 		return null;
 	}
+
 }

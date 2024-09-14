@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.danger.service;
 
+import java.beans.PropertyDescriptor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -48,7 +49,9 @@ import com.ruoyi.electrical.util.PicUtils;
 import com.ruoyi.system.service.ISysDictTypeService;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.handler.impl.ExcelDataHandlerDefaultImpl;
 import cn.afterturn.easypoi.util.PoiMergeCellUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
@@ -108,6 +111,47 @@ public class OwnerUnitDangerExportStationService {
 		exportParams.setSheetName("隐患台账");
 		exportParams.setTitle("充电站隐患台账");
 		exportParams.setStyle(StationDangerExcelExportStylerImpl.class);
+		exportParams.setDataHandler(new ExcelDataHandlerDefaultImpl<Object>() {
+			@Override
+			public Object exportHandler(Object obj, String name, Object value) {
+				String stringValue = String.valueOf(value);
+				if (StrUtil.isBlank(stringValue)) {
+					stringValue = "/";
+				}
+				return super.exportHandler(obj, name, stringValue);
+			}
+
+			@Override
+			public String[] getNeedHandlerFields() {
+
+				Map<String, PropertyDescriptor> propertyDescriptorMap = BeanUtil
+						.getPropertyDescriptorMap(DangerExportStationDto.class, false);
+				List<String> fields = new ArrayList<String>();
+				propertyDescriptorMap.forEach((name, pd) -> {
+					if (String.class.equals(pd.getPropertyType()) || Long.class.equals(pd.getPropertyType())) {
+						fields.add(name);
+					}
+				});
+
+				Map<String, PropertyDescriptor> propertyDescriptorMap1 = BeanUtil
+						.getPropertyDescriptorMap(StationPileInfo.class, false);
+				propertyDescriptorMap1.forEach((name, pd) -> {
+					if (String.class.equals(pd.getPropertyType()) || Long.class.equals(pd.getPropertyType())) {
+						fields.add(name);
+					}
+				});
+
+				Map<String, PropertyDescriptor> propertyDescriptorMap2 = BeanUtil
+						.getPropertyDescriptorMap(DangerExportStationDangerDto.class, false);
+				propertyDescriptorMap2.forEach((name, pd) -> {
+					if (String.class.equals(pd.getPropertyType()) || Long.class.equals(pd.getPropertyType())) {
+						fields.add(name);
+					}
+				});
+
+				return fields.toArray(new String[fields.size()]);
+			}
+		});
 
 		Workbook workbook = new XSSFWorkbook();
 		StationDangerReportExcelExportService service = new StationDangerReportExcelExportService();
@@ -408,7 +452,7 @@ public class OwnerUnitDangerExportStationService {
 								danger.setStatus("2");
 							}
 
-							danger.setDescription(StrUtil.format("{}、{}{}", dangerIndex++, String.join(",", locations),
+							danger.setDescription(StrUtil.format("{}、{}{}", dangerIndex++, String.join("、", locations),
 									ownerUnitDanger.getDescription()));
 							danger.setLevel(LEVEL_MAP.get(ownerUnitDanger.getLevel()));
 							danger.setSuggestions(ownerUnitDanger.getSuggestions());

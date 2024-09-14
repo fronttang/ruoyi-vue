@@ -1,5 +1,7 @@
 package com.ruoyi.electrical.vo;
 
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
@@ -29,6 +31,11 @@ public class OwnerUnitDangerGroupDetailVo {
 	 * 初检状态
 	 */
 	private String initialStatus;
+
+	/**
+	 * 初检时间
+	 */
+	private Date initialDate;
 
 	/**
 	 * 复检状态

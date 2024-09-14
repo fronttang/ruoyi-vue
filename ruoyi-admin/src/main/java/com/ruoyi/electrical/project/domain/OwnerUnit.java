@@ -247,4 +247,14 @@ public class OwnerUnit extends BaseEntity {
 	 * 业主二维码
 	 */
 	private String mngQrcode;
+
+	/**
+	 * 天气
+	 */
+	private String weather;
+
+	/**
+	 * 风速（m/s）
+	 */
+	private String windSpeed;
 }

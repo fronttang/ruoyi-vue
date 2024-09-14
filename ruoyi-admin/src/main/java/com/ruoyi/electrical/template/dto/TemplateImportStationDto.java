@@ -15,7 +15,7 @@ public class TemplateImportStationDto {
 	private String attr;
 
 	/** 一级编号 */
-	@Excel(name = "编号", orderNum = "2")
+	@Excel(name = "编号", orderNum = "2", type = 10)
 	private String firstCode;
 
 	/** 权重 */

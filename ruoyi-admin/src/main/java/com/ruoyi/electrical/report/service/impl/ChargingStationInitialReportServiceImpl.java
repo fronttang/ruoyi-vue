@@ -5,8 +5,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +43,8 @@ import com.ruoyi.electrical.report.dto.station.StationForm;
 import com.ruoyi.electrical.report.dto.station.StationFormData;
 import com.ruoyi.electrical.report.dto.station.StationInitialReport;
 import com.ruoyi.electrical.report.dto.station.StationOwnerUnitInfo;
+import com.ruoyi.electrical.report.dto.station.StationPeprePic;
+import com.ruoyi.electrical.report.dto.station.StationPic;
 import com.ruoyi.electrical.report.dto.station.StationPile;
 import com.ruoyi.electrical.report.dto.station.StationPileForm;
 import com.ruoyi.electrical.report.dto.station.StationPileForm.StationPileFormData;
@@ -91,6 +94,8 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 
 	private static final Map<String, String> MODULE_MAP = new HashMap<String, String>();
 
+	private static final Map<String, String> OVERVIEW_MODULE_MAP = new LinkedHashMap<String, String>();
+
 	static {
 		MODULE_MAP.put("1", "整体安全检查");
 		MODULE_MAP.put("2", "用电安全检查");
@@ -98,6 +103,12 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		MODULE_MAP.put("4", "电化学储能设施安全检查");
 		MODULE_MAP.put("5", "场站其他检查");
 		MODULE_MAP.put("6", "充电系统检查");
+
+		OVERVIEW_MODULE_MAP.put("1", "1、整体安全");
+		OVERVIEW_MODULE_MAP.put("2", "2、用电安全");
+		OVERVIEW_MODULE_MAP.put("6", "3、充电系统安全");
+		OVERVIEW_MODULE_MAP.put("3", "4、消防安全");
+		OVERVIEW_MODULE_MAP.put("4", "5、储能系统安全");
 	}
 
 	@Override
@@ -117,7 +128,7 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 			ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("pileGroup", policy)
 					.bind("piles", policy).bind("form", policy).bind("data", policy).bind("form.data", policy)
 					.bind("danger", new StationDangerTableRenderPolicy(report.getUnit()))
-					.bind("pileFormData", new StationPileFormTableRenderPolicy());
+					.bind("pileFormData", new StationPileFormTableRenderPolicy()).bind("dangerPic", policy);
 			Configure config = configureBuilder.build();
 
 			Map<String, Object> dataMap = BeanUtil.beanToMap(report);
@@ -235,80 +246,214 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		List<StationDanger> stationDangerList = ownerUnitDangerMapper.stationReportDangerList(ownerUnit.getId());
 
 		if (CollUtil.isNotEmpty(formDatas)) {
-
 			scoreDatas.addAll(formDatas.stream().filter((d) -> d.getDangers() > 0).collect(Collectors.toList()));
+			unitInfo.setScoreDatas(scoreDatas);
+		}
 
-			String detectModule = ownerUnit.getDetectModule();
+		String detectModule = ownerUnit.getDetectModule();
 
-			if (StrUtil.isNotBlank(detectModule)) {
-				String[] modules = detectModule.split(",");
-				if (modules != null) {
+		if (StrUtil.isNotBlank(detectModule)) {
 
-					List<String> moduleList = Arrays.asList(modules);
-					pileForm = moduleList.contains("6");
+			List<String> moduleList = StrUtil.split(detectModule, ",");
+			moduleList.sort(Comparator.naturalOrder());
 
-					for (int i = 0; i < modules.length; i++) {
+			pileForm = moduleList.contains("6");
 
-						String module = modules[i];
+			for (int i = 0; i < moduleList.size(); i++) {
 
-						if (!"6".equalsIgnoreCase(module)) {
-							StationForm form = new StationForm();
-							form.setName(MODULE_MAP.get(module));
+				String module = moduleList.get(i);
 
-							List<StationFormData> formData = formDatas.stream()
-									.filter((d) -> module.equalsIgnoreCase(d.getDetectModule()))
-									.collect(Collectors.toList());
-							form.setData(formData);
-							forms.add(form);
+				if (!"6".equalsIgnoreCase(module)) {
+					StationForm form = new StationForm();
+					form.setName(MODULE_MAP.get(module));
+
+					List<StationFormData> formData = formDatas.stream()
+							.filter((d) -> module.equalsIgnoreCase(d.getDetectModule())).collect(Collectors.toList());
+					form.setData(formData);
+					forms.add(form);
+				}
+			}
+		}
+
+		OVERVIEW_MODULE_MAP.forEach((module, name) -> {
+			StationDanger danger = new StationDanger();
+			danger.setLocation(name);
+			danger.setMerge(true);
+			dangers.add(danger);
+
+			if (CollUtil.isNotEmpty(stationDangerList)) {
+				List<StationDanger> dList = stationDangerList.stream()
+						.filter((d) -> module.equalsIgnoreCase(d.getFormId())).collect(Collectors.toList());
+
+				Map<Long, StationDanger> dangerMap = new HashMap<Long, StationDanger>();
+				// 合并相同dangerId数据
+				if (CollUtil.isNotEmpty(dList)) {
+					dList.forEach((dan) -> {
+						Long dangerId = dan.getDangerId();
+						if (dangerId == null) {
+							dangerId = IdUtil.getSnowflakeNextId();
+						}
+						StationDanger stationDanger = dangerMap.get(dangerId);
+						if (stationDanger == null) {
+							stationDanger = dan;
+							dangerMap.put(dangerId, dan);
 						}
 
-						StationDanger danger = new StationDanger();
-						danger.setLocation(StrUtil.format("{}、{}", i + 1, MODULE_MAP.get(module)));
-						danger.setMerge(true);
-						dangers.add(danger);
-
-						if (CollUtil.isNotEmpty(stationDangerList)) {
-							List<StationDanger> dList = stationDangerList.stream()
-									.filter((d) -> module.equalsIgnoreCase(d.getFormId())).collect(Collectors.toList());
-
-							Map<Long, StationDanger> dangerMap = new HashMap<Long, StationDanger>();
-							// 合并相同dangerId数据
-							if (CollUtil.isNotEmpty(dList)) {
-								dList.forEach((dan) -> {
-									Long dangerId = dan.getDangerId();
-									if (dangerId == null) {
-										dangerId = IdUtil.getSnowflakeNextId();
-									}
-									StationDanger stationDanger = dangerMap.get(dangerId);
-									if (stationDanger == null) {
-										dangerMap.put(dangerId, dan);
-									}
-
-									String location = dan.getLocation();
-									if (StrUtil.isNotBlank(dan.getChargingPileName())) {
-										location = StrUtil.format("{}{}", dan.getChargingPileName(), location);
-									}
-									stationDanger.getLocations().add(location);
-								});
-							}
-
-							if (CollUtil.isNotEmpty(dangerMap)) {
-								dangers.addAll(new ArrayList<StationDanger>(dangerMap.values()));
-							}
+						String location = dan.getLocation();
+						if (StrUtil.isNotBlank(dan.getChargingPileName())) {
+							location = StrUtil.format("({}) {}", dan.getChargingPileName(), location);
 						}
+						stationDanger.getLocations().add(location);
+					});
+				}
+
+				if (CollUtil.isNotEmpty(dangerMap)) {
+					dangers.addAll(new ArrayList<StationDanger>(dangerMap.values()));
+				} else {
+					StationDanger noDanger = new StationDanger();
+					noDanger.setLocation("无");
+					noDanger.setDescription("/");
+					noDanger.setSuggestions("/");
+					dangers.add(noDanger);
+				}
+			} else {
+				StationDanger noDanger = new StationDanger();
+				noDanger.setLocation("无");
+				noDanger.setDescription("/");
+				noDanger.setSuggestions("/");
+				dangers.add(noDanger);
+			}
+		});
+
+		data.setForm(forms);
+		data.setDanger(dangers);
+
+		if (pileForm) {
+			data.setPileForm(buildPileForm(data, project, chargingPiles, formDatas, stationDangerList));
+		}
+		// 隐患图片
+		data.setDangerPic(buildDangerPic(stationDangerList));
+
+		// 代表照片
+		List<StationPeprePic> peprePictures = chargingPileService.getStationPeprePicture(ownerUnit.getId(),
+				ownerUnit.getRounds());
+		data.setPic(buildPeprePictures(peprePictures));
+
+		return data;
+	}
+
+	private List<StationPic> buildPeprePictures(List<StationPeprePic> pictures) {
+		List<StationPic> picture = new ArrayList<StationPic>();
+
+		Map<String, List<StationPic>> pictureMap = new HashMap<String, List<StationPic>>();
+
+		if (CollUtil.isNotEmpty(pictures)) {
+			int i = 0;
+
+			List<StationPic> tempList = new ArrayList<StationPic>();
+
+			for (StationPeprePic ppic : pictures) {
+				if (StrUtil.isNotBlank(ppic.getPicture())) {
+					List<String> pics = StrUtil.split(ppic.getPicture(), ",");
+					for (String pic : pics) {
+
+						if (i % 2 == 0) {
+							tempList = new ArrayList<StationPic>();
+							pictureMap.put(String.valueOf(i), tempList);
+						}
+
+						StationPic stationPic = new StationPic();
+						stationPic.setPic1(pic);
+						if (StrUtil.isNotBlank(ppic.getCode())) {
+							stationPic.setCode1(StrUtil.format("({})", ppic.getCode()));
+						}
+
+						tempList.add(stationPic);
+
+						i++;
 					}
 				}
 			}
-			data.setForm(forms);
-			data.setDanger(dangers);
+		}
 
-			unitInfo.setScoreDatas(scoreDatas);
+		if (CollUtil.isNotEmpty(pictureMap)) {
+			pictureMap.forEach((id, pics) -> {
 
-			if (pileForm) {
-				data.setPileForm(buildPileForm(data, project, chargingPiles, formDatas, stationDangerList));
+				if (CollUtil.isNotEmpty(pics)) {
+
+					StationPic pic = pics.get(0);
+
+					if (pics.size() >= 2) {
+						StationPic picture2 = pics.get(1);
+						pic.setPic2(picture2.getPic1());
+						pic.setCode2(picture2.getCode1());
+						pic.setDescription2(picture2.getDescription1());
+					}
+
+					picture.add(pic);
+				}
+			});
+		}
+
+		return picture;
+	}
+
+	private List<StationPic> buildDangerPic(List<StationDanger> stationDangerList) {
+		List<StationPic> dangerPic = new ArrayList<StationPic>();
+
+		Map<String, List<StationPic>> pictureMap = new HashMap<String, List<StationPic>>();
+
+		if (CollUtil.isNotEmpty(stationDangerList)) {
+			int i = 0;
+
+			List<StationPic> tempList = new ArrayList<StationPic>();
+
+			for (StationDanger danger : stationDangerList) {
+				if (StrUtil.isNotBlank(danger.getDangerPic())) {
+					List<String> pictures = StrUtil.split(danger.getDangerPic(), ",");
+					for (String pic : pictures) {
+
+						if (i % 2 == 0) {
+							tempList = new ArrayList<StationPic>();
+							pictureMap.put(String.valueOf(i), tempList);
+						}
+
+						StationPic picture = new StationPic();
+						picture.setPic1(pic);
+						if (StrUtil.isNotBlank(danger.getFirstCode())) {
+							picture.setCode1(StrUtil.format("({})", danger.getFirstCode()));
+						}
+
+						picture.setDescription1(danger.getDescription());
+
+						tempList.add(picture);
+
+						i++;
+					}
+				}
 			}
 		}
-		return data;
+
+		if (CollUtil.isNotEmpty(pictureMap)) {
+			pictureMap.forEach((id, pics) -> {
+
+				if (CollUtil.isNotEmpty(pics)) {
+
+					StationPic picture = pics.get(0);
+
+					if (pics.size() >= 2) {
+						StationPic picture2 = pics.get(1);
+						picture.setPic2(picture2.getPic1());
+						picture.setCode2(picture2.getCode1());
+						picture.setDescription2(picture2.getDescription1());
+					}
+
+					dangerPic.add(picture);
+				}
+			});
+		}
+
+		return dangerPic;
 	}
 
 	private StationPile buildPileForm(StationInitialReport data, Project project, List<ChargingPile> chargingPiles,
@@ -381,7 +526,7 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 						Long dangers = countChargingPileDangers(stationDangerList, chargingPile.getId(), d.getId());
 
 						map.put("pileName" + c, chargingPile.getCode());
-						map.put("result" + c, dangers > 0 ? "有风险" : "无风险");
+						map.put("result" + c, dangers > 0 ? "发现风险点" : "无风险");
 					}
 				} catch (Exception e) {
 				}

@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.report.dto.high;
 
+import java.util.Date;
 import java.util.List;
 
 import com.deepoove.poi.data.FilePictureRenderData;
@@ -90,6 +91,11 @@ public class HighDangerInfo {
 	 * 检测员ID
 	 */
 	private Long inspectorId;
+
+	/**
+	 * 检测日期
+	 */
+	private Date inspectorDate;
 
 	/**
 	 * 隐患等级

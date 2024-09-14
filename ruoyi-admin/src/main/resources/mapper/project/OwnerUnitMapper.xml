@@ -65,10 +65,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="mngQrcode"    column="mng_qrcode"    />
+        <result property="weather"    column="weather"    />
+        <result property="windSpeed"    column="wind_speed"    />
     </resultMap>
 
     <sql id="selectOwnerUnitVo">
-        select id, code, name, type, detect_id, detect_name, temperature, humidity, mng_qrcode, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, grid, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, fire_safety_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
+        select id, code, name, type, detect_id, detect_name, temperature, humidity, weather, wind_speed, mng_qrcode, project_id, project_name, area, district, street, community, hamlet, entrust, manager, gridman, grid, address, contact, phone, acreage, layers, nature, test_start_date, test_end_date, test_date, test_content, door_number, buildman, unit_type, incharge, venue_type, business_scope, safety_incharge, safety_incharge_phone, safety_manager, safety_manager_phone, high_risk_type, staffs, licence, fire_safety_unit, station_type, rounds, detect_module, operating, property_type, property_name, panorama_pic, station_pic, create_by, create_time, update_by, update_time from owner_unit
     </sql>
 
     <select id="selectOwnerUnitList" parameterType="OwnerUnit" resultMap="OwnerUnitResult">

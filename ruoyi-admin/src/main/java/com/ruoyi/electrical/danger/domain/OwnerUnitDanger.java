@@ -13,6 +13,7 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 隐患数据对象 owner_unit_danger
@@ -20,6 +21,7 @@ import lombok.ToString;
  * @author ruoyi
  * @date 2024-07-15
  */
+@Slf4j
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -262,7 +264,7 @@ public class OwnerUnitDanger extends BaseEntity {
 		} else if ("4".equalsIgnoreCase(this.projectType)) {
 			// 充电桩
 			if (StrUtil.isNotBlank(this.chargingPileName)) {
-				return StrUtil.format("{}{}", this.chargingPileName, this.location);
+				return StrUtil.format("({}) {}", this.chargingPileName, this.location);
 			}
 		}
 
@@ -348,6 +350,7 @@ public class OwnerUnitDanger extends BaseEntity {
 	public String getStatus() {
 		if ("B".equalsIgnoreCase(this.formType)) {
 			String result = getResult();
+			log.info(StrUtil.format("{}结果为{}", this.formCode, result));
 			if (IFormbDangerHandler.QUALIFIED.equals(result)) {
 				// 非隐患
 				return "9";

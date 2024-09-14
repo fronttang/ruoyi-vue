@@ -3,6 +3,7 @@ package com.ruoyi.electrical.project.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -194,6 +195,8 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 
 		List<OwnerUnitDanger> dangers = ownerUnitDangerService.selectOwnerUnitDangerList(dangerQuery);
 		if (CollUtil.isNotEmpty(dangers)) {
+			dangers = dangers.stream().filter((d) -> "2".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
+
 			dangers.forEach((danger) -> {
 
 				danger.setId(null);
@@ -203,8 +206,8 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 				ownerUnitDangerService.insertOwnerUnitDanger(danger);
 			});
 		}
-
 		steps.add("复制成功");
+		steps.add("删除\"完成\"隐患成功");
 		// 复制成功
 		redisCache.setCacheObject(CacheConstants.UNIT_ROUND_STEP + unitId, steps, 1, TimeUnit.DAYS);
 

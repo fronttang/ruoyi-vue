@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.dto;
 
+import java.util.Date;
 import java.util.List;
 
 import com.ruoyi.electrical.report.dto.high.HighDangerInfo;
@@ -126,6 +127,26 @@ public class DangerExportQueryDto {
 	 * 营业执照
 	 */
 	private String businessLicense;
+
+	/**
+	 * 门头照
+	 */
+	private String doorPic;
+
+	/**
+	 * 整改二维码
+	 */
+	private String mngQrcode;
+
+	/**
+	 * 检测员ID
+	 */
+	private Long inspectorId;
+
+	/**
+	 * 初测日期
+	 */
+	private Date initialDate;
 
 	/**
 	 * 隐患列表

@@ -168,6 +168,11 @@
           <dict-tag :options="dict.type.again_test_status" :value="scope.row.reviewStatus"/>
         </template>
       </el-table-column>
+      <el-table-column label="初检时间" align="center" prop="initialDate" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.initialDate, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="隐患数量" align="center" prop="dangers" width="100" />
       <el-table-column label="待整改数" align="center" prop="rectifications" width="100" />
       <el-table-column label="待复检数" align="center" prop="reexaminations" width="100" />

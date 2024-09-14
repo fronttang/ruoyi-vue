@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.ruoyi.electrical.project.domain.ChargingPile;
 import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
+import com.ruoyi.electrical.report.dto.station.StationPeprePic;
 
 /**
  * 充电桩Mapper接口
@@ -65,4 +66,6 @@ public interface ChargingPileMapper {
 	public Integer countChargingPileDangers(@Param("pileId") Long pileId, @Param("formDataId") Long formDataId);
 
 	public List<ChargingPileInfo> selectStationPileList(@Param("unitId") Long unitId);
+
+	public List<StationPeprePic> getStationPeprePicture(@Param("unitId") Long unitId, @Param("rounds") Long rounds);
 }

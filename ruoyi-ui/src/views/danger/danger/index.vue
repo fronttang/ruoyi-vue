@@ -12,7 +12,7 @@
       <el-form-item label="状态" prop="status" >
         <el-select v-model="queryParams.status" placeholder="请选择状态" filterable clearable>
           <el-option
-            v-for="dict in dict.type.again_test_status"
+            v-for="dict in dict.type.danger_status"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -84,7 +84,7 @@
           <image-preview :src="scope.row.detectPic" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="操作" fixed="right" align="center" width="250" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -92,18 +92,13 @@
             icon="el-icon-edit"
             @click="handleView(scope.row)"
           >查看</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-refresh-left"
-            @click="handleStatus(scope.row, '0')"
-          >重置待整改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-refresh-left"
-            @click="handleStatus(scope.row, '1')"
-          >重置待复检</el-button>
+          <el-dropdown size="mini" @command="(command) => handleStatus(scope.row, command)" v-if="scope.row.status != null && scope.row.status != '' && scope.row.status != '9'" >
+            <el-button size="mini" type="text" icon="el-icon-refresh-left">重置</el-button>
+            <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="0" icon="el-icon-edit" >重置待整改</el-dropdown-item>
+                <el-dropdown-item command="1" icon="el-icon-edit" >重置待复检</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -211,17 +206,20 @@
         <el-form-item label="辐射率" prop="radiation">
           <el-input v-model="formb.radiation" disabled />
         </el-form-item>
-        <el-form-item label="天气" prop="weather" >
+        <el-form-item label="天气" prop="weather" v-if="false" >
           <el-input v-model="formb.weather" disabled/>
         </el-form-item>
         <el-form-item label="测试距离（m)" prop="distance">
           <el-input v-model="formb.distance" disabled/>
         </el-form-item>
-        <el-form-item label="风速（m/s）" prop="windSpeed">
+        <el-form-item label="风速（m/s）" prop="windSpeed" v-if="false">
           <el-input v-model="formb.windSpeed" disabled/>
         </el-form-item>
         <el-form-item label="检测时间" prop="detectionTime">
           <el-input v-model="formb.detectionTime" disabled/>
+        </el-form-item>
+        <el-form-item label="检测位置" prop="location" >
+          <el-input v-model="formb.location" disabled/>
         </el-form-item>
         <el-form-item label="被测设备名称" prop="deviceName">
           <el-input v-model="formb.deviceName" disabled/>
@@ -237,6 +235,9 @@
         </el-form-item>
         <el-form-item label="额定电流（A)" prop="ratedCurrent">
           <el-input v-model="formb.ratedCurrent" disabled/>
+        </el-form-item>
+        <el-form-item label="判定结果" prop="result">
+          <el-input v-model="formb.result" disabled/>
         </el-form-item>
         <el-form-item label-width="0px">
         <el-card class="box-card" v-if="formb.threePhase != null">
@@ -374,6 +375,9 @@
         <el-form-item label="现场检测图" prop="inspectionPic">
           <image-preview :src="formb.inspectionPic" :width="50" :height="50"/>
         </el-form-item>
+        <el-form-item label="红外判定图" prop="infraredPic">
+          <image-preview :src="formb.infraredPic" :width="50" :height="50"/>
+        </el-form-item>
       </el-form>
     </el-dialog>
 
@@ -382,6 +386,12 @@
       <el-form ref="formb" :model="formb" label-width="120px">
         <el-form-item label="辐射率" prop="radiation">
           <el-input v-model="formb.radiation" disabled />
+        </el-form-item>
+        <el-form-item label="测试距离（m)" prop="distance">
+          <el-input v-model="formb.distance" disabled/>
+        </el-form-item>
+        <el-form-item label="检测时间" prop="detectionTime">
+          <el-input v-model="formb.detectionTime" disabled/>
         </el-form-item>
         <el-form-item label="检测位置" prop="location" >
           <el-input v-model="formb.location" disabled/>
@@ -404,11 +414,17 @@
         <el-form-item label="额定电流（A)" prop="ratedCurrent">
           <el-input v-model="formb.ratedCurrent" disabled/>
         </el-form-item>
+        <el-form-item label="判定结果" prop="result">
+          <el-input v-model="formb.result" disabled/>
+        </el-form-item>
         <el-form-item label="整体外观图" prop="overallPic">
           <image-preview :src="formb.overallPic" :width="50" :height="50"/>
         </el-form-item>
         <el-form-item label="现场检测图" prop="inspectionPic">
           <image-preview :src="formb.inspectionPic" :width="50" :height="50"/>
+        </el-form-item>
+        <el-form-item label="红外判定图" prop="infraredPic">
+          <image-preview :src="formb.infraredPic" :width="50" :height="50"/>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -497,6 +513,9 @@
     <!-- 隐患数据B5详情对话框 -->
     <el-dialog title="B5（开关、插座安装高度检测）" :visible.sync="openb5" width="500px" append-to-body>
       <el-form ref="formb" :model="formb" label-width="100px">
+        <el-form-item label="场所类型" prop="venueType">
+          <el-input v-model="formb.venueType" disabled/>
+        </el-form-item>
         <el-form-item label="被测设备名称" prop="deviceName">
           <el-input v-model="formb.deviceName" disabled/>
         </el-form-item>
@@ -885,7 +904,7 @@ import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 
 export default {
   name: "OwnerUnit",
-  dicts: ['high_risk_type', 'again_test_status', 'hazard_level', 'hazard_level_high', 'hazard_level_charging_station'],
+  dicts: ['high_risk_type', 'again_test_status', 'hazard_level', 'hazard_level_high', 'hazard_level_charging_station', 'danger_status'],
   data() {
     return {
       // 遮罩层
@@ -1098,11 +1117,11 @@ export default {
       });
     },
     dangerStatusFormat(row){
-      //if(row.formType === 'B'){
-      //  return "/";
-      //} else{
-        return this.selectDictLabel(this.dict.type.again_test_status, row.status);
-      //}
+      if(row.status === '9'){
+        return "非隐患";
+      } else{
+        return this.selectDictLabel(this.dict.type.danger_status, row.status);
+      }
     },
     handleView(row){
       this.reset();

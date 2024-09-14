@@ -51,4 +51,14 @@ public class StationInitialReport {
 	 */
 	private StationPile pileForm = new StationPile();
 
+	/**
+	 * 隐患图片
+	 */
+	private List<StationPic> dangerPic = new ArrayList<StationPic>();
+
+	/**
+	 * 代表照片
+	 */
+	private List<StationPic> pic = new ArrayList<StationPic>();
+
 }

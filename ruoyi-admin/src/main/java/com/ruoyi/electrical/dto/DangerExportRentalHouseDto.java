@@ -82,15 +82,39 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 	private String openStatus = "正常";
 
 	/**
+	 * 门头照
+	 */
+	@Excel(name = "整体照片", orderNum = "12", type = 2, imageType = 2, needMerge = true)
+	private byte[] doorPicture = null;
+
+	/**
+	 * 检测人员
+	 */
+	@Excel(name = "检测人员", orderNum = "13", needMerge = true)
+	private String inspector;
+
+	/**
+	 * 检测日期
+	 */
+	@Excel(name = "检测日期", orderNum = "14", needMerge = true)
+	private String inspectorDate;
+
+	/**
+	 * 整改二维码
+	 */
+	@Excel(name = "整改二维码", orderNum = "15", type = 2, imageType = 2, needMerge = true)
+	private byte[] mngQrcodePicture = null;
+
+	/**
 	 * 总分
 	 */
-	@Excel(name = "总得分", orderNum = "12", needMerge = true)
+	@Excel(name = "总得分", orderNum = "16", needMerge = true)
 	private String totalScore;
 
 	/**
 	 * 隐患列表
 	 */
-	@ExcelCollection(name = "扣分标准", orderNum = "13")
+	@ExcelCollection(name = "扣分标准", orderNum = "17")
 	private List<OwnerUnitDangerFormExportDto> forms;
 
 	@Data
@@ -99,13 +123,13 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 		/**
 		 * 扣分标准
 		 */
-		@Excel(name = "扣分标准", orderNum = "11", needMerge = true)
+		@Excel(name = "扣分标准", orderNum = "17", needMerge = true)
 		private String maxScore;
 
 		/**
 		 * 扣分项
 		 */
-		@ExcelCollection(name = "扣分值", orderNum = "12")
+		@ExcelCollection(name = "扣分值", orderNum = "17")
 		private List<OwnerUnitDangerFormDataExportDto> formDatas;
 
 	}
@@ -116,13 +140,13 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 		/**
 		 * 扣分值
 		 */
-		@Excel(name = "扣分值", orderNum = "11", needMerge = true)
+		@Excel(name = "扣分值", orderNum = "18", needMerge = true)
 		private String score;
 
 		/**
 		 * 隐患
 		 */
-		@ExcelCollection(name = "隐患", orderNum = "12")
+		@ExcelCollection(name = "隐患", orderNum = "18")
 		private List<OwnerUnitDangerInfoExportDto> dangers;
 
 	}
@@ -133,62 +157,56 @@ public class DangerExportRentalHouseDto implements IDangerExportDto {
 		/**
 		 * 隐患描述
 		 */
-		@Excel(name = "隐患描述", orderNum = "12")
+		@Excel(name = "隐患描述", orderNum = "19")
 		private String description;
 
 		/**
 		 * 隐患等级
 		 */
-		@Excel(name = "隐患等级", orderNum = "13")
+		@Excel(name = "隐患等级", orderNum = "20")
 		private String level;
 
 		/**
 		 * 备注
 		 */
-		@Excel(name = "备注", orderNum = "14")
+		@Excel(name = "备注", orderNum = "21")
 		private String remark;
 
 		/**
 		 * 整改建议
 		 */
-		@Excel(name = "整改建议", orderNum = "15")
+		@Excel(name = "整改建议", orderNum = "22")
 		private String suggestions;
 
 		/**
 		 * 隐患图片
 		 */
-		@Excel(name = "隐患图片1", orderNum = "16", type = 2, imageType = 2)
+		@Excel(name = "隐患图片1", orderNum = "23", type = 2, imageType = 2)
 		private byte[] dangerPic1 = null;
 
 		/**
 		 * 隐患图片
 		 */
-		@Excel(name = "隐患图片2", orderNum = "17", type = 2, imageType = 2)
+		@Excel(name = "隐患图片2", orderNum = "24", type = 2, imageType = 2)
 		private byte[] dangerPic2 = null;
 
 		/**
 		 * 整改情况
 		 */
-		@Excel(name = "整改情况", orderNum = "18")
+		@Excel(name = "整改情况", orderNum = "25")
 		private String rectificationStatus;
 
 		/**
 		 * 整改图
 		 */
-		@Excel(name = "整改照片1", orderNum = "19", type = 2, imageType = 2)
+		@Excel(name = "整改照片1", orderNum = "26", type = 2, imageType = 2)
 		private byte[] rectificationPic1 = null;
 
 		/**
 		 * 整改图
 		 */
-		@Excel(name = "整改照片2", orderNum = "20", type = 2, imageType = 2)
+		@Excel(name = "整改照片2", orderNum = "27", type = 2, imageType = 2)
 		private byte[] rectificationPic2 = null;
-
-		/**
-		 * 整体外观图
-		 */
-		@Excel(name = "整体照片", orderNum = "21", type = 2, imageType = 2)
-		private byte[] overallPic1 = null;
 
 	}
 }

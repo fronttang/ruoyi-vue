@@ -31,18 +31,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="isTestReason"    column="is_test_reason"    />
         <result property="initialStatus"    column="initial_status"    />
         <result property="businessLicense"    column="business_license"    />
+        <result property="doorPic"    column="door_pic"    />
+        <result property="mngQrcode"    column="mng_qrcode"    />
+        <result property="inspectorId"    column="inspector_id"    />
+        <result property="initialDate"    column="initial_date"    />
     </resultMap>
     
     <select id="exportByQuery" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="OwnerUnitResult">
     	select t.* from (select o.id, o.code, o.name, o.grid, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
     	o.high_risk_type, o.safety_incharge, o.safety_incharge_phone, o.safety_manager, o.safety_manager_phone,
-    	r1.is_test_reason,
+    	r1.is_test_reason, o.mng_qrcode,r1.inspector_id,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
 		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date,
-		JSON_UNQUOTE(uc.config->'$.businessLicense') as business_license
+		JSON_UNQUOTE(uc.config->'$.businessLicense') as business_license,
+		JSON_UNQUOTE(uc.config->'$.doorPic') as door_pic
 		from owner_unit o 
 		left join owner_unit_config uc on uc.unit_id = o.id
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
@@ -73,12 +78,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	select o.id, o.code, o.name, o.grid, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
     	o.high_risk_type, o.safety_incharge, o.safety_incharge_phone, o.safety_manager, o.safety_manager_phone,
-    	r1.is_test_reason,
+    	r1.is_test_reason, o.mng_qrcode,r1.inspector_id,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
 		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date,
-		JSON_UNQUOTE(uc.config->'$.businessLicense') as business_license
+		JSON_UNQUOTE(uc.config->'$.businessLicense') as business_license,
+		JSON_UNQUOTE(uc.config->'$.doorPic') as door_pic
 		from owner_unit o 
 		left join owner_unit_config uc on uc.unit_id = o.id
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'

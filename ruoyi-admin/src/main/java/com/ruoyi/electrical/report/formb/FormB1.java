@@ -54,6 +54,11 @@ public class FormB1 extends BaseFormB {
 	private String deviceName;
 
 	/**
+	 * 检测位置
+	 */
+	private String location;
+
+	/**
 	 * 设备编号
 	 */
 	private String deviceCode;

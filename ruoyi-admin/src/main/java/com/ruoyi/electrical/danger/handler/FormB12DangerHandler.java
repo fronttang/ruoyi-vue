@@ -6,6 +6,7 @@ import com.ruoyi.electrical.report.formb.FormB12;
 
 import cn.hutool.core.util.StrUtil;
 
+@FormbDangerHandler("B12")
 public class FormB12DangerHandler implements IFormbDangerHandler {
 
 	private static String OTHER_1 = "未安装";

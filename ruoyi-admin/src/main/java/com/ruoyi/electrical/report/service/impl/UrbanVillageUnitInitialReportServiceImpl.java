@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Struct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +64,7 @@ import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.dto.UrbanVillageDanger;
 import com.ruoyi.electrical.report.formb.FormB14;
+import com.ruoyi.electrical.report.formb.FormB6;
 import com.ruoyi.electrical.report.mapper.OwnerUnitReportMapper;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
@@ -267,16 +267,16 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		}, Function.identity()));
 
 		formbDict.forEach((dict) -> {
-			Class<?> formbClass = frombMap.get(dict.getDictValue());
+			// Class<?> formbClass = frombMap.get(dict.getDictValue());
 
 			try {
-				formb.put(dict.getDictValue(), Arrays.asList(formbClass.newInstance()));
-			} catch (InstantiationException | IllegalAccessException e) {
+				formb.put(dict.getDictValue(), Arrays.asList());
+			} catch (Exception e) {
 				log.error("", e);
 			}
 		});
-		formb.put("B14A", Arrays.asList(new FormB14()));
-		formb.put("B14B", Arrays.asList(new FormB14()));
+		formb.put("B14A", Arrays.asList());
+		formb.put("B14B", Arrays.asList());
 
 		List<OwnerUnitDanger> dangers = new ArrayList<OwnerUnitDanger>();
 		// 查所有formb的隐患数据
@@ -302,6 +302,22 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 									String detectDate = DateUtil.format(dang.getInitialTime(),
 											DatePattern.CHINESE_DATE_FORMATTER);
 									BeanUtil.setFieldValue(formbBean, "detectDate", detectDate);
+
+									if ("B1".equalsIgnoreCase(dang.getFormCode())
+											|| "BB1".equalsIgnoreCase(dang.getFormCode())) {
+										BeanUtil.setFieldValue(formbBean, "weather", ownerUnit.getWeather());
+										BeanUtil.setFieldValue(formbBean, "windSpeed", ownerUnit.getWindSpeed());
+									}
+
+									if ("B6".equalsIgnoreCase(dang.getFormCode())) {
+										FormB6 formb6 = (FormB6) formbBean;
+										if (">1000".equalsIgnoreCase(formb6.getAction())
+												|| "不动作".equalsIgnoreCase(formb6.getAction())) {
+											BeanUtil.setFieldValue(formbBean, "dialValue0", ">1000");
+											BeanUtil.setFieldValue(formbBean, "dialValue180", ">1000");
+										}
+									}
+
 									return formbBean;
 								}
 							} catch (Exception e) {
@@ -523,9 +539,6 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 		List<DetectFormData> formDatas = new ArrayList<DetectFormData>();
 
-		IntuitiveDetectData dataQuery = new IntuitiveDetectData();
-		dataQuery.setTemplateId(project.getTemplateId());
-
 		List<IntuitiveDetectData> detectData = intuitiveDetectDataService
 				.selectReportIntuitiveDetectDataList(project.getTemplateId(), ownerUnit.getId());
 		if (detectData != null) {
@@ -543,7 +556,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				}
 				formData.setLevel(data.getLevel());
 				formData.setDecide(data.getDanger() != null && data.getDanger() > 0 ? "不符合" : "符合");
-				formData.setResult("√");
+				formData.setResult(data.getDanger() != null && data.getDanger() > 0 ? "Ⅹ" : "√");
 
 				formDatas.add(formData);
 			});

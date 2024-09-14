@@ -161,7 +161,7 @@ public class OwnerUnitController extends BaseController {
 
 		String status = redisCache.getCacheObject(CacheConstants.UNIT_ROUND_STEP_STATUS + unitId);
 
-		if (CollUtil.isNotEmpty(steps) && steps.size() < 4 && !"error".equalsIgnoreCase(status)) {
+		if (CollUtil.isNotEmpty(steps) && steps.size() < 5 && !"error".equalsIgnoreCase(status)) {
 			return AjaxResult.error("还有推进中的轮次，请稍后重试。");
 		}
 		boolean success = ownerUnitService.startRounds(unitId);

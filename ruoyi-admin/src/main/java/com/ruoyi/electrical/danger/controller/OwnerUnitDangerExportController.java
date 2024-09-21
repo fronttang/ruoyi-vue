@@ -87,7 +87,7 @@ public class OwnerUnitDangerExportController extends BaseController {
 			return saveFile("高风险隐患台账", workbook);
 		} else if ("4".equalsIgnoreCase(projectType)) {
 			// 充电站
-			workbook = exportStationService.exportDanger(data);
+			workbook = exportStationService.exportDanger(data, false);
 			setCellBorder(workbook);
 			return saveFile("充电站隐患台账", workbook);
 		}
@@ -110,6 +110,26 @@ public class OwnerUnitDangerExportController extends BaseController {
 			setCellBorder(workbook);
 			// downLoadExcel("城中村出租屋用电安全隐患台账明细表", response, workbook);
 			return saveFile("城中村出租屋用电安全复检隐患台账明细表", workbook);
+		}
+
+		return AjaxResult.error();
+
+	}
+
+	@RequestMapping("/station/rounds/export")
+	public AjaxResult stationRoundsExport(OwnerUnitDangerGroupDetailDto data, HttpServletResponse response) {
+
+		Project project = projectService.selectProjectById(data.getProjectId());
+		if (project == null) {
+			return AjaxResult.error();
+		}
+
+		String projectType = project.getType();
+		if ("4".equalsIgnoreCase(projectType)) {
+			// 充电站
+			Workbook workbook = exportStationService.exportDanger(data, true);
+			setCellBorder(workbook);
+			return saveFile("充电站总隐患台账", workbook);
 		}
 
 		return AjaxResult.error();

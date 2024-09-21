@@ -77,6 +77,9 @@ public interface IntuitiveDetectDataMapper {
 	public int deleteIntuitiveDetectDataByTemplateId(@Param("templateId") Long templateId);
 
 	public List<StationFormData> selectStationDetectData(@Param("templateId") Long templateId,
+			@Param("unitId") Long unitId, @Param("rounds") Long rounds);
+
+	public List<StationFormData> selectStationDetectDataAllRounds(@Param("templateId") Long templateId,
 			@Param("unitId") Long unitId);
 
 	public List<IntuitiveDetectData> selectReportIntuitiveDetectDataList(@Param("templateId") Long templateId,

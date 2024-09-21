@@ -241,12 +241,13 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		boolean pileForm = false;
 
 		List<StationFormData> formDatas = detectDataMapper.selectStationDetectData(project.getTemplateId(),
-				ownerUnit.getId());
+				ownerUnit.getId(), ownerUnit.getRounds());
 
 		List<StationDanger> stationDangerList = ownerUnitDangerMapper.stationReportDangerList(ownerUnit.getId());
 
 		if (CollUtil.isNotEmpty(formDatas)) {
 			scoreDatas.addAll(formDatas.stream().filter((d) -> d.getDangers() > 0).collect(Collectors.toList()));
+			unitInfo.setDangers(stationDangerList);
 			unitInfo.setScoreDatas(scoreDatas);
 		}
 

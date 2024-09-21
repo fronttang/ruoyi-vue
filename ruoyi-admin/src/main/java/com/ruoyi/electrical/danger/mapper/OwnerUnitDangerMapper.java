@@ -34,6 +34,14 @@ public interface OwnerUnitDangerMapper {
 	 */
 	public List<OwnerUnitDanger> ownerUnitDangerList(OwnerUnitDanger ownerUnitDanger);
 
+	/**
+	 * 所有轮次隐患数据
+	 * 
+	 * @param ownerUnitDanger
+	 * @return
+	 */
+	public List<OwnerUnitDanger> ownerUnitDangerListAllRounds(OwnerUnitDanger ownerUnitDanger);
+
 	public List<DictVO> selecOwnerUnitBuildingDict(@Param("unitId") Long unitId);
 
 	/**

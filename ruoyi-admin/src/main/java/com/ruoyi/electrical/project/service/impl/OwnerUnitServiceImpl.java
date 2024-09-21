@@ -195,7 +195,7 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 
 		List<OwnerUnitDanger> dangers = ownerUnitDangerService.selectOwnerUnitDangerList(dangerQuery);
 		if (CollUtil.isNotEmpty(dangers)) {
-			dangers = dangers.stream().filter((d) -> "2".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
+			dangers = dangers.stream().filter((d) -> !"2".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
 
 			dangers.forEach((danger) -> {
 

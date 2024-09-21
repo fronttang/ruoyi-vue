@@ -139,6 +139,15 @@
             @click="handleExportStationDanger"
           >导出隐患台账</el-button>
         </el-col>
+        <el-col :span="1.5" v-if="this.projectType == '4'">
+          <el-button
+            type="warning"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExportRoundsStationDanger"
+          >导出总隐患台账</el-button>
+        </el-col>
         <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
       </el-row>
 
@@ -258,8 +267,7 @@
   }
 </style>
 <script>
-import { listUnitDanger, unitPictures, dangerExport, dangerReivewExport} from "@/api/danger/danger";
-import { detectUnitDict } from "@/api/projectrole/DetectUnit";
+import { listUnitDanger, unitPictures, dangerExport, dangerReivewExport, stationRoundsDangerExport} from "@/api/danger/danger";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
@@ -493,6 +501,22 @@ export default {
       //this.download1('/owner/unit/danger/export', {
       //  ...this.queryParams
       //}, `充电站隐患台账.xlsx`)
+    },
+    handleExportRoundsStationDanger(row){
+      this.queryParams.ids = this.ids;
+      this.downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+      stationRoundsDangerExport(this.queryParams).then(response => {
+        let a = document.createElement("a");
+        a.href = process.env.VUE_APP_BASE_API + response.data;
+        a.download = "充电站总隐患台账.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        this.downloadLoadingInstance.close();
+      }).catch((r) => {
+        this.$modal.msgError('生成文件出现错误，请联系管理员！')
+        this.downloadLoadingInstance.close();
+      });
     },
     downloadDangerExport(data, fileName){
       this.downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })

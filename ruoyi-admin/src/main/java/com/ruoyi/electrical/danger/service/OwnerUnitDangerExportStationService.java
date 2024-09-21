@@ -79,16 +79,20 @@ public class OwnerUnitDangerExportStationService {
 	private final Map<String, String> LEVEL_MAP = new HashMap<String, String>();
 	private final Map<String, String> DETECT_MODULE = new HashMap<String, String>();
 
-	public Workbook exportDanger(OwnerUnitDangerGroupDetailDto data) {
+	public Workbook exportDanger(OwnerUnitDangerGroupDetailDto data, boolean isAllRounds) {
 
 		List<DangerExportStationQueryDto> exportData = new ArrayList<DangerExportStationQueryDto>();
 
 		if (data.getIds() != null && data.getIds().length > 0) {
-			exportData.addAll(dangerExportService.exportStationByUnitId(data.getIds()));
+			exportData.addAll(dangerExportService.exportStationByUnitId(data.getIds(), isAllRounds));
 		} else {
-			exportData.addAll(dangerExportService.exportStationByQuery(data));
+			exportData.addAll(dangerExportService.exportStationByQuery(data, isAllRounds));
 		}
 
+		return exportDanger(exportData, isAllRounds);
+	}
+
+	private Workbook exportDanger(List<DangerExportStationQueryDto> exportData, boolean isAllRounds) {
 		List<SysDictData> levels = dictTypeService.selectDictDataByType("hazard_level_charging_station");
 		if (CollUtil.isNotEmpty(levels)) {
 			for (SysDictData level : levels) {
@@ -102,7 +106,7 @@ public class OwnerUnitDangerExportStationService {
 			}
 		}
 
-		List<DangerExportStationDto> exportDatas = buildExportStationDto(exportData);
+		List<DangerExportStationDto> exportDatas = buildExportStationDto(exportData, isAllRounds);
 
 		LinkedList<DangerExportStationDto> exportDataList = new LinkedList<DangerExportStationDto>(exportDatas);
 
@@ -282,7 +286,8 @@ public class OwnerUnitDangerExportStationService {
 		return style;
 	}
 
-	private List<DangerExportStationDto> buildExportStationDto(List<DangerExportStationQueryDto> exportData) {
+	private List<DangerExportStationDto> buildExportStationDto(List<DangerExportStationQueryDto> exportData,
+			boolean isAllRounds) {
 
 		Long index = 1L;
 		List<DangerExportStationDto> result = new ArrayList<DangerExportStationDto>();
@@ -299,16 +304,21 @@ public class OwnerUnitDangerExportStationService {
 
 			Project project = projectService.selectProjectById(data.getProjectId());
 			if (project != null) {
-
-				List<StationFormData> formDatas = detectDataMapper.selectStationDetectData(project.getTemplateId(),
-						data.getId());
+				List<StationFormData> formDatas = new ArrayList<StationFormData>();
+				if (isAllRounds) {
+					formDatas = detectDataMapper.selectStationDetectData(project.getTemplateId(), data.getId(),
+							data.getRounds());
+				} else {
+					formDatas = detectDataMapper.selectStationDetectDataAllRounds(project.getTemplateId(),
+							data.getId());
+				}
 
 				if (formDatas != null) {
 
 					formDatas = formDatas.stream().filter((d) -> d.getDangers() > 0).collect(Collectors.toList());
 					ComputeStationScoreService stationScoreService = new ComputeStationScoreService();
 					BigDecimal compute = stationScoreService.compute(data.getDetectModule(), data.getStationType(),
-							formDatas);
+							formDatas, dangers);
 					compute = compute.setScale(2, RoundingMode.HALF_UP);
 
 					export.setScore(compute.toPlainString());

@@ -266,6 +266,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	d.parent_id, d.first_code, d.first_content, d.secondary_code, d.secondary_content,
     	 d.weights, d.weights_c_es, d.weights_c_nes, d.weights_d_es, d.weights_d_nes, d.attribution, 
     	 d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time ,
+    	 (select count(1) from owner_unit_danger ud where ud.unit_id=#{unitId} and ud.form_data_id = d.id and ud.rounds = #{rounds} ) as dangers
+    	 from intuitive_detect_data d where d.template_id = #{templateId} 
+    	 order by d.weights asc
+    </select>
+    
+    <select id="selectStationDetectDataAllRounds" resultMap="StationFormDataResult">
+    	select d.id, d.template_id, d.detect_title, d.type, d.unit_type, d.module_type, d.detect_module, 
+    	d.parent_id, d.first_code, d.first_content, d.secondary_code, d.secondary_content,
+    	 d.weights, d.weights_c_es, d.weights_c_nes, d.weights_d_es, d.weights_d_nes, d.attribution, 
+    	 d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time ,
     	 (select count(1) from owner_unit_danger ud where ud.unit_id=#{unitId} and ud.form_data_id = d.id) as dangers
     	 from intuitive_detect_data d where d.template_id = #{templateId} 
     	 order by d.weights asc

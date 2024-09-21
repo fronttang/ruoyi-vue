@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.danger.service;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
@@ -533,11 +535,15 @@ public class OwnerUnitDangerExportHighService {
 					String compressedFile = StrUtil.subBefore(filePath, ".", true) + "_compressed."
 							+ FileUtil.getSuffix(filePath);
 
-					if (FileUtil.exist(compressedFile)) {
-						return FileUtil.readBytes(compressedFile);
-					}
+					log.info("compressed:{}", compressedFile);
+					log.info("pic:{}", pic);
 
-					return FileUtil.readBytes(pic);
+					if (FileUtil.exist(compressedFile)) {
+						return FileUtils.readFileToByteArray(new File(compressedFile));
+						// return FileUtil.readBytes(compressedFile);
+					}
+					return FileUtils.readFileToByteArray(new File(filePath));
+					// return FileUtil.readBytes(filePath);
 				}
 			}
 			// return PicUtils.compressPicForScale(PicUtils.readFileByte(pic), 100);
@@ -546,5 +552,4 @@ public class OwnerUnitDangerExportHighService {
 		}
 		return null;
 	}
-
 }

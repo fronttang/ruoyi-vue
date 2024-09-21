@@ -20,7 +20,7 @@ public class StationFormData {
 	/**
 	 * 一级编号内容
 	 */
-	private Object firstContent;
+	private String firstContent;
 
 	/**
 	 * 检测板块

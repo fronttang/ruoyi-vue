@@ -2,10 +2,9 @@ package com.ruoyi.electrical.report.dto.station;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
 
 import com.deepoove.poi.data.FilePictureRenderData;
 import com.deepoove.poi.data.TextRenderData;
@@ -15,9 +14,10 @@ import com.deepoove.poi.xwpf.WidthScalePattern;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.service.ComputeStationScoreService;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
@@ -245,10 +245,17 @@ public class StationOwnerUnitInfo {
 	 */
 	private List<StationFormData> scoreDatas;
 
+	/**
+	 * 分数信息
+	 */
+	private List<StationDanger> dangers;
+
 	public Double getScore() {
 
 		ComputeStationScoreService compute = new ComputeStationScoreService();
-		BigDecimal result = compute.compute(this.detectModule, this.stationType, scoreDatas);
+
+		List<OwnerUnitDanger> dangers = BeanUtil.copyToList(this.dangers, OwnerUnitDanger.class);
+		BigDecimal result = compute.compute(this.detectModule, this.stationType, scoreDatas, dangers);
 
 		result = result.setScale(2, RoundingMode.HALF_UP);
 		return result.doubleValue();

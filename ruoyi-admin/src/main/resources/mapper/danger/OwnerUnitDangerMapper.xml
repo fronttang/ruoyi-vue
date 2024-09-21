@@ -122,6 +122,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
+    <select id="ownerUnitDangerListAllRounds" parameterType="OwnerUnitDanger" resultMap="OwnerUnitDangerResult">
+        <include refid="selectOwnerUnitDangerVo"/>
+        <where>  
+            <if test="location != null  and location != ''"> 
+            and (d.location like concat('%', #{location}, '%') 
+            or u.name like concat('%', #{location}, '%')
+            or a.name like concat('%', #{location}, '%')
+            or b.name like concat('%', #{location}, '%')
+            )
+            </if>
+            <choose>
+				<when test="rounds != null and rounds != ''">
+					and d.rounds = #{rounds} 
+				</when>
+			</choose>
+            <if test="status != null  and status != ''"> and d.status = #{status}</if>
+            <if test="projectId != null  and projectId != ''"> and u.project_id = #{projectId}</if>
+            <if test="level != null  and level != ''"> and d.level = #{level}</if>
+            <if test="buildingId != null  and buildingId != ''"> and d.building_id = #{buildingId}</if>
+            <if test="unitId != null  and unitId != ''"> and d.unit_id = #{unitId}</if>
+            <if test="level != null  and level != ''"> and d.level = #{level}</if>
+            <if test="initialTime != null"> and date(d.initial_time) = #{initialTime}</if>
+            <if test="formId != null"> and d.form_id = #{formId}</if>
+        </where>
+    </select>
+    
     <select id="ownerUnitDangerById" parameterType="Long" resultMap="OwnerUnitDangerResult">
         <include refid="selectOwnerUnitDangerVo"/>
         where d.id = #{id}

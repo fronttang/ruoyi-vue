@@ -78,6 +78,14 @@ export function dangerExport(query){
   })
 }
 
+export function stationRoundsDangerExport(query){
+  return request({
+    url: '/owner/unit/danger/station/rounds/export',
+    method: 'get',
+    params: query
+  })
+}
+
 
 export function dangerReivewExport(query){
   return request({

@@ -79,28 +79,35 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 	}
 
 	@Override
-	public List<DangerExportStationQueryDto> exportStationByQuery(OwnerUnitDangerGroupDetailDto data) {
+	public List<DangerExportStationQueryDto> exportStationByQuery(OwnerUnitDangerGroupDetailDto data,
+			boolean allRounds) {
 		List<DangerExportStationQueryDto> exportData = dangerExportMapper.exportStationByQuery(data);
 		if (CollUtil.isNotEmpty(exportData)) {
 
 			exportData.forEach((d) -> {
 				OwnerUnitDanger query = new OwnerUnitDanger();
 				query.setUnitId(d.getId());
-				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerList(query));
+				if (!allRounds) {
+					query.setRounds(d.getRounds());
+				}
+				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerListAllRounds(query));
 			});
 		}
 		return exportData;
 	}
 
 	@Override
-	public List<DangerExportStationQueryDto> exportStationByUnitId(Long[] unitIds) {
+	public List<DangerExportStationQueryDto> exportStationByUnitId(Long[] unitIds, boolean allRounds) {
 		List<DangerExportStationQueryDto> exportData = dangerExportMapper.exportStationByUnitId(unitIds);
 		if (CollUtil.isNotEmpty(exportData)) {
 
 			exportData.forEach((d) -> {
 				OwnerUnitDanger query = new OwnerUnitDanger();
 				query.setUnitId(d.getId());
-				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerList(query));
+				if (!allRounds) {
+					query.setRounds(d.getRounds());
+				}
+				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerListAllRounds(query));
 			});
 		}
 		return exportData;

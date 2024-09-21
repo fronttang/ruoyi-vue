@@ -17,8 +17,8 @@ public interface IOwnerUnitDangerExportService {
 
 	List<DangerExportUrbanVillageQueryDto> exportUrbanVillageByUnitId(Long[] unitIds);
 
-	List<DangerExportStationQueryDto> exportStationByQuery(OwnerUnitDangerGroupDetailDto data);
+	List<DangerExportStationQueryDto> exportStationByQuery(OwnerUnitDangerGroupDetailDto data, boolean allRounds);
 
-	List<DangerExportStationQueryDto> exportStationByUnitId(Long[] unitIds);
+	List<DangerExportStationQueryDto> exportStationByUnitId(Long[] unitIds, boolean allRounds);
 
 }

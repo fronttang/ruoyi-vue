@@ -195,6 +195,11 @@ public class DangerExportStationQueryDto {
 	private Long projectId;
 
 	/**
+	 * 轮次
+	 */
+	private Long rounds;
+
+	/**
 	 * 隐患列表
 	 */
 	private List<OwnerUnitDanger> dangers = new ArrayList<OwnerUnitDanger>();

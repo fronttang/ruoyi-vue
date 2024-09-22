@@ -73,4 +73,10 @@ public class FormB6 extends BaseFormB {
 	@ApiModelProperty("现场检测图")
 	private String inspectionPic;
 
+	/**
+	 * 检测位置
+	 */
+	@ApiModelProperty("检测位置")
+	private String location;
+
 }

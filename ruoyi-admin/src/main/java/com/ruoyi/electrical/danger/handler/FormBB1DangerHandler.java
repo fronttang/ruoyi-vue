@@ -113,4 +113,21 @@ public class FormBB1DangerHandler implements IFormbDangerHandler {
 		return null;
 	}
 
+	@Override
+	public String getLocation(OwnerUnitDanger vo) {
+
+		String location = null;
+		FormBB1 formb = getFormb(vo);
+		if (formb != null) {
+
+			String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+			String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+			String deviceName = StrUtil.isNotBlank(formb.getDeviceName()) ? formb.getDeviceName() : "";
+
+			location = StrUtil.format("{}{}{}", buildingName, unitAreaName, deviceName);
+		}
+
+		return location;
+	}
+
 }

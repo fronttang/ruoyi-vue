@@ -148,4 +148,14 @@ public class FormB8DangerHandler implements IFormbDangerHandler {
 
 	}
 
+	@Override
+	public String getLocation(OwnerUnitDanger vo) {
+
+		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+
+		return StrUtil.format("{}{}", buildingName, unitAreaName);
+
+	}
+
 }

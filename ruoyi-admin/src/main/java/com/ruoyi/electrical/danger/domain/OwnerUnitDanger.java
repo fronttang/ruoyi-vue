@@ -242,6 +242,32 @@ public class OwnerUnitDanger extends BaseEntity {
 	}
 
 	/**
+	 * 报告位置
+	 * 
+	 * @return
+	 */
+	public String getReportLocation1() {
+
+		// ProjectType type = enumutil
+		// 城中村/工业园
+		if ("1".equalsIgnoreCase(this.projectType) || "2".equalsIgnoreCase(this.projectType)) {
+
+			if ("B".equalsIgnoreCase(this.formType)) {
+				if (StrUtil.isNotBlank(this.formCode)) {
+					IFormbDangerHandler formbDangerHander = FormbDangerHandlerFactory
+							.getFormbDangerHander(this.formCode);
+					if (formbDangerHander != null) {
+						return formbDangerHander.getLocation(this);
+					}
+				}
+			}
+		}
+		String unitAreaName = StrUtil.isNotBlank(this.areaName) ? this.areaName : "";
+		String buildingName = StrUtil.isNotBlank(this.buildingName) ? this.buildingName : "";
+		return StrUtil.format("{}{}{}", buildingName, unitAreaName, this.location);
+	}
+
+	/**
 	 * 列表及详情位置
 	 * 
 	 * @return

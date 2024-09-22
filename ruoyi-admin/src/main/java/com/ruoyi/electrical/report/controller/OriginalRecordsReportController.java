@@ -63,6 +63,7 @@ import com.ruoyi.electrical.report.dto.OriginalRecords;
 import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.formb.FormB14;
+import com.ruoyi.electrical.report.formb.FormB6;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
 import com.ruoyi.electrical.role.service.IDetectUnitService;
@@ -350,6 +351,18 @@ public class OriginalRecordsReportController extends BaseController {
 											|| "BB1".equalsIgnoreCase(dang.getFormCode())) {
 										BeanUtil.setFieldValue(formbBean, "weather", ownerUnit.getWeather());
 										BeanUtil.setFieldValue(formbBean, "windSpeed", ownerUnit.getWindSpeed());
+										BeanUtil.setFieldValue(formbBean, "deviceName", dang.getReportLocation1());
+									} else {
+										BeanUtil.setFieldValue(formbBean, "location", dang.getReportLocation1());
+									}
+
+									if ("B6".equalsIgnoreCase(dang.getFormCode())) {
+										FormB6 formb6 = (FormB6) formbBean;
+										if (">1000".equalsIgnoreCase(formb6.getAction())
+												|| "不动作".equalsIgnoreCase(formb6.getAction())) {
+											BeanUtil.setFieldValue(formbBean, "dialValue0", ">1000");
+											BeanUtil.setFieldValue(formbBean, "dialValue180", ">1000");
+										}
 									}
 
 									return formbBean;

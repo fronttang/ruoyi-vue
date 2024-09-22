@@ -211,4 +211,21 @@ public class FormB2DangerHandler implements IFormbDangerHandler {
 		return location;
 	}
 
+	@Override
+	public String getLocation(OwnerUnitDanger vo) {
+
+		String location = null;
+		FormB2 formb = getFormb(vo);
+		if (formb != null) {
+
+			String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+			String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+			String locat = StrUtil.isNotBlank(formb.getLocation()) ? formb.getLocation() : "";
+
+			location = StrUtil.format("{}{}{}", buildingName, unitAreaName, locat);
+		}
+
+		return location;
+	}
+
 }

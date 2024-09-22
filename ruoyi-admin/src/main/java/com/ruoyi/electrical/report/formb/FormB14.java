@@ -13,8 +13,14 @@ import lombok.ToString;
 @Formb("B14")
 public class FormB14 extends BaseFormB {
 
+	/**
+	 * 剩余电流值检测
+	 */
 	public static final String TYPE_RESIDUALCURRENT = "residualCurrent";
 
+	/**
+	 * 报警时间检测
+	 */
 	public static final String TYPE_ALARMTIME = "alarmTime";
 
 	/**
@@ -132,4 +138,22 @@ public class FormB14 extends BaseFormB {
 		@ApiModelProperty("现场检测图")
 		private String inspectionPic;
 	}
+
+	/**
+	 * 检测位置
+	 */
+	@ApiModelProperty("检测位置")
+	private String location;
+
+	/**
+	 * 整体外观图
+	 */
+	@ApiModelProperty("整体外观图")
+	private String overallPic;
+
+	/**
+	 * 现场检测图
+	 */
+	@ApiModelProperty("现场检测图")
+	private String inspectionPic;
 }

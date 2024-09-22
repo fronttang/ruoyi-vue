@@ -307,6 +307,9 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 											|| "BB1".equalsIgnoreCase(dang.getFormCode())) {
 										BeanUtil.setFieldValue(formbBean, "weather", ownerUnit.getWeather());
 										BeanUtil.setFieldValue(formbBean, "windSpeed", ownerUnit.getWindSpeed());
+										BeanUtil.setFieldValue(formbBean, "deviceName", dang.getReportLocation1());
+									} else {
+										BeanUtil.setFieldValue(formbBean, "location", dang.getReportLocation1());
 									}
 
 									if ("B6".equalsIgnoreCase(dang.getFormCode())) {
@@ -482,8 +485,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			danger.setDescription(firstDanger.getDescription());
 			danger.setSuggestions(firstDanger.getSuggestions());
 
-			List<String> dangerPics = dangers.stream().filter((d) -> StrUtil.isNotBlank(d.getDangerPic()))
-					.map((d) -> d.getDangerPic()).flatMap(str -> Arrays.stream(str.split(",")))
+			List<String> dangerPics = dangers.stream().filter((d) -> StrUtil.isNotBlank(d.getPicture()))
+					.map((d) -> d.getPicture()).flatMap(str -> Arrays.stream(str.split(",")))
 					.collect(Collectors.toList());
 
 			if (CollUtil.isNotEmpty(dangerPics)) {
@@ -556,7 +559,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				}
 				formData.setLevel(data.getLevel());
 				formData.setDecide(data.getDanger() != null && data.getDanger() > 0 ? "不符合" : "符合");
-				formData.setResult(data.getDanger() != null && data.getDanger() > 0 ? "Ⅹ" : "√");
+				formData.setResult(data.getDanger() != null && data.getDanger() > 0 ? "×" : "√");
 
 				formDatas.add(formData);
 			});

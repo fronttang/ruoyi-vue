@@ -174,14 +174,24 @@ public class FormB14DangerHandler implements IFormbDangerHandler {
 			String type = getType(vo);
 			if (FormB14.TYPE_RESIDUALCURRENT.equals(type)) {
 				if (Objects.nonNull(formb.getResidualCurrent())) {
-					return formb.getResidualCurrent().getOverallPic();
+					return formb.getOverallPic();
 				}
 			} else if (FormB14.TYPE_ALARMTIME.equals(type)) {
 				if (Objects.nonNull(formb.getAlarmTime())) {
-					return formb.getAlarmTime().getInspectionPic();
+					return formb.getInspectionPic();
 				}
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public String getLocation(OwnerUnitDanger vo) {
+
+		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+
+		return StrUtil.format("{}{}", buildingName, unitAreaName);
+
 	}
 }

@@ -23,6 +23,10 @@ import lombok.ToString;
 @SuppressWarnings("unused")
 public class FormB1 extends BaseFormB {
 
+	public static final String THREE_PHASE = "三相";
+
+	public static final String SINGLE_PHASE = "单相";
+
 	/**
 	 * 辐射率
 	 */
@@ -99,6 +103,11 @@ public class FormB1 extends BaseFormB {
 	private SinglePhase singlePhase = new SinglePhase();
 
 	/**
+	 * 类型 三相/单相
+	 */
+	private String type;
+
+	/**
 	 * 判定结果 合格/不合格
 	 */
 	private String result;
@@ -167,6 +176,11 @@ public class FormB1 extends BaseFormB {
 		 * N
 		 */
 		private ABNCLData N = new ABNCLData();
+
+		/**
+		 * 电压（V）LN
+		 */
+		private String ln;
 	}
 
 	/**

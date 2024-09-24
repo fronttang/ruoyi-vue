@@ -125,7 +125,7 @@
             @click="handleAudit(scope.row)"
           >审核</el-button>
           <el-tooltip class="item" effect="dark" content="打开制式Word报告" placement="top">
-            <el-button v-if="scope.row.status === '0' || scope.row.status === '1'"
+            <el-button 
               size="medium"
               type="text"
               icon="iconfont iconfont-word"
@@ -133,45 +133,21 @@
             ></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="打开归档Word报告" placement="top">
-            <el-button v-if="scope.row.archivedWord != null"
+            <el-button 
               size="medium"
               type="text"
               icon="iconfont iconfont-bg-word"
               @click="handleOpenArchivedWordReport(scope.row)"
             ></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="Word报告归档为PDF" placement="top">
-            <el-button v-if="scope.row.status === '3'"
-              size="medium"
-              type="text"
-              icon="iconfont iconfont-bg-pdf"
-              @click="handleArchivedWordReportToPdf(scope.row)"
-            ></el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="打开归档PDF报告" placement="top">
-            <el-button  v-if="scope.row.status === '3'"
-              size="medium"
-              type="text"
-              icon="iconfont iconfont-pdf1"
-              @click="handleOpenArchivedPdf(scope.row)"
-            ></el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="下载归档PDF报告" placement="top">
-            <el-button  v-if="scope.row.status === '3'"
-              size="medium"
-              type="text"
-              icon="iconfont iconfont-download1"
-              @click="handleDownloadArchivedPDFReport(scope.row)"
-            ></el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="下载原始记录（电检）" placement="top">
-            <el-button v-if="projectType === '1' || projectType === '2'"
-              size="medium"
-              type="text"
-              icon="iconfont iconfont-download"
-              @click="handleDownloadOriginalRecords(scope.row)"
-            ></el-button>
-          </el-tooltip>
+          <el-dropdown size="medium" @command="(command) => handleCommand(command, scope.row)" >
+            <el-button size="medium" type="text" icon="iconfont iconfont-download"></el-button>
+            <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="downloadInitialReport" icon="iconfont iconfont-download" >下载制式Word报告</el-dropdown-item>
+                <el-dropdown-item command="downloadArchivedWordReport" icon="iconfont iconfont-download" >下载归档Word报告</el-dropdown-item>
+                <el-dropdown-item command="downloadOriginalRecords" icon="iconfont iconfont-download" >下载原始记录（电检）</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
           <el-tooltip class="item" effect="dark" content="重置报告状态为“未审核”" placement="top">
             <el-button v-if="scope.row.status !== '0' && workerRoleId === '2'"
               size="medium"
@@ -529,6 +505,13 @@ export default {
         });
       }
     },
+    handleDownloadInitialReport(row){
+      if(row.wordFile == null){
+        this.$modal.msgError("无制式Word报告");
+      } else {
+        this.$download.resource(row.wordFile, "制式Word报告.docx");
+      }
+    },
     handleOpenArchivedPdf(row){
       if(row.archivedPdf == null){
         this.$modal.msgError("请先归档Word报告为PDF");
@@ -551,6 +534,13 @@ export default {
         this.$tab.openPage("编辑Word归档报告", '/report/weboffice/weboffice/' + row.reportId + "/2");
       }
     },
+    handleDownloadArchivedWordReport(row) {
+      if(row.archivedWord == null){
+        this.$modal.msgError("无归档Word报告");
+      } else {
+        this.$download.resource(row.archivedWord, "Word归档报告.docx");
+      }
+    },
     handleArchivedWordReportToPdf(row){
       this.loading = true;
       // word报告归档为pdf
@@ -561,7 +551,23 @@ export default {
         //this.$modal.msgError("无归档Word报告");
         this.loading = false;
       });
-    }
+    },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "downloadInitialReport":
+          this.handleDownloadInitialReport(row);
+          break;
+        case "downloadArchivedWordReport":
+          this.handleDownloadArchivedWordReport(row);
+          break;
+        case "downloadOriginalRecords":
+          this.handleDownloadOriginalRecords(row);
+          break;
+        default:
+          break;
+      }
+    },
   }
 };
 </script>

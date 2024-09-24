@@ -18,6 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="hamlet"    column="hamlet"    />
         <result property="archivedPdf"    column="archived_pdf"    />
         <result property="archivedWord"    column="archived_word"    />
+        <result property="wordFile"    column="word_file"    />
     </resultMap>
     
     <resultMap type="OwnerUnitReport" id="OwnerUnitReportResult">

@@ -63,6 +63,7 @@ import com.ruoyi.electrical.report.dto.InitialReport;
 import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.dto.UrbanVillageDanger;
+import com.ruoyi.electrical.report.formb.FormB1;
 import com.ruoyi.electrical.report.formb.FormB14;
 import com.ruoyi.electrical.report.formb.FormB6;
 import com.ruoyi.electrical.report.mapper.OwnerUnitReportMapper;
@@ -209,11 +210,11 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
 		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL()
 				.bind("data", new FormLoopRowTableRenderPolicy()).bind("device", policy).bind("formb.B1", policy)
-				.bind("formb.BB1", policy).bind("formb.B2", policy).bind("formb.B3", policy).bind("formb.B4", policy)
-				.bind("formb.B5", policy).bind("formb.B6", policy).bind("formb.B7", policy).bind("formb.B8", policy)
-				.bind("formb.B9", policy).bind("formb.B10", policy).bind("formb.B11", policy).bind("formb.B12", policy)
-				.bind("formb.B13", policy).bind("formb.B14", policy).bind("formb.B14A", policy)
-				.bind("formb.B14B", policy).bind("formb.B15", policy);
+				.bind("formb.B1A", policy).bind("formb.B1B", policy).bind("formb.BB1", policy).bind("formb.B2", policy)
+				.bind("formb.B3", policy).bind("formb.B4", policy).bind("formb.B5", policy).bind("formb.B6", policy)
+				.bind("formb.B7", policy).bind("formb.B8", policy).bind("formb.B9", policy).bind("formb.B10", policy)
+				.bind("formb.B11", policy).bind("formb.B12", policy).bind("formb.B13", policy).bind("formb.B14", policy)
+				.bind("formb.B14A", policy).bind("formb.B14B", policy).bind("formb.B15", policy);
 		Configure config = configureBuilder.build();
 		try {
 
@@ -277,6 +278,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		});
 		formb.put("B14A", Arrays.asList());
 		formb.put("B14B", Arrays.asList());
+		formb.put("B1A", Arrays.asList());
+		formb.put("B1B", Arrays.asList());
 
 		List<OwnerUnitDanger> dangers = new ArrayList<OwnerUnitDanger>();
 		// 查所有formb的隐患数据
@@ -347,6 +350,22 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 						}).collect(Collectors.toList());
 
 						formb.put("B14B", alarmTimes);
+					} else if ("B1".equalsIgnoreCase(key)) {
+						// 单相
+						List<Object> singlePhase = value.stream().filter((d) -> {
+							FormB1 b1 = (FormB1) d;
+							return FormB1.SINGLE_PHASE.equalsIgnoreCase(b1.getType());
+						}).collect(Collectors.toList());
+
+						formb.put("B1B", singlePhase);
+
+						// 三相
+						List<Object> threePhase = value.stream().filter((d) -> {
+							FormB1 b1 = (FormB1) d;
+							return !FormB1.SINGLE_PHASE.equalsIgnoreCase(b1.getType());
+						}).collect(Collectors.toList());
+
+						formb.put("B1A", threePhase);
 					} else {
 						formb.put(key, value);
 					}

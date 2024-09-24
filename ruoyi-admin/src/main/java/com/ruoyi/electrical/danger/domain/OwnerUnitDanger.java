@@ -70,6 +70,11 @@ public class OwnerUnitDanger extends BaseEntity {
 	private String projectType;
 
 	/**
+	 * 高风险类型
+	 */
+	private String highRiskType;
+
+	/**
 	 * 检测单位ID
 	 */
 	private Long detectId;

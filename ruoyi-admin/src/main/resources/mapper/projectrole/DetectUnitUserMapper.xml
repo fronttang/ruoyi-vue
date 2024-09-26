@@ -25,11 +25,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="hamlet"    column="hamlet"    />
         <result property="projectId"    column="project_id"    />
         <result property="projectName" column="project_name"  />
+        <result property="accountType" column="account_type"  />
     </resultMap>
 
     <sql id="selectDetectUnitUserVo">
         select s.user_id, s.project_id, p.name as project_name, s.detect_id, u.name as detect_name, s.user_type, s.user_name, s.nick_name, s.password, s.status, 
-        s.recorder, s.district, s.street, s.community, s.hamlet, s.create_by, s.create_time, s.update_by, s.update_time 
+        s.recorder, s.district, s.street, s.community, s.hamlet, s.create_by, s.create_time, s.update_by, s.update_time ,s.account_type
         from sys_user s left join detect_unit u on s.detect_id = u.id
         left join project p on s.project_id = p.id
     </sql>
@@ -45,6 +46,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="street != null  and street != ''"> and s.street = #{street}</if>
             <if test="community != null  and community != ''"> and s.community = #{community}</if>
             <if test="hamlet != null  and hamlet != ''"> and s.hamlet = #{hamlet}</if>
+            <if test="accountType != null  and accountType != ''"> and s.account_type = #{accountType}</if>
         </where>
     </select>
     
@@ -81,6 +83,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="accountType != null">account_type,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="detectId != null">#{detectId},</if>
@@ -100,6 +103,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="accountType != null">#{accountType},</if>
          </trim>
     </insert>
 
@@ -122,6 +126,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="accountType != null">account_type = #{accountType},</if>
         </trim>
         where user_id = #{id}
     </update>

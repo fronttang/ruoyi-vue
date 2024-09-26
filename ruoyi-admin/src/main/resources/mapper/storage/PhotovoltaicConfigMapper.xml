@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.storage.mapper.PhotovoltaicConfigMapper">
+    
+    <resultMap type="PhotovoltaicConfig" id="PhotovoltaicConfigResult">
+        <result property="id"    column="id"    />
+        <result property="averagePrice"    column="average_price"    />
+        <result property="firstDecayRate"    column="first_decay_rate"    />
+        <result property="stepDecayRate"    column="step_decay_rate"    />
+        <result property="power"    column="power"    />
+        <result property="effectiveHours"    column="effective_hours" typeHandler="com.ruoyi.electrical.storage.type.EffectiveHoursTypeHandler"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPhotovoltaicConfigVo">
+        select id, average_price, first_decay_rate, step_decay_rate, power, effective_hours, create_by, create_time, update_by, update_time from photovoltaic_config
+    </sql>
+
+    <select id="selectPhotovoltaicConfigList" parameterType="PhotovoltaicConfig" resultMap="PhotovoltaicConfigResult">
+        <include refid="selectPhotovoltaicConfigVo"/>
+        <where>  
+            <if test="averagePrice != null "> and average_price = #{averagePrice}</if>
+            <if test="firstDecayRate != null "> and first_decay_rate = #{firstDecayRate}</if>
+            <if test="stepDecayRate != null "> and step_decay_rate = #{stepDecayRate}</if>
+            <if test="power != null "> and power = #{power}</if>
+            <if test="effectiveHours != null  and effectiveHours != ''"> and effective_hours = #{effectiveHours}</if>
+        </where>
+    </select>
+    
+    <select id="selectPhotovoltaicConfigById" parameterType="Long" resultMap="PhotovoltaicConfigResult">
+        <include refid="selectPhotovoltaicConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPhotovoltaicConfig" parameterType="PhotovoltaicConfig">
+        insert into photovoltaic_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="averagePrice != null">average_price,</if>
+            <if test="firstDecayRate != null">first_decay_rate,</if>
+            <if test="stepDecayRate != null">step_decay_rate,</if>
+            <if test="power != null">power,</if>
+            <if test="effectiveHours != null">effective_hours,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="averagePrice != null">#{averagePrice},</if>
+            <if test="firstDecayRate != null">#{firstDecayRate},</if>
+            <if test="stepDecayRate != null">#{stepDecayRate},</if>
+            <if test="power != null">#{power},</if>
+            <if test="effectiveHours != null">#{effectiveHours,typeHandler=com.ruoyi.electrical.storage.type.EffectiveHoursTypeHandler},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePhotovoltaicConfig" parameterType="PhotovoltaicConfig">
+        update photovoltaic_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="averagePrice != null">average_price = #{averagePrice},</if>
+            <if test="firstDecayRate != null">first_decay_rate = #{firstDecayRate},</if>
+            <if test="stepDecayRate != null">step_decay_rate = #{stepDecayRate},</if>
+            <if test="power != null">power = #{power},</if>
+            <if test="effectiveHours != null">effective_hours = #{effectiveHours,typeHandler=com.ruoyi.electrical.storage.type.EffectiveHoursTypeHandler},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePhotovoltaicConfigById" parameterType="Long">
+        delete from photovoltaic_config where id = #{id}
+    </delete>
+
+    <delete id="deletePhotovoltaicConfigByIds" parameterType="String">
+        delete from photovoltaic_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

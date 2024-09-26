@@ -75,4 +75,9 @@ public class DetectUnitUser extends BaseEntity {
 
 	private String projectName;
 
+	/**
+	 * 账号类型
+	 */
+	private String accountType;
+
 }

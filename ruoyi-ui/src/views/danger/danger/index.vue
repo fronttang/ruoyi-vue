@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="名称/隐患位置" prop="location" label-width="120px">
+      <el-form-item label="名称/隐患位置/隐患描述" prop="location" label-width="180px">
         <el-input
           v-model="queryParams.location"
-          placeholder="请输入名称/隐患位置"
+          placeholder="请输入名称/隐患位置/隐患描述"
           clearable
           @keyup.enter.native="handleQuery"
         />

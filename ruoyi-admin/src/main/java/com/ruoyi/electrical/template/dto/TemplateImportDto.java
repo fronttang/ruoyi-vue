@@ -34,6 +34,12 @@ public class TemplateImportDto {
 	@Excel(name = "报告标准", orderNum = "6")
 	private String firstContent;
 
+	/**
+	 * 报告显示等级
+	 */
+	@Excel(name = "报告显示等级", orderNum = "6")
+	private String reportLevel;
+
 	/** 隐患等级 */
 	@Excel(name = "隐患等级", orderNum = "7")
 	private String level;

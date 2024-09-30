@@ -109,4 +109,6 @@ public class IntuitiveDetectData extends BaseEntity {
 
 	private String level;
 
+	private String reportLevel;
+
 }

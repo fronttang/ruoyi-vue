@@ -31,10 +31,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="reportLevel"    column="report_level"    />
+        <result property="level"    column="level"    />
     </resultMap>
 
     <sql id="selectIntuitiveDetectDataVo">
-        select id, template_id, detect_title, type, unit_type, module_type, detect_module, parent_id, first_code, first_content, secondary_code, secondary_content, weights, weights_c_es, weights_c_nes, weights_d_es, weights_d_nes, attribution, output, max_score, view, view_parent_id, create_by, create_time, update_by, update_time from intuitive_detect_data
+        select id, template_id, detect_title, type, unit_type, module_type, level, detect_module, parent_id, first_code, first_content, secondary_code, secondary_content, weights, weights_c_es, weights_c_nes, weights_d_es, weights_d_nes, attribution, output, max_score, view, view_parent_id, create_by, create_time, update_by, update_time from intuitive_detect_data
     </sql>
 
     <select id="selectIntuitiveDetectDataList" parameterType="IntuitiveDetectData" resultMap="IntuitiveDetectDataResult">
@@ -66,7 +68,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         d.secondary_code, d.secondary_content, d.weights, d.weights_c_es, d.weights_c_nes, d.weights_d_es, d.weights_d_nes, d.attribution, 
         d.output, d.max_score, d.view, d.view_parent_id, d.create_by, d.create_time, d.update_by, d.update_time,
         (select count(1) from owner_unit_danger ud where ud.form_data_id = d.id and ud.unit_id = #{unitId} ) as danger,
-        (select level from intuitive_detect_danger idd where idd.data_id = d.id limit 1) as level
+        (select level from intuitive_detect_danger idd where idd.data_id = d.id limit 1) as level,
+        d.level as report_level
         from intuitive_detect_data d
         where d.template_id = #{templateId}
         and d.output = '1' 
@@ -160,6 +163,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="level != null">level,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="templateId != null">#{templateId},</if>
@@ -187,6 +191,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="level != null">#{level},</if>
          </trim>
     </insert>
 
@@ -218,6 +223,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="level != null">level = #{level},</if>
         </trim>
         where id = #{id}
     </update>

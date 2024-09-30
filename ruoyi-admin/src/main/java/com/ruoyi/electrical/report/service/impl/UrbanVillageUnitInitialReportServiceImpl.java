@@ -300,7 +300,10 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 								if (Objects.nonNull(formbData)) {
 									Object formbBean = formbData.toJavaObject(frombMap.get(dang.getFormCode()));
 									// BeanUtils.copyProperties(formbBean, newInstance);
-									BeanUtil.setFieldValue(formbBean, "temperature", ownerUnit.getTemperature());
+
+									if (!"B15".equalsIgnoreCase(dang.getFormCode())) {
+										BeanUtil.setFieldValue(formbBean, "temperature", ownerUnit.getTemperature());
+									}
 									BeanUtil.setFieldValue(formbBean, "humidity", ownerUnit.getHumidity());
 									String detectDate = DateUtil.format(dang.getInitialTime(),
 											DatePattern.CHINESE_DATE_FORMATTER);
@@ -576,7 +579,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					// formData.setFirstContent(new TextRenderData(data.getFirstContent(), style));
 					formData.setMerge(true);
 				}
-				formData.setLevel(data.getLevel());
+				formData.setLevel(StrUtil.isNotBlank(data.getReportLevel()) ? data.getReportLevel() : data.getLevel());
 				formData.setDecide(data.getDanger() != null && data.getDanger() > 0 ? "不符合" : "符合");
 				formData.setResult(data.getDanger() != null && data.getDanger() > 0 ? "×" : "√");
 

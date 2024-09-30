@@ -101,6 +101,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             or u.name like concat('%', #{location}, '%')
             or a.name like concat('%', #{location}, '%')
             or b.name like concat('%', #{location}, '%')
+            or d.description like concat('%', #{location}, '%')
             )
             </if>
             <choose>

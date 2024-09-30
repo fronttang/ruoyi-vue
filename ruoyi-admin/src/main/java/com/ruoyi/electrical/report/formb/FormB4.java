@@ -14,9 +14,9 @@ import lombok.ToString;
 public class FormB4 extends BaseFormB {
 
 	/**
-	 * 灯具类型 普通/仓库
+	 * 灯具类型 普通/仓库 照明装置/常用电器装置
 	 */
-	@ApiModelProperty("灯具类型 普通/仓库")
+	@ApiModelProperty("灯具类型 照明装置/常用电器装置")
 	private String lampType;
 
 	/**

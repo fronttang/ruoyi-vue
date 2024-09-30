@@ -141,6 +141,16 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="报告显示等级" label-width="100px" prop="level">
+          <el-select v-model="form.level" placeholder="报告显示等级">
+            <el-option
+              v-for="dict in dict.type.hazard_level"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="一级编号" label-width="100px" prop="firstCode">
           <el-input v-model="form.firstCode" placeholder="请输入一级编号" />
           <el-input v-model="form.firstContent" type="textarea" placeholder="请输入内容" />
@@ -359,7 +369,8 @@ export default {
         createBy: null,
         createTime: null,
         updateBy: null,
-        updateTime: null
+        updateTime: null,
+        level: null
       };
       this.addDanger = false;
       this.IntuitiveDetectDangerList = [];

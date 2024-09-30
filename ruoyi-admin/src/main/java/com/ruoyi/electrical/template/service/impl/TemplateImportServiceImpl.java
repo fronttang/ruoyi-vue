@@ -89,6 +89,9 @@ public class TemplateImportServiceImpl implements ITemplateImportService {
 				if (StrUtil.isNotBlank(importData.getAttr()) && StrUtil.contains(importData.getAttr(), "户")) {
 					attribution.add("2");
 				}
+				if (StrUtil.isNotBlank(importData.getAttr()) && StrUtil.contains(importData.getAttr(), "配电房")) {
+					attribution.add("3");
+				}
 
 				List<IntuitiveDetectData> formDatas = form.getDatas();
 				if (formDatas == null) {
@@ -104,6 +107,8 @@ public class TemplateImportServiceImpl implements ITemplateImportService {
 					fromData.setTemplateId(templateId);
 					fromData.setType("标题".equalsIgnoreCase(importData.getType()) ? "1" : "2");
 					fromData.setOutput("1");
+					// 报告显示等级
+					fromData.setLevel(importData.getReportLevel());
 
 					formDataMap.put(importData.getFirstCode(), fromData);
 					formDatas.add(fromData);

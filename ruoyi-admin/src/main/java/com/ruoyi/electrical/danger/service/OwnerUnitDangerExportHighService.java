@@ -486,7 +486,7 @@ public class OwnerUnitDangerExportHighService {
 
 		infoExport.setLevel(LEVEL_MAP.get(danger.getLevel()));
 
-		if ("2".equalsIgnoreCase(danger.getStatus())) {
+		if ("已整改".equalsIgnoreCase(danger.getStatus())) {
 			infoExport.setRectificationStatus("是");
 		} else {
 			infoExport.setRectificationStatus("否");

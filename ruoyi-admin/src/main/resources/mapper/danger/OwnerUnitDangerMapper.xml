@@ -5,6 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.electrical.danger.mapper.OwnerUnitDangerMapper">
     
     <resultMap type="com.ruoyi.electrical.report.dto.high.HighDangerInfo" id="HighReportDanger">
+     	<result property="unitId"    column="unit_id"    />
     	<result property="firstContent"    column="first_content"    />
     	<result property="score"    column="score"    />
     	<result property="description"    column="description"    />
@@ -317,7 +318,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
     
     <select id="selectOwnerDangerHighReportByUnitId" parameterType="Long" resultMap="HighReportDanger">
-    	select da.first_content, dd.score,dd.id, d.description, d.suggestions, d.danger_pic, d.inspector_id, d.danger_id,
+    	select d.unit_id, da.first_content, dd.score,dd.id, d.description, d.suggestions, d.danger_pic, d.inspector_id, d.danger_id,
     	id.id as form_id, id.first_content as form_name, id.max_score, da.id as form_data_id, da.first_content as form_data_name,
     	(CASE WHEN dd.acc_method is null THEN '1' ELSE dd.acc_method END) as acc_method, da.max_score as data_max_score,
     	d.rectification_pic,d.level,d.status,d.remark,d.create_time as inspector_date,

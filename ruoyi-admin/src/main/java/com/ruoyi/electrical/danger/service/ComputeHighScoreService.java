@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ComputeHighScoreService {
 
-	public Double compute(List<HighDangerInfo> dangers) {
+	public BigDecimal compute(List<HighDangerInfo> dangers) {
 
 		BigDecimal totalScore = BigDecimal.ZERO;
 		try {
@@ -66,7 +66,7 @@ public class ComputeHighScoreService {
 		}
 		totalScore = new BigDecimal(100).subtract(totalScore);
 		totalScore.setScale(2, RoundingMode.HALF_UP);
-		return totalScore.doubleValue();
+		return totalScore;
 	}
 
 	private BigDecimal computeFormDataScore(List<HighDangerInfo> formDatas) {

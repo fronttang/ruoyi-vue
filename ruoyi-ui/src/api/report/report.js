@@ -17,7 +17,6 @@ export function getReport(query) {
   })
 }
 
-// 查询报告日志
 export function getWordReport(reportId) {
   return request({
     url: '/report/download/' + reportId,

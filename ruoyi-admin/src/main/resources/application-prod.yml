@@ -1,6 +1,8 @@
 ruoyi: 
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
   profile: /dat/upload
+  echarts:
+    api: http://10.206.16.12:3000
 
 # token配置
 token:

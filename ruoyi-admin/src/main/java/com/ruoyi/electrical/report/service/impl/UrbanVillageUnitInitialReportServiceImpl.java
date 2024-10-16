@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
@@ -217,6 +218,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				.bind("formb.B14A", policy).bind("formb.B14B", policy).bind("formb.B15", policy);
 		Configure config = configureBuilder.build();
 		try {
+
+			ZipSecureFile.setMinInflateRatio(0.001);
 
 			Map<String, Object> dataMap = BeanUtil.beanToMap(initialReport);
 

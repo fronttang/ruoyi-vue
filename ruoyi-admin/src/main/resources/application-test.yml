@@ -1,7 +1,15 @@
 ruoyi: 
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
   profile: /dat/upload
-  
+  echarts:
+    api: http://10.206.16.13:3000
+
+wx:
+  mp:
+    configs:
+      - appId: wxb5930c3148e86017
+        secret: 6cb08aec1c895b67a66fb174fba96d8f
+
 # 数据源配置
 spring:
   # redis 配置

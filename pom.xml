@@ -213,6 +213,10 @@
 	        <id>com.e-iceblue</id>
 	        <url>https://repo.e-iceblue.cn/repository/maven-public/</url>
 	    </repository>
+        <repository>
+	        <id>aspose</id>
+	        <url>https://releases.aspose.com/java/repo/</url>
+	    </repository>
     </repositories>
 
     <pluginRepositories>

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aspose.words.Document;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -143,32 +144,8 @@ public class UnitReportController extends BaseController {
 			String baseDir = RuoYiConfig.getUploadPath();
 			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
 
-//			// 创建PDF文档
-//			Document pdfDoc = new Document();
-//			PdfWriter.getInstance(pdfDoc, new FileOutputStream(saveFile));
-//			pdfDoc.open();
-//
-//			for (XWPFParagraph p : document.getParagraphs()) {
-//				// Create a Paragraph for the PDF document
-//				Paragraph pdfParagraph = new Paragraph(p.getText());
-//				// Add the paragraph to the PDF document
-//				pdfDoc.add(pdfParagraph);
-//			}
-//			pdfDoc.close();
-//			document.close();
-
-			// 实例化Document类的对象
-			com.spire.doc.Document doc = new com.spire.doc.Document();
-
-			// 下载Word文件
-//		        URL url = new URL("http://xxxx/ExportWord_230724_172956.docx");
-//		        InputStream inputStream = url.openStream();
-//		        doc.loadFromStream(inputStream,FileFormat.Docx);
-			// 加载Word
-			doc.loadFromFile(archivedWordPath);
-			// 保存为PDF格式
-
-			doc.saveToFile(saveFile.getPath(), com.spire.doc.FileFormat.PDF);
+			Document doc = new Document(archivedWordPath);
+			doc.save(saveFile.getAbsolutePath());
 
 			log.info("Word文档已成功转换为PDF！");
 

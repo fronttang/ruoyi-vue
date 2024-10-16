@@ -8,12 +8,14 @@ spring:
     # 地址
     #host: localhost
     host: 129.211.210.175
+    #host: 175.27.166.216
     # 端口，默认为6379
     port: 6379
     # 数据库索引
     database: 0
     # 密码
     password: DAT@TestRedis147
+    #password: DAT@ProdRedis147
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -26,3 +28,6 @@ spring:
         url: jdbc:mysql://129.211.210.175:3306/dat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
         password: DAT@TestMysql147
+        #url: jdbc:mysql://175.27.166.216:3306/dat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        #username: root
+        #password: DAT@ProdMysql147

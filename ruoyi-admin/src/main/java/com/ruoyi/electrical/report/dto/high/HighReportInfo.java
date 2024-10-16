@@ -1,5 +1,6 @@
 package com.ruoyi.electrical.report.dto.high;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class HighReportInfo {
 
 	public Double getTotalScore() {
 		ComputeHighScoreService compute = new ComputeHighScoreService();
-		return compute.compute(danger);
+		return compute.compute(danger).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
 	}
 
 }

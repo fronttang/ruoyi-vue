@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.report.mapper.CommunityReportMapper">
+    
+    <resultMap type="CommunityReport" id="CommunityReportResult">
+        <result property="id"    column="id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="district"    column="district"    />
+        <result property="street"    column="street"    />
+        <result property="community"    column="community"    />
+        <result property="districtName"    column="district_name"    />
+        <result property="streetName"    column="street_name"    />
+        <result property="communityName"    column="community_name"    />
+        <result property="type"    column="type"    />
+        <result property="code"    column="code"    />
+        <result property="score"    column="score"    />
+        <result property="status"    column="status"    />
+        <result property="reject"    column="reject"    />
+        <result property="wordFile"    column="word_file"    />
+        <result property="wordFileVersion"    column="word_file_version"    />
+        <result property="archivedPdf"    column="archived_pdf"    />
+        <result property="archivedWord"    column="archived_word"    />
+        <result property="archivedWordVersion"    column="archived_word_version"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    
+    <resultMap type="com.ruoyi.electrical.vo.CommunityReportVo" id="CommunityReportVo">
+        <result property="reportId"    column="report_id"    />
+        <result property="status"    column="status"    />
+        <result property="type"    column="type"    />
+        <result property="district"    column="district"    />
+        <result property="street"    column="street"    />
+        <result property="community"    column="community"    />
+        <result property="archivedPdf"    column="archived_pdf"    />
+        <result property="archivedWord"    column="archived_word"    />
+        <result property="wordFile"    column="word_file"    />
+    </resultMap>
+
+	<sql id="selectCommunityReportVo">
+        select 
+        r.id, r.project_id, 
+        r.district, r.street, r.community, 
+        a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name,
+        r.type, r.code, r.score, r.status, r.reject, 
+        r.word_file, r.word_file_version, r.archived_pdf, r.archived_word, r.archived_word_version, 
+        r.create_by, r.create_time, r.update_by, r.update_time 
+        from community_report r
+        left join sys_dict_data a on r.district = a.dict_value and a.dict_type='district'
+		left join sys_dict_data b on r.street = b.dict_value and b.dict_type='street'
+		left join sys_dict_data c on r.community = c.dict_value and c.dict_type='community'
+    </sql>
+
+    <select id="selectCommunityReportList" parameterType="CommunityReport" resultMap="CommunityReportVo">
+        select t.* from (select pa.district, pa.street, pa.community, pa.project_id, r.type, r.id as report_id,
+		CASE WHEN r.id is null THEN 0 ELSE r.status END as status, 
+		r.reject, r.word_file,r.archived_pdf,r.archived_word from project_area pa
+		left join community_report r on (r.district = pa.district and r.street=pa.street and r.community=pa.community and r.type = #{type})
+		where pa.project_id = #{projectId} ) t where 1=1
+        <where>
+            <if test="district != null  and district != ''"> and t.district = #{district}</if>
+            <if test="street != null  and street != ''"> and t.street = #{street}</if>
+            <if test="community != null  and community != ''"> and t.community = #{community}</if>
+            <if test="status != null  and status != ''"> and t.status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectCommunityReportById" parameterType="Long" resultMap="CommunityReportResult">
+        <include refid="selectCommunityReportVo"/>
+        where r.id = #{id}
+    </select>
+    
+    <select id="getCommunityReportByAreaAndType" parameterType="CommunityReport" resultMap="CommunityReportResult">
+        <include refid="selectCommunityReportVo"/>
+        where r.project_id = #{projectId} and r.type = #{type} 
+        and r.district = #{district} and r.street = #{street} and r.community = #{community}
+    </select>
+
+    <insert id="insertCommunityReport" parameterType="CommunityReport">
+        insert into community_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="district != null">district,</if>
+            <if test="street != null">street,</if>
+            <if test="community != null">community,</if>
+            <if test="type != null">type,</if>
+            <if test="code != null">code,</if>
+            <if test="score != null">score,</if>
+            <if test="status != null">status,</if>
+            <if test="reject != null">reject,</if>
+            <if test="wordFile != null">word_file,</if>
+            <if test="wordFileVersion != null">word_file_version,</if>
+            <if test="archivedPdf != null">archived_pdf,</if>
+            <if test="archivedWord != null">archived_word,</if>
+            <if test="archivedWordVersion != null">archived_word_version,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="district != null">#{district},</if>
+            <if test="street != null">#{street},</if>
+            <if test="community != null">#{community},</if>
+            <if test="type != null">#{type},</if>
+            <if test="code != null">#{code},</if>
+            <if test="score != null">#{score},</if>
+            <if test="status != null">#{status},</if>
+            <if test="reject != null">#{reject},</if>
+            <if test="wordFile != null">#{wordFile},</if>
+            <if test="wordFileVersion != null">#{wordFileVersion},</if>
+            <if test="archivedPdf != null">#{archivedPdf},</if>
+            <if test="archivedWord != null">#{archivedWord},</if>
+            <if test="archivedWordVersion != null">#{archivedWordVersion},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCommunityReport" parameterType="CommunityReport">
+        update community_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="street != null">street = #{street},</if>
+            <if test="community != null">community = #{community},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="reject != null">reject = #{reject},</if>
+            <if test="wordFile != null">word_file = #{wordFile},</if>
+            <if test="wordFileVersion != null">word_file_version = #{wordFileVersion},</if>
+            <if test="archivedPdf != null">archived_pdf = #{archivedPdf},</if>
+            <if test="archivedWord != null">archived_word = #{archivedWord},</if>
+            <if test="archivedWordVersion != null">archived_word_version = #{archivedWordVersion},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCommunityReportById" parameterType="Long">
+        delete from community_report where id = #{id}
+    </delete>
+
+    <delete id="deleteCommunityReportByIds" parameterType="String">
+        delete from community_report where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <select id="getCommunityOwnerUnitList" parameterType="CommunityReport" resultType="com.ruoyi.electrical.report.dto.CommunityReportOwnerUnit" >
+    	select u.id, u.name, u.high_risk_type as type, r.id as report_id, 
+		CASE WHEN r.detect_status is null THEN 0 ELSE r.detect_status END as status 
+		from owner_unit u
+    	left join owner_unit_report r on (r.unit_id = u.id and r.type = '1' )
+    	where u.project_id = #{projectId} and u.district = #{district} and u.street = #{street} and u.community = #{community}
+    </select>
+    
+</mapper>

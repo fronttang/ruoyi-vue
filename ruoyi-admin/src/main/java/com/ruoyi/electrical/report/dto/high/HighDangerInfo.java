@@ -18,6 +18,11 @@ import lombok.Data;
 public class HighDangerInfo {
 
 	/**
+	 * 业主单元ID
+	 */
+	private Long unitId;
+
+	/**
 	 * 一级编号
 	 */
 	private String firstCode;
@@ -118,6 +123,16 @@ public class HighDangerInfo {
 		} else {
 			return "未整改";
 		}
+	}
+
+	/**
+	 * 状态码
+	 */
+	@SuppressWarnings("unused")
+	private String statusCode;
+
+	public String getStatusCode() {
+		return this.status;
 	}
 
 	/**

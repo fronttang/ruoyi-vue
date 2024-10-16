@@ -83,7 +83,7 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 	@Autowired
 	private OwnerUnitQrcodeService ownerUnitQrcodeService;
 
-	private static Map<String, String> HIGH_TYPE_NAME_MAP = new HashMap<String, String>();
+	public static final Map<String, String> HIGH_TYPE_NAME_MAP = new HashMap<String, String>();
 
 	private static TextRenderData CHECKED = new TextRenderData("R", new Style("Wingdings 2", 12));
 
@@ -268,6 +268,7 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 		});
 	}
 
+	@SuppressWarnings("deprecation")
 	private void getOwnerUnitConfig(OwnerUnitConfig ownerUnitConfig, OwnerUnitInfo ownerUnitInfo)
 			throws InstantiationException, IllegalAccessException {
 

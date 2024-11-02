@@ -70,7 +70,7 @@ public class DangerExportStationDto {
 		 * 充电站充电桩总功率
 		 */
 		@Excel(name = "总功率（kw)", orderNum = "8", groupName = "场站充电桩", needMerge = true)
-		private String stationPilePower;
+		private Long stationPilePower;
 
 		/**
 		 * 非车载充电桩总数
@@ -79,10 +79,22 @@ public class DangerExportStationDto {
 		private Long quantity1;
 
 		/**
+		 * 非车载充电桩总功率
+		 */
+		@Excel(name = "总功率", orderNum = "10", groupName = "非车载充电桩", needMerge = true)
+		private Long power1 = 0L;
+
+		/**
 		 * 交流充电桩总数
 		 */
 		@Excel(name = "总数", orderNum = "10", groupName = "交流充电桩", needMerge = true)
 		private Long quantity2;
+
+		/**
+		 * 交流充电桩总功率
+		 */
+		@Excel(name = "总功率", orderNum = "10", groupName = "交流充电桩", needMerge = true)
+		private Long power2 = 0L;
 
 	}
 

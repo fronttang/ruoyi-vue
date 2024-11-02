@@ -64,7 +64,7 @@ public class StationFormData {
 	private String result;
 
 	public String getResult() {
-		return dangers != null && dangers > 0 ? "有风险" : "无风险";
+		return dangers != null && dangers > 0 ? "发现风险点" : "未发现风险点";
 	}
 
 }

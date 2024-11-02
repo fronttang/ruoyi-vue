@@ -19,6 +19,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="archivedPdf"    column="archived_pdf"    />
         <result property="archivedWord"    column="archived_word"    />
         <result property="wordFile"    column="word_file"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="reportDate"    column="report_date"    />
     </resultMap>
     
     <resultMap type="OwnerUnitReport" id="OwnerUnitReportResult">
@@ -45,14 +48,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="reportDate"    column="report_date"    />
     </resultMap>
 
 	<sql id="selectOwnerUnitReportVo">
-        select id, unit_id, is_danger_notice, is_complete, is_test, is_test_reason, type, code, archived_pdf, archived_word, word_file, word_file_version, archived_word_version, detect_data, detect_status, inspector, inspector_id, status, reject, create_by, create_time, update_by, update_time from owner_unit_report
+        select id, unit_id, is_danger_notice, is_complete, is_test, is_test_reason, type, code, archived_pdf, archived_word, word_file, word_file_version, archived_word_version, detect_data, detect_status, inspector, inspector_id, status, reject,
+        start_date, end_date, report_date, 
+        create_by, create_time, update_by, update_time 
+        from owner_unit_report
     </sql>
 
     <select id="selectOwnerUnitReportList" parameterType="com.ruoyi.electrical.dto.OwnerUnitReportDto" resultMap="OwnerUnitReportVo">
-    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,  r.archived_pdf, r.archived_word, r.word_file, r.word_file_version, r.archived_word_version,
+    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,  
+    	r.archived_pdf, r.archived_word, r.word_file, r.word_file_version, r.archived_word_version,
+    	r.start_date, r.end_date, 
+    	CASE WHEN r.report_date is null THEN now() ELSE r.report_date END as report_date,
     	u.district, u.street, u.community, u.hamlet,
     	CASE WHEN r.status is null THEN 0 ELSE r.status END as status, 
     	CASE WHEN r.reject is null THEN 0 ELSE r.reject END as reject
@@ -65,6 +77,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          <if test="street != null  and street != ''"> and t.street = #{street}</if>
          <if test="community != null  and community != ''"> and t.community = #{community}</if>
          <if test="hamlet != null  and hamlet != ''"> and t.hamlet = #{hamlet}</if>
+    </select>
+    
+    <select id="selectOwnerUnitReportListByUnitIds" resultMap="OwnerUnitReportVo">
+    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,  
+    	r.archived_pdf, r.archived_word, r.word_file, r.word_file_version, r.archived_word_version,
+    	r.start_date, r.end_date, 
+    	CASE WHEN r.report_date is null THEN now() ELSE r.report_date END as report_date,
+    	u.district, u.street, u.community, u.hamlet,
+    	CASE WHEN r.status is null THEN 0 ELSE r.status END as status, 
+    	CASE WHEN r.reject is null THEN 0 ELSE r.reject END as reject
+        from owner_unit u left join owner_unit_report r on (r.unit_id = u.id and r.type = #{type})
+        where u.project_id = #{projectId} ) t where unit_id in 
+        <foreach item="id" collection="unitIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
     
     <select id="selectOwnerUnitReportById" resultMap="OwnerUnitReportResult">
@@ -103,6 +130,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="startDate != null">start_date,</if>
+            <if test="endDate != null">end_date,</if>
+            <if test="reportDate != null">report_date,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -128,6 +158,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="startDate != null">#{startDate},</if>
+            <if test="endDate != null">#{endDate},</if>
+            <if test="reportDate != null">#{reportDate},</if>
          </trim>
     </insert>
 
@@ -155,6 +188,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="reportDate != null">report_date = #{reportDate},</if>
         </trim>
         where id = #{id}
     </update>

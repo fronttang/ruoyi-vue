@@ -39,7 +39,27 @@ public class StationInitialReport {
 	/**
 	 * 检测项
 	 */
-	private List<StationForm> form = new ArrayList<StationForm>();
+	// private List<StationForm> form = new ArrayList<StationForm>();
+
+	/**
+	 * 1、整体安全检查
+	 */
+	private List<StationFormData> form1 = new ArrayList<StationFormData>();
+
+	/**
+	 * 2、用电安全检查
+	 */
+	private List<StationFormData> form2 = new ArrayList<StationFormData>();
+
+	/**
+	 * 4、消防设施安全检查
+	 */
+	private List<StationFormData> form4 = new ArrayList<StationFormData>();
+
+	/**
+	 * 5、储能系统检查
+	 */
+	private List<StationFormData> form5 = new ArrayList<StationFormData>();
 
 	/**
 	 * 隐患列表

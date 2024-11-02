@@ -155,6 +155,12 @@
         <el-form-item label="记录员" prop="recorder">
           <el-input v-model="form.recorder" placeholder="请输入记录员" />
         </el-form-item>
+        <el-form-item label="图片模式" prop="picModel">
+          <el-radio-group v-model="form.picModel">
+            <el-radio label="1">可选手机相册</el-radio>
+            <el-radio label="0">不可选手机相册</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -274,7 +280,8 @@ export default {
         updateBy: null,
         updateTime: null,
         type: '02',
-        recorder: null
+        recorder: null,
+        picModel: '1'
       };
       this.resetForm("form");
     },

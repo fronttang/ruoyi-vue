@@ -2,6 +2,7 @@ package com.ruoyi.electrical.project.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ import com.ruoyi.electrical.project.service.IChargingPileService;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -126,6 +128,7 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 	}
 
 	@Override
+	@Transactional
 	public boolean startRounds(Long unitId) {
 
 		OwnerUnit ownerUnit = ownerUnitMapper.selectOwnerUnitById(unitId);
@@ -178,15 +181,16 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 		List<ChargingPile> chargingPiles = chargingPileService.selectChargingPileList(query);
 		if (CollUtil.isNotEmpty(chargingPiles)) {
 
-			chargingPiles.forEach(((pile) -> {
+			for (ChargingPile pile : chargingPiles) {
+				Long id = IdUtil.getSnowflakeNextId();
 
-				pile.setId(null);
+				pile.setOriginalId(pile.getId());
+				pile.setId(id);
 				pile.setRounds(nextRounds);
 				pile.setUpdateTime(DateUtils.getNowDate());
 
 				chargingPileService.insertChargingPile(pile);
-
-			}));
+			}
 		}
 
 		OwnerUnitDanger dangerQuery = new OwnerUnitDanger();
@@ -197,14 +201,37 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 		if (CollUtil.isNotEmpty(dangers)) {
 			dangers = dangers.stream().filter((d) -> !"2".equalsIgnoreCase(d.getStatus())).collect(Collectors.toList());
 
-			dangers.forEach((danger) -> {
+			for (OwnerUnitDanger danger : dangers) {
 
 				danger.setId(null);
 				danger.setRounds(nextRounds);
 				danger.setUpdateTime(DateUtils.getNowDate());
 
+				if (danger.getChargingPileId() != null) {
+					// 充电站ID替换
+					List<Long> chargingPileId = danger.getChargingPileId();
+
+					List<Long> newChargingPileId = new ArrayList<Long>();
+					if (CollUtil.isNotEmpty(chargingPileId)) {
+						for (Long pileId : chargingPileId) {
+
+							if (CollUtil.isNotEmpty(chargingPiles)) {
+								Optional<ChargingPile> first = chargingPiles.stream()
+										.filter((d) -> pileId.equals(d.getOriginalId())).findFirst();
+								if (first.isPresent()) {
+									ChargingPile chargingPile = first.get();
+									if (chargingPile != null && chargingPile.getId() != null) {
+										newChargingPileId.add(chargingPile.getId());
+									}
+								}
+							}
+						}
+					}
+					danger.setChargingPileId(newChargingPileId);
+				}
+
 				ownerUnitDangerService.insertOwnerUnitDanger(danger);
-			});
+			}
 		}
 		steps.add("复制成功");
 		steps.add("删除\"完成\"隐患成功");

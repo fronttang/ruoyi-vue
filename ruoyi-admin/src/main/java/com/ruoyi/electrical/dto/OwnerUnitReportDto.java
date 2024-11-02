@@ -1,5 +1,9 @@
 package com.ruoyi.electrical.dto;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -51,5 +55,23 @@ public class OwnerUnitReportDto {
 	 * 村
 	 */
 	private String hamlet;
+
+	private String remark;
+
+	private String operationPic;
+
+	/**
+	 * 编制开始日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date startDate;
+
+	/**
+	 * 编制结束日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date endDate;
+
+	private Long[] unitIds;
 
 }

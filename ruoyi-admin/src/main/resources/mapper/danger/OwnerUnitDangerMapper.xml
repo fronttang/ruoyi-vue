@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="unitAreaId"    column="unit_area_id"    />
         <result property="areaName"    column="area_name"    />
         <result property="areaType"    column="area_type"    />
-        <result property="chargingPileId"    column="charging_pile_id"    />
+        <result property="chargingPileId"    column="charging_pile_id" typeHandler="com.ruoyi.electrical.type.ListLongTypeHandler"   />
         <result property="chargingPileName"    column="charging_pile_name"    />
         <result property="rounds"    column="rounds"    />
         <result property="dangerId"    column="danger_id"    />
@@ -166,7 +166,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitId != null "> and unit_id = #{unitId}</if>
             <if test="buildingId != null "> and building_id = #{buildingId}</if>
             <if test="unitAreaId != null "> and unit_area_id = #{unitAreaId}</if>
-            <if test="chargingPileId != null  and chargingPileId != ''"> and charging_pile_id = #{chargingPileId}</if>
             <if test="rounds != null "> and rounds = #{rounds}</if>
             <if test="dangerId != null "> and danger_id = #{dangerId}</if>
             <if test="formId != null "> and form_id = #{formId}</if>
@@ -237,7 +236,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitId != null">#{unitId},</if>
             <if test="buildingId != null">#{buildingId},</if>
             <if test="unitAreaId != null">#{unitAreaId},</if>
-            <if test="chargingPileId != null">#{chargingPileId},</if>
+            <if test="chargingPileId != null">#{chargingPileId,typeHandler=com.ruoyi.electrical.type.ListLongTypeHandler},</if>
             <if test="rounds != null">#{rounds},</if>
             <if test="dangerId != null">#{dangerId},</if>
             <if test="formId != null">#{formId},</if>
@@ -274,7 +273,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitId != null">unit_id = #{unitId},</if>
             <if test="buildingId != null">building_id = #{buildingId},</if>
             <if test="unitAreaId != null">unit_area_id = #{unitAreaId},</if>
-            <if test="chargingPileId != null">charging_pile_id = #{chargingPileId},</if>
+            <if test="chargingPileId != null">charging_pile_id = #{chargingPileId,typeHandler=com.ruoyi.electrical.type.ListLongTypeHandler},</if>
             <if test="rounds != null">rounds = #{rounds},</if>
             <if test="dangerId != null">danger_id = #{dangerId},</if>
             <if test="formId != null">form_id = #{formId},</if>
@@ -362,11 +361,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="hamlet != null and hamlet !='' "> and t.hamlet = #{hamlet}</if>
             <if test="highRiskType != null and highRiskType !='' "> and t.high_risk_type = #{highRiskType}</if>
             <if test="initialStatus != null and initialStatus !='' "> and t.initial_status = #{initialStatus}</if>
-            <if test="reviewStatus != null and reviewStatus !='' "> and t.review_status = #{reviewStatus}</if>
-            <if test="startInitialDate != null and startInitialDate !='' "> and date(t.initial_date) &gt;= #{startInitialDate}</if>
-            <if test="endInitialDate != null and endInitialDate !='' "> and date(t.initial_date) &lt;= #{endInitialDate}</if>
-            <if test="startReviewDate != null and startReviewDate !='' "> and date(t.review_date) &gt;= #{startReviewDate}</if>
-            <if test="endReivewDate != null and endReivewDate !='' "> and date(t.review_date) &lt;= #{endReivewDate}</if>
+            <if test="reviewStatus != null and reviewStatus != '' ">
+            	<choose>
+					<when test="reviewStatus == 0">
+						and t.rectifications > 0
+					</when>
+					<when test="reviewStatus == 1">
+						and t.reexaminations > 0
+					</when>
+					<when test="reviewStatus == 2">
+						and ( t.dangers > 0 and t.dangers = t.finishs)
+					</when>
+				</choose>
+            </if>
+            <if test="startInitialDate != null "> and date(t.initial_date) &gt;= #{startInitialDate}</if>
+            <if test="endInitialDate != null"> and date(t.initial_date) &lt;= #{endInitialDate}</if>
+            <if test="startReviewDate != null  "> and date(t.review_date) &gt;= #{startReviewDate}</if>
+            <if test="endReivewDate != null "> and date(t.review_date) &lt;= #{endReivewDate}</if>
         </where>
     	
     </select>
@@ -407,7 +418,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="weightsDNes"    column="weights_d_nes"    />
         <result property="firstCode"    column="first_code"    />
         <result property="dangerPic"    column="danger_pic"    />
-        <result property="chargingPileId"    column="charging_pile_id"  typeHandler="com.ruoyi.electrical.type.ListStringTypeHandler"   />
+        <result property="chargingPileId"    column="charging_pile_id"  typeHandler="com.ruoyi.electrical.type.ListLongTypeHandler"   />
     </resultMap>
 
 

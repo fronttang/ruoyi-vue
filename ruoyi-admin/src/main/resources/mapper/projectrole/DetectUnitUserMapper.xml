@@ -26,11 +26,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="projectId"    column="project_id"    />
         <result property="projectName" column="project_name"  />
         <result property="accountType" column="account_type"  />
+        <result property="picModel" column="pic_model"  />
     </resultMap>
 
     <sql id="selectDetectUnitUserVo">
         select s.user_id, s.project_id, p.name as project_name, s.detect_id, u.name as detect_name, s.user_type, s.user_name, s.nick_name, s.password, s.status, 
-        s.recorder, s.district, s.street, s.community, s.hamlet, s.create_by, s.create_time, s.update_by, s.update_time ,s.account_type
+        s.recorder, s.district, s.street, s.community, s.hamlet, s.create_by, s.create_time, s.update_by, s.update_time ,s.account_type, s.pic_model
         from sys_user s left join detect_unit u on s.detect_id = u.id
         left join project p on s.project_id = p.id
     </sql>
@@ -84,6 +85,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="accountType != null">account_type,</if>
+            <if test="picModel != null">pic_model,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="detectId != null">#{detectId},</if>
@@ -104,6 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="accountType != null">#{accountType},</if>
+            <if test="picModel != null">#{picModel},</if>
          </trim>
     </insert>
 
@@ -127,6 +130,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="accountType != null">account_type = #{accountType},</if>
+            <if test="picModel != null">pic_model = #{picModel},</if>
         </trim>
         where user_id = #{id}
     </update>

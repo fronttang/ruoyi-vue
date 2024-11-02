@@ -3,9 +3,6 @@ package com.ruoyi.electrical.report.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +24,7 @@ import com.ruoyi.electrical.report.service.IChargingStationInitialReportService;
 import com.ruoyi.electrical.report.service.IHighFireRiskInitialReportService;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
+import com.ruoyi.electrical.vo.ReportFileVo;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
@@ -59,16 +57,15 @@ public class UnitReportController extends BaseController {
 	/**
 	 * @param reportId
 	 */
-	@RequestMapping("/{reportId}")
-	public AjaxResult initialReport(@PathVariable Long reportId, HttpServletRequest request,
-			HttpServletResponse response) {
+	@RequestMapping("/{unitId}/{type}")
+	public AjaxResult initialReport(@PathVariable Long unitId, @PathVariable String type) {
 
-		OwnerUnitReport report = unitReportService.selectOwnerUnitReportById(reportId);
+		OwnerUnitReport report = unitReportService.selectOwnerUnitReportByUnitIdAndType(unitId, type);
 		if (report == null) {
 			return AjaxResult.error();
 		}
 
-		OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(report.getUnitId());
+		OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(unitId);
 
 		if (ownerUnit == null) {
 			return AjaxResult.error();
@@ -77,14 +74,14 @@ public class UnitReportController extends BaseController {
 
 			// 城中村 / 工业园
 			if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
-				return toAjax(urbanVillageUnitInitialReportService.initialReport(reportId));
+				return urbanVillageUnitInitialReportService.initialReport(report.getId());
 			} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
 				// 高风险
-				return toAjax(fireRiskInitialReportService.initialReport(reportId));
+				return fireRiskInitialReportService.initialReport(report.getId());
 
 			} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
 				// 充电站
-				return toAjax(chargingStationInitialReportService.initialReport(reportId));
+				return chargingStationInitialReportService.initialReport(report.getId());
 
 			} else {
 				return AjaxResult.error();
@@ -93,14 +90,14 @@ public class UnitReportController extends BaseController {
 
 			// 城中村 / 工业园
 			if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
-				return toAjax(urbanVillageUnitInitialReportService.reviewReport(reportId));
+				return urbanVillageUnitInitialReportService.reviewReport(report.getId());
 			} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
 				// 高风险
-				return toAjax(fireRiskInitialReportService.reviewReport(reportId));
+				return fireRiskInitialReportService.reviewReport(report.getId());
 
 			} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
 				// 充电站
-				return toAjax(chargingStationInitialReportService.reviewReport(reportId));
+				return chargingStationInitialReportService.reviewReport(report.getId());
 
 			} else {
 				return AjaxResult.error();
@@ -110,9 +107,9 @@ public class UnitReportController extends BaseController {
 		}
 	}
 
-	@GetMapping("/archived/pdf/{reportId}")
-	public AjaxResult archivedPdf(@PathVariable Long reportId) {
-		OwnerUnitReport report = unitReportService.selectOwnerUnitReportById(reportId);
+	@GetMapping("/archived/pdf/{unitId}/{type}")
+	public AjaxResult archivedPdf(@PathVariable Long unitId, @PathVariable String type) {
+		OwnerUnitReport report = unitReportService.selectOwnerUnitReportByUnitIdAndType(unitId, type);
 		if (report == null) {
 			return AjaxResult.error();
 		}
@@ -149,11 +146,14 @@ public class UnitReportController extends BaseController {
 
 			log.info("Word文档已成功转换为PDF！");
 
+			String path = FileUploadUtils.getPathFileName(baseDir, filePath);
 			OwnerUnitReport result = new OwnerUnitReport();
-			result.setId(reportId);
-			result.setArchivedPdf(FileUploadUtils.getPathFileName(baseDir, filePath));
+			result.setId(report.getId());
+			result.setArchivedPdf(path);
 
-			return toAjax(unitReportService.updateOwnerUnitReport(result));
+			unitReportService.updateOwnerUnitReport(result);
+
+			return success(new ReportFileVo(report.getId(), path));
 
 		} catch (Exception e) {
 			log.error("", e);

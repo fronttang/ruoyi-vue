@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -296,6 +297,38 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 	@Override
 	public int updateOwnerUnitReport(OwnerUnitReport ownerUnitReport) {
 		return ownerUnitReportMapper.updateOwnerUnitReport(ownerUnitReport);
+	}
+
+	@Override
+	public boolean setReportDate(OwnerUnitReport report) {
+
+		Date startDate = report.getStartDate();
+		Date endDate = report.getEndDate();
+
+		if (startDate == null || endDate == null) {
+			return false;
+		}
+
+		long start = startDate.getTime();
+		long end = endDate.getTime();
+
+		Random random = new Random();
+		long reportDate = start + (long) (random.nextDouble() * (end - start + 1));
+
+		OwnerUnitReport update = new OwnerUnitReport();
+		update.setId(report.getId());
+		update.setStartDate(startDate);
+		update.setEndDate(endDate);
+		update.setReportDate(new Date(reportDate));
+
+		ownerUnitReportMapper.updateOwnerUnitReport(update);
+
+		return true;
+	}
+
+	@Override
+	public List<OwnerUnitReportVo> selectOwnerUnitReportListByUnitIds(Long[] unitIds, Long projectId, String type) {
+		return ownerUnitReportMapper.selectOwnerUnitReportListByUnitIds(unitIds, projectId, type);
 	}
 
 }

@@ -50,4 +50,7 @@ public interface OwnerUnitReportMapper {
 
 	public OwnerUnitReivewDateVo getOwnerUnitReviewer(@Param("unitId") Long unitId);
 
+	public List<OwnerUnitReportVo> selectOwnerUnitReportListByUnitIds(@Param("unitIds") Long[] unitIds,
+			@Param("projectId") Long projectId, @Param("type") String type);
+
 }

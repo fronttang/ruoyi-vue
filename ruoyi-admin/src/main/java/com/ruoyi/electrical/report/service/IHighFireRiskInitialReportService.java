@@ -1,8 +1,10 @@
 package com.ruoyi.electrical.report.service;
 
+import com.ruoyi.common.core.domain.AjaxResult;
+
 public interface IHighFireRiskInitialReportService {
 
-	int initialReport(Long reportId);
+	AjaxResult initialReport(Long reportId);
 
-	int reviewReport(Long reportId);
+	AjaxResult reviewReport(Long reportId);
 }

@@ -1,5 +1,8 @@
 package com.ruoyi.electrical.vo;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
@@ -85,5 +88,23 @@ public class OwnerUnitReportVo {
 	 * 归档word报告地址
 	 */
 	private String archivedWord;
+
+	/**
+	 * 编制开始日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date startDate;
+
+	/**
+	 * 编制结束日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date endDate;
+
+	/**
+	 * 编制日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date reportDate;
 
 }

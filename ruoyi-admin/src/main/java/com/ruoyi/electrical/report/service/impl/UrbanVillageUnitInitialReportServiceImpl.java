@@ -41,6 +41,7 @@ import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.deepoove.poi.util.PoitlIOUtils;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
@@ -75,6 +76,7 @@ import com.ruoyi.electrical.role.service.IDetectUnitService;
 import com.ruoyi.electrical.template.domain.IntuitiveDetectData;
 import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
 import com.ruoyi.electrical.vo.OwnerUnitReivewDateVo;
+import com.ruoyi.electrical.vo.ReportFileVo;
 import com.ruoyi.system.service.ISysDictDataService;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -131,11 +133,11 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 	}
 
 	@Override
-	public int reviewReport(Long reportId) {
+	public AjaxResult reviewReport(Long reportId) {
 
 		InitialReport initialReport = getReviewReportData(reportId);
 		if (initialReport == null) {
-			return 0;
+			return AjaxResult.error();
 		}
 
 		log.info("reviewReport:{} ", JSON.toJSONString(initialReport, Feature.WriteMapNullValue));
@@ -155,18 +157,18 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			XWPFTemplate mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
 			main = mainTemplate.getXWPFDocument();
 
-			return saveReportFile(reportId, initialReport, main);
+			String path = saveReportFile(reportId, initialReport, main);
 
-			// return AjaxResult.success(data);
+			return AjaxResult.success(new ReportFileVo(reportId, path));
 		} catch (Exception e) {
 			log.error("生成电气检测复检报告失败！", e);
-			return 0;
+			return AjaxResult.error();
 		} finally {
 
 		}
 	}
 
-	private int saveReportFile(Long reportId, InitialReport initialReport, NiceXWPFDocument main)
+	private String saveReportFile(Long reportId, InitialReport initialReport, NiceXWPFDocument main)
 			throws IOException, FileNotFoundException {
 		LocalDateTime now = LocalDateTime.now();
 		String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
@@ -190,20 +192,24 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			wordFileVersion = wordFileVersion + 1;
 		}
 
+		String path = FileUploadUtils.getPathFileName(baseDir, filePath);
+
 		OwnerUnitReport report = new OwnerUnitReport();
 		report.setId(reportId);
 		report.setWordFileVersion(wordFileVersion);
-		report.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
+		report.setWordFile(path);
 
-		return unitReportService.updateOwnerUnitReport(report);
+		unitReportService.updateOwnerUnitReport(report);
+
+		return path;
 	}
 
 	@Override
-	public int initialReport(Long reportId) {
+	public AjaxResult initialReport(Long reportId) {
 
 		InitialReport initialReport = getReportData(reportId);
 		if (initialReport == null) {
-			return 0;
+			return AjaxResult.error();
 		}
 
 		log.info("initialReport:{} ", JSON.toJSONString(initialReport, Feature.WriteMapNullValue));
@@ -243,12 +249,12 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			XWPFTemplate formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
 			main = main.merge(formTemplate.getXWPFDocument());
 
-			return saveReportFile(reportId, initialReport, main);
+			String path = saveReportFile(reportId, initialReport, main);
 
-			// return AjaxResult.success(data);
+			return AjaxResult.success(new ReportFileVo(reportId, path));
 		} catch (Exception e) {
 			log.error("生成电气检测初检报告失败！", e);
-			return 0;
+			return AjaxResult.error();
 		} finally {
 
 		}
@@ -436,7 +442,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
 		BeanUtils.copyProperties(report, reportInfo, "detectData");
-		reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+		reportInfo.setDetectData(DateUtil.format(report.getReportDate(), DatePattern.CHINESE_DATE_FORMATTER));
 
 		OwnerUnitInfo unitInfo = new OwnerUnitInfo();
 		BeanUtils.copyProperties(ownerUnit, unitInfo, "nature", "testStartDate", "testEndDate");
@@ -700,7 +706,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
 		BeanUtils.copyProperties(report, reportInfo, "detectData");
 		if (Objects.nonNull(report.getDetectData())) {
-			reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+			reportInfo.setDetectData(DateUtil.format(report.getReportDate(), DatePattern.CHINESE_DATE_FORMATTER));
 		} else {
 			reportInfo.setDetectData(DateUtil.format(new Date(), DatePattern.CHINESE_DATE_FORMATTER));
 		}

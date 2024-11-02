@@ -41,4 +41,8 @@ public interface IOwnerUnitReportService {
 
 	public boolean resetStatusOwnerUnitReportByUnitIdAndType(Long unitId, String type);
 
+	public boolean setReportDate(OwnerUnitReport report);
+
+	public List<OwnerUnitReportVo> selectOwnerUnitReportListByUnitIds(Long[] unitIds, Long projectId, String type);
+
 }

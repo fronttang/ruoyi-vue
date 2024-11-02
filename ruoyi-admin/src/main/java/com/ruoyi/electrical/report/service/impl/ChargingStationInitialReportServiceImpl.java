@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +23,7 @@ import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.deepoove.poi.util.PoitlIOUtils;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.electrical.danger.mapper.OwnerUnitDangerMapper;
@@ -39,7 +39,6 @@ import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.dto.station.ChargingPileInfo;
 import com.ruoyi.electrical.report.dto.station.StationDanger;
 import com.ruoyi.electrical.report.dto.station.StationDangerTableRenderPolicy;
-import com.ruoyi.electrical.report.dto.station.StationForm;
 import com.ruoyi.electrical.report.dto.station.StationFormData;
 import com.ruoyi.electrical.report.dto.station.StationInitialReport;
 import com.ruoyi.electrical.report.dto.station.StationOwnerUnitInfo;
@@ -55,6 +54,7 @@ import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.electrical.role.domain.DetectUnit;
 import com.ruoyi.electrical.role.service.IDetectUnitService;
 import com.ruoyi.electrical.template.mapper.IntuitiveDetectDataMapper;
+import com.ruoyi.electrical.vo.ReportFileVo;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -100,7 +100,7 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		MODULE_MAP.put("1", "整体安全检查");
 		MODULE_MAP.put("2", "用电安全检查");
 		MODULE_MAP.put("3", "消防设施安全检查");
-		MODULE_MAP.put("4", "电化学储能设施安全检查");
+		MODULE_MAP.put("4", "储能系统检查");
 		MODULE_MAP.put("5", "场站其他检查");
 		MODULE_MAP.put("6", "充电系统检查");
 
@@ -112,12 +112,12 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 	}
 
 	@Override
-	public int reviewReport(Long reportId) {
-		return 0;
+	public AjaxResult reviewReport(Long reportId) {
+		return AjaxResult.error();
 	}
 
 	@Override
-	public int initialReport(Long reportId) {
+	public AjaxResult initialReport(Long reportId) {
 
 		StationInitialReport report = getStationInitialReport(reportId);
 		try {
@@ -126,7 +126,8 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 
 			LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
 			ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("pileGroup", policy)
-					.bind("piles", policy).bind("form", policy).bind("data", policy).bind("form.data", policy)
+					.bind("piles", policy).bind("form", policy).bind("form1", policy).bind("form2", policy)
+					.bind("form4", policy).bind("form5", policy).bind("data", policy).bind("form.data", policy)
 					.bind("danger", new StationDangerTableRenderPolicy(report.getUnit()))
 					.bind("pileFormData", new StationPileFormTableRenderPolicy()).bind("dangerPic", policy);
 			Configure config = configureBuilder.build();
@@ -166,17 +167,19 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 				wordFileVersion = wordFileVersion + 1;
 			}
 
+			String path = FileUploadUtils.getPathFileName(baseDir, filePath);
+
 			OwnerUnitReport result = new OwnerUnitReport();
 			result.setId(reportId);
 			result.setWordFileVersion(wordFileVersion);
-			result.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
+			result.setWordFile(path);
 
-			return unitReportService.updateOwnerUnitReport(result);
+			unitReportService.updateOwnerUnitReport(result);
 
-			// return AjaxResult.success(data);
+			return AjaxResult.success(new ReportFileVo(reportId, path));
 		} catch (Exception e) {
 			log.error("生成初检报告失败！", e);
-			return 0;
+			return AjaxResult.error();
 		} finally {
 
 		}
@@ -214,7 +217,7 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
 		BeanUtils.copyProperties(report, reportInfo);
-		reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+		reportInfo.setDetectData(DateUtil.format(report.getReportDate(), DatePattern.CHINESE_DATE_FORMATTER));
 		data.setReport(reportInfo);
 
 		DetectUnitInfo detectUnitInfo = new DetectUnitInfo();
@@ -232,13 +235,13 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		List<ChargingPileInfo> pileGroup = chargingPileService.selectStationPileList(ownerUnit.getId());
 		data.setPileGroup(pileGroup);
 
-		List<StationForm> forms = new ArrayList<StationForm>();
+		// List<StationForm> forms = new ArrayList<StationForm>();
 
 		List<StationDanger> dangers = new ArrayList<StationDanger>();
 
 		List<StationFormData> scoreDatas = new ArrayList<StationFormData>();
 
-		boolean pileForm = false;
+		// boolean pileForm = false;
 
 		List<StationFormData> formDatas = detectDataMapper.selectStationDetectData(project.getTemplateId(),
 				ownerUnit.getId(), ownerUnit.getRounds());
@@ -251,30 +254,46 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 			unitInfo.setScoreDatas(scoreDatas);
 		}
 
-		String detectModule = ownerUnit.getDetectModule();
+		// String detectModule = ownerUnit.getDetectModule();
 
-		if (StrUtil.isNotBlank(detectModule)) {
+//		if (StrUtil.isNotBlank(detectModule)) {
+//
+//			List<String> moduleList = StrUtil.split(detectModule, ",");
+//			moduleList.sort(Comparator.naturalOrder());
+//
+//			pileForm = moduleList.contains("6");
+//
+//			for (int i = 0; i < moduleList.size(); i++) {
+//
+//				String module = moduleList.get(i);
+//
+//				if (!"6".equalsIgnoreCase(module)) {
+//					StationForm form = new StationForm();
+//					form.setName(MODULE_MAP.get(module));
+//
+//					List<StationFormData> formData = formDatas.stream()
+//							.filter((d) -> module.equalsIgnoreCase(d.getDetectModule())).collect(Collectors.toList());
+//					form.setData(formData);
+//					forms.add(form);
+//				}
+//			}
+//		}
 
-			List<String> moduleList = StrUtil.split(detectModule, ",");
-			moduleList.sort(Comparator.naturalOrder());
+		List<StationFormData> formData1 = formDatas.stream().filter((d) -> "1".equalsIgnoreCase(d.getDetectModule()))
+				.collect(Collectors.toList());
+		data.setForm1(formData1);
 
-			pileForm = moduleList.contains("6");
+		List<StationFormData> formData2 = formDatas.stream().filter((d) -> "2".equalsIgnoreCase(d.getDetectModule()))
+				.collect(Collectors.toList());
+		data.setForm2(formData2);
 
-			for (int i = 0; i < moduleList.size(); i++) {
+		List<StationFormData> formData4 = formDatas.stream().filter((d) -> "3".equalsIgnoreCase(d.getDetectModule()))
+				.collect(Collectors.toList());
+		data.setForm4(formData4);
 
-				String module = moduleList.get(i);
-
-				if (!"6".equalsIgnoreCase(module)) {
-					StationForm form = new StationForm();
-					form.setName(MODULE_MAP.get(module));
-
-					List<StationFormData> formData = formDatas.stream()
-							.filter((d) -> module.equalsIgnoreCase(d.getDetectModule())).collect(Collectors.toList());
-					form.setData(formData);
-					forms.add(form);
-				}
-			}
-		}
+		List<StationFormData> formData5 = formDatas.stream().filter((d) -> "4".equalsIgnoreCase(d.getDetectModule()))
+				.collect(Collectors.toList());
+		data.setForm5(formData5);
 
 		OVERVIEW_MODULE_MAP.forEach((module, name) -> {
 			StationDanger danger = new StationDanger();
@@ -301,10 +320,12 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 						}
 
 						String location = dan.getLocation();
-						if (StrUtil.isNotBlank(dan.getChargingPileName())) {
-							location = StrUtil.format("({}) {}", dan.getChargingPileName(), location);
+//						if (StrUtil.isNotBlank(dan.getChargingPileName())) {
+//							location = StrUtil.format("({}) {}", dan.getChargingPileName(), location);
+//						}
+						if (StrUtil.isNotBlank(location)) {
+							stationDanger.getLocations().add(location);
 						}
-						stationDanger.getLocations().add(location);
 					});
 				}
 
@@ -313,25 +334,25 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 				} else {
 					StationDanger noDanger = new StationDanger();
 					noDanger.setLocation("无");
-					noDanger.setDescription("/");
+					// noDanger.setDescription("/");
 					noDanger.setSuggestions("/");
 					dangers.add(noDanger);
 				}
 			} else {
 				StationDanger noDanger = new StationDanger();
 				noDanger.setLocation("无");
-				noDanger.setDescription("/");
+				// noDanger.setDescription("/");
 				noDanger.setSuggestions("/");
 				dangers.add(noDanger);
 			}
 		});
 
-		data.setForm(forms);
+		// data.setForm(forms);
 		data.setDanger(dangers);
 
-		if (pileForm) {
-			data.setPileForm(buildPileForm(data, project, chargingPiles, formDatas, stationDangerList));
-		}
+		// if (pileForm) {
+		data.setPileForm(buildPileForm(data, project, chargingPiles, formDatas, stationDangerList));
+		// }
 		// 隐患图片
 		data.setDangerPic(buildDangerPic(stationDangerList));
 
@@ -461,7 +482,7 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 			List<StationFormData> formDatas, List<StationDanger> stationDangerList) {
 
 		StationPile stationPile = new StationPile();
-		stationPile.setName(StrUtil.format("{}、{}", data.getForm().size() + 1, MODULE_MAP.get("6")));
+		stationPile.setName("3、充电系统检查");
 
 		if (CollUtil.isNotEmpty(formDatas) && CollUtil.isNotEmpty(chargingPiles)) {
 			List<StationPileForm> pileForms = new ArrayList<StationPileForm>();
@@ -524,10 +545,10 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 				try {
 					for (int c = 1; c <= subList.size(); c++) {
 						ChargingPile chargingPile = subList.get(c - 1);
-						Long dangers = countChargingPileDangers(stationDangerList, chargingPile.getId(), d.getId());
+						long dangers = countChargingPileDangers(stationDangerList, chargingPile.getId(), d.getId());
 
 						map.put("pileName" + c, chargingPile.getCode());
-						map.put("result" + c, dangers > 0 ? "发现风险点" : "无风险");
+						map.put("result" + c, dangers > 0 ? "发现风险点" : "未发现风险点");
 					}
 				} catch (Exception e) {
 				}
@@ -542,7 +563,7 @@ public class ChargingStationInitialReportServiceImpl implements IChargingStation
 		pileForm.setPileFormDatas(pileFormDatasList);
 	}
 
-	private Long countChargingPileDangers(List<StationDanger> stationDangerList, Long pileId, Long formDataId) {
+	private long countChargingPileDangers(List<StationDanger> stationDangerList, Long pileId, Long formDataId) {
 		if (CollUtil.isNotEmpty(stationDangerList)) {
 			return stationDangerList.stream().filter((d) -> {
 				return d.getChargingPileId().contains(pileId) && formDataId != null

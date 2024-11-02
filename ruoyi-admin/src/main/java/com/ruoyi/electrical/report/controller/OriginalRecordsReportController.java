@@ -1,8 +1,9 @@
 package com.ruoyi.electrical.report.controller;
 
-import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -14,9 +15,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
@@ -47,8 +45,12 @@ import com.deepoove.poi.policy.TableRenderPolicy;
 import com.deepoove.poi.util.PoitlIOUtils;
 import com.deepoove.poi.util.TableTools;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
 import com.ruoyi.electrical.danger.service.IOwnerUnitDangerService;
 import com.ruoyi.electrical.project.domain.OwnerUnit;
@@ -79,7 +81,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,6 +112,9 @@ public class OriginalRecordsReportController extends BaseController {
 
 	@Autowired
 	private IOwnerUnitDangerService ownerUnitDangerService;
+
+	@Autowired
+	private IOwnerUnitReportService ownerUnitReportService;
 
 	private static Set<Class<?>> allFormbBeans = new HashSet<Class<?>>();
 
@@ -164,12 +168,17 @@ public class OriginalRecordsReportController extends BaseController {
 	 * 
 	 * @param reportId
 	 */
-	@RequestMapping("/{reportId}")
-	public void originalRecords(@PathVariable Long reportId, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping("/{unitId}/{type}")
+	public AjaxResult originalRecords(@PathVariable Long unitId, @PathVariable String type) {
 
-		OriginalRecords originalRecords = getReportData(reportId);
+		OwnerUnitReport report = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(unitId, type);
+		if (report == null) {
+			return AjaxResult.error();
+		}
+
+		OriginalRecords originalRecords = getReportData(report.getId());
 		if (originalRecords == null) {
-			return;
+			return AjaxResult.error();
 		}
 
 		log.info("originalRecords : " + originalRecords);
@@ -228,22 +237,40 @@ public class OriginalRecordsReportController extends BaseController {
 				}
 			}
 
-			// main.merge(documents, main.createParagraph().createRun());
+			LocalDateTime now = LocalDateTime.now();
+			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+			String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
+			String datePath = DateUtil.format(now, "yyyy/MM/dd");
 
-			String fileName = URLEncodeUtil.encode("电检原始记录报告");
-			response.setContentType("application/octet-stream;charset=utf-8");
-			response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".docx");
+			String filePath = StrUtil.format("{}/{}", datePath, fileName);
 
-			OutputStream out = response.getOutputStream();
-			BufferedOutputStream bos = new BufferedOutputStream(out);
-			main.write(bos);
-			bos.flush();
-			out.flush();
+			String baseDir = RuoYiConfig.getUploadPath();
+			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
 
-			PoitlIOUtils.closeQuietlyMulti(main, bos, out); // 最后不要忘记关闭这些流。
+			main.write(new FileOutputStream(saveFile));
+
+			PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
+
+			String path = FileUploadUtils.getPathFileName(baseDir, filePath);
+			return AjaxResult.success().put("data", path);
+
+//			// main.merge(documents, main.createParagraph().createRun());
+//
+//			String fileName = URLEncodeUtil.encode("电检原始记录报告");
+//			response.setContentType("application/octet-stream;charset=utf-8");
+//			response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".docx");
+//
+//			OutputStream out = response.getOutputStream();
+//			BufferedOutputStream bos = new BufferedOutputStream(out);
+//			main.write(bos);
+//			bos.flush();
+//			out.flush();
+//
+//			PoitlIOUtils.closeQuietlyMulti(main, bos, out); // 最后不要忘记关闭这些流。
 
 		} catch (Exception e) {
 			log.error("生成电检原始记录报告失败！", e);
+			return AjaxResult.error();
 		} finally {
 
 		}
@@ -272,7 +299,7 @@ public class OriginalRecordsReportController extends BaseController {
 
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
 		BeanUtils.copyProperties(report, reportInfo, "detectData");
-		reportInfo.setDetectData(DateUtil.format(report.getDetectData(), DatePattern.CHINESE_DATE_FORMATTER));
+		reportInfo.setDetectData(DateUtil.format(report.getReportDate(), DatePattern.CHINESE_DATE_FORMATTER));
 
 		OwnerUnitInfo unitInfo = new OwnerUnitInfo();
 		BeanUtils.copyProperties(ownerUnit, unitInfo, "nature");

@@ -55,9 +55,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class OwnerUnitDangerExportStationService {
 
@@ -171,7 +172,7 @@ public class OwnerUnitDangerExportStationService {
 			int size = 1;
 
 			Row row1 = sheet.getRow(index);
-			row1.getCell(23).setCellStyle(getLevelCellStyle(workbook, stationData));
+			row1.getCell(25).setCellStyle(getLevelCellStyle(workbook, stationData));
 
 			if (CollUtil.isNotEmpty(stationData.getDangers())) {
 
@@ -183,11 +184,15 @@ public class OwnerUnitDangerExportStationService {
 				row1.getCell(8).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
 				row1.getCell(9).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
 				row1.getCell(10).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+				row1.getCell(11).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
+				row1.getCell(12).setCellStyle(styleImpl.stringSeptailStyle(workbook, true));
 
 				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 7, 7);
 				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 8, 8);
 				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 9, 9);
 				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 10, 10);
+				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 11, 11);
+				PoiMergeCellUtil.addMergedRegion(sheet, index, index + size - 1, 12, 12);
 
 				// row1.getCell(7).setCellStyle(getDefaultCellStyle(workbook));
 				// row1.getCell(8).setCellStyle(getDefaultCellStyle(workbook));
@@ -204,16 +209,19 @@ public class OwnerUnitDangerExportStationService {
 				for (int j = 0; j < dangers.size(); j++) {
 					DangerExportStationDangerDto danger = dangers.get(j);
 					Row row = sheet.getRow(index + j);
-					row.getCell(16).setCellStyle(getStationDangerStyle(workbook));
-					row.getCell(17).setCellStyle(getStationDangerStyle(workbook));
+
+					// row.getCell(16).setCellStyle(getStationDangerStyle(workbook));
+					// row.getCell(17).setCellStyle(getStationDangerStyle(workbook));
 					row.getCell(18).setCellStyle(getStationDangerStyle(workbook));
 					row.getCell(19).setCellStyle(getStationDangerStyle(workbook));
 					row.getCell(20).setCellStyle(getStationDangerStyle(workbook));
 					row.getCell(21).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(22).setCellStyle(getStationDangerStyle(workbook));
+					row.getCell(23).setCellStyle(getStationDangerStyle(workbook));
 
 					if ("true".equalsIgnoreCase(danger.getLevel())) {
-						PoiMergeCellUtil.addMergedRegion(sheet, index + j, index + j, 16, 21);
-						row.getCell(16).setCellStyle(getStationDangerTitleStyle(workbook));
+						PoiMergeCellUtil.addMergedRegion(sheet, index + j, index + j, 18, 23);
+						row.getCell(18).setCellStyle(getStationDangerTitleStyle(workbook));
 					}
 				}
 			}
@@ -222,7 +230,7 @@ public class OwnerUnitDangerExportStationService {
 
 		Row titleRow3 = sheet.getRow(3);
 		for (int i = 0; i <= 24; i++) {
-			if (i == 7 || i == 8 || i == 9 || i == 10) {
+			if (i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12) {
 				continue;
 			}
 			titleRow3.createCell(i).setCellStyle(styleImpl.getTitleStyle((short) 0));
@@ -273,10 +281,10 @@ public class OwnerUnitDangerExportStationService {
 		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setWrapText(true);
 
-		Font font = workbook.createFont();
-		font.setFontHeightInPoints((short) 10);
-
-		style.setFont(font);
+//		Font font = workbook.createFont();
+//		font.setFontHeightInPoints((short) 10);
+//
+//		style.setFont(font);
 
 		style.setBorderBottom(BorderStyle.THIN);
 		style.setBorderTop(BorderStyle.THIN);
@@ -336,44 +344,72 @@ public class OwnerUnitDangerExportStationService {
 			StationPileInfo pileInfo = new StationPileInfo();
 			if (CollUtil.isNotEmpty(stationPiles)) {
 
-				Optional<BigDecimal> quantity1 = stationPiles.stream()
-						.filter((d) -> "非车载充电桩".equalsIgnoreCase(d.getType()))
-						.filter((d) -> Objects.nonNull(d.getQuantity())).map((d) -> new BigDecimal(d.getQuantity()))
-						.reduce(BigDecimal::add);
+				try {
+					Optional<BigDecimal> quantity1 = stationPiles.stream()
+							.filter((d) -> "非车载充电桩".equalsIgnoreCase(d.getType()))
+							.filter((d) -> Objects.nonNull(d.getQuantity())).map((d) -> new BigDecimal(d.getQuantity()))
+							.reduce(BigDecimal::add);
 
-				if (quantity1.isPresent()) {
-					BigDecimal quantity = quantity1.get();
-					quantity = quantity.setScale(0, RoundingMode.HALF_UP);
-					pileInfo.setQuantity1(quantity.longValue());
-				} else {
-					pileInfo.setQuantity1(0L);
-				}
+					if (quantity1.isPresent()) {
+						BigDecimal quantity = quantity1.get();
+						quantity = quantity.setScale(0, RoundingMode.HALF_UP);
+						pileInfo.setQuantity1(quantity.longValue());
+					} else {
+						pileInfo.setQuantity1(0L);
+					}
 
-				Optional<BigDecimal> quantity2 = stationPiles.stream()
-						.filter((d) -> "交流充电桩".equalsIgnoreCase(d.getType()))
-						.filter((d) -> Objects.nonNull(d.getQuantity())).map((d) -> new BigDecimal(d.getQuantity()))
-						.reduce(BigDecimal::add);
+					try {
+						Optional<BigDecimal> power1 = stationPiles.stream()
+								.filter((d) -> "非车载充电桩".equalsIgnoreCase(d.getType()))
+								.filter((d) -> Objects.nonNull(d.getQuantity()) && Objects.nonNull(d.getPower()))
+								.map((d) -> new BigDecimal(d.getQuantity()).multiply(new BigDecimal(d.getPower())))
+								.reduce(BigDecimal::add);
+						if (power1.isPresent()) {
+							BigDecimal power = power1.get();
+							power = power.setScale(0, RoundingMode.HALF_UP);
+							pileInfo.setPower1(power.longValue());
+						} else {
+							pileInfo.setPower1(0L);
+						}
+					} catch (Exception e) {
+						log.error("", e);
+					}
 
-				if (quantity2.isPresent()) {
-					BigDecimal quantity = quantity2.get();
-					quantity = quantity.setScale(0, RoundingMode.HALF_UP);
-					pileInfo.setQuantity2(quantity.longValue());
-				} else {
-					pileInfo.setQuantity2(0L);
-				}
+					Optional<BigDecimal> quantity2 = stationPiles.stream()
+							.filter((d) -> "交流充电桩".equalsIgnoreCase(d.getType()))
+							.filter((d) -> Objects.nonNull(d.getQuantity())).map((d) -> new BigDecimal(d.getQuantity()))
+							.reduce(BigDecimal::add);
 
-				pileInfo.setStationPileQuantity(pileInfo.getQuantity1() + pileInfo.getQuantity2());
+					if (quantity2.isPresent()) {
+						BigDecimal quantity = quantity2.get();
+						quantity = quantity.setScale(0, RoundingMode.HALF_UP);
+						pileInfo.setQuantity2(quantity.longValue());
+					} else {
+						pileInfo.setQuantity2(0L);
+					}
 
-				Optional<BigDecimal> power = stationPiles.stream().filter((d) -> Objects.nonNull(d.getPower()))
-						.filter((d) -> NumberUtil.isNumber(d.getPower())).map((d) -> new BigDecimal(d.getPower()))
-						.reduce(BigDecimal::add);
+					try {
+						Optional<BigDecimal> power2 = stationPiles.stream()
+								.filter((d) -> "交流充电桩".equalsIgnoreCase(d.getType()))
+								.filter((d) -> Objects.nonNull(d.getQuantity()) && Objects.nonNull(d.getPower()))
+								.map((d) -> new BigDecimal(d.getQuantity()).multiply(new BigDecimal(d.getPower())))
+								.reduce(BigDecimal::add);
 
-				if (power.isPresent()) {
-					BigDecimal powersum = power.get();
-					powersum = powersum.setScale(0, RoundingMode.HALF_UP);
-					pileInfo.setStationPilePower(powersum.toPlainString());
-				} else {
-					pileInfo.setStationPilePower("");
+						if (power2.isPresent()) {
+							BigDecimal power = power2.get();
+							power = power.setScale(0, RoundingMode.HALF_UP);
+							pileInfo.setPower2(power.longValue());
+						} else {
+							pileInfo.setQuantity2(0L);
+						}
+					} catch (Exception e) {
+						log.error("", e);
+					}
+
+					pileInfo.setStationPileQuantity(pileInfo.getQuantity1() + pileInfo.getQuantity2());
+					pileInfo.setStationPilePower(pileInfo.getPower1() + pileInfo.getPower2());
+				} catch (Exception e) {
+					log.error("", e);
 				}
 			}
 
@@ -450,7 +486,7 @@ public class OwnerUnitDangerExportStationService {
 
 							List<String> locations = descDangers.stream()
 									.filter((d) -> StrUtil.isNotBlank(d.getLocation()))
-									.map(OwnerUnitDanger::getLocation).distinct().collect(Collectors.toList());
+									.map(OwnerUnitDanger::getReportLocation).distinct().collect(Collectors.toList());
 
 							long count = descDangers.stream().filter(
 									(d) -> "0".equalsIgnoreCase(d.getStatus()) || "1".equalsIgnoreCase(d.getStatus()))

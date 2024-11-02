@@ -23,6 +23,11 @@ public class ChargingPile extends BaseEntity {
 	/** ID */
 	private Long id;
 
+	/**
+	 * 原始充电桩ID
+	 */
+	private Long originalId;
+
 	/** 充电站ID */
 	@Excel(name = "充电站ID")
 	private Long unitId;

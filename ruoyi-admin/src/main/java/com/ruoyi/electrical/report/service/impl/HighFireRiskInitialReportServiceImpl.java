@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +30,7 @@ import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.deepoove.poi.util.PoitlIOUtils;
 import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.file.FileUploadUtils;
@@ -48,6 +48,7 @@ import com.ruoyi.electrical.report.dto.high.HighReportInfo;
 import com.ruoyi.electrical.report.dto.high.OwnerUnitInfo;
 import com.ruoyi.electrical.report.service.IHighFireRiskInitialReportService;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
+import com.ruoyi.electrical.vo.ReportFileVo;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -109,22 +110,22 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 	}
 
 	@Override
-	public int reviewReport(Long reportId) {
+	public AjaxResult reviewReport(Long reportId) {
 		return initialReport(reportId);
 	}
 
 	@Override
-	public int initialReport(Long reportId) {
+	public AjaxResult initialReport(Long reportId) {
 
 		OwnerUnitReport report = unitReportService.selectOwnerUnitReportById(reportId);
 		if (report == null) {
-			return 0;
+			return AjaxResult.error();
 		}
 
 		OwnerUnit ownerUnit = ownerUnitMapper.getOwnerUnitById(report.getUnitId());
 
 		if (ownerUnit == null) {
-			return 0;
+			return AjaxResult.error();
 		}
 
 		OwnerUnitConfig ownerUnitConfig = ownerUnitConfigService.selectOwnerUnitConfigByUnitId(ownerUnit.getId());
@@ -149,7 +150,7 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 			List<HighDangerInfo> danger = ownerUnitDangerMapper.selectOwnerDangerHighReportByUnitId(ownerUnit.getId());
 
 			HighReportInfo reportInfo = new HighReportInfo();
-			reportInfo.setCreateDate(DateUtil.format(new Date(), DatePattern.CHINESE_DATE_FORMATTER));
+			reportInfo.setCreateDate(DateUtil.format(report.getReportDate(), DatePattern.CHINESE_DATE_FORMATTER));
 			reportInfo.setUnit(ownerUnitInfo);
 			if (CollUtil.isNotEmpty(danger)) {
 				reportInfo.setDanger(danger);
@@ -217,17 +218,19 @@ public class HighFireRiskInitialReportServiceImpl implements IHighFireRiskInitia
 				wordFileVersion = wordFileVersion + 1;
 			}
 
+			String path = FileUploadUtils.getPathFileName(baseDir, filePath);
+
 			OwnerUnitReport result = new OwnerUnitReport();
 			result.setId(reportId);
 			result.setWordFileVersion(wordFileVersion);
-			result.setWordFile(FileUploadUtils.getPathFileName(baseDir, filePath));
+			result.setWordFile(path);
 
-			return unitReportService.updateOwnerUnitReport(result);
+			unitReportService.updateOwnerUnitReport(result);
 
-			// return AjaxResult.success(data);
+			return AjaxResult.success(new ReportFileVo(reportId, path));
 		} catch (Exception e) {
 			log.error("生成报告失败！", e);
-			return 0;
+			return AjaxResult.error();
 		} finally {
 
 		}

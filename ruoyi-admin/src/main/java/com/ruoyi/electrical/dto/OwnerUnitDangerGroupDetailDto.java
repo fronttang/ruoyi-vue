@@ -2,6 +2,8 @@ package com.ruoyi.electrical.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -65,21 +67,25 @@ public class OwnerUnitDangerGroupDetailDto {
 	/**
 	 * 开始 初检时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startInitialDate;
 
 	/**
 	 * 结束 初检时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date endInitialDate;
 
 	/**
 	 * 开始 复检时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startReviewDate;
 
 	/**
 	 * 结束 复检时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date endReivewDate;
 
 }

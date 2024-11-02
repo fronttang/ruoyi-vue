@@ -1,6 +1,7 @@
 package com.ruoyi.electrical.danger.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -96,7 +97,7 @@ public class OwnerUnitDanger extends BaseEntity {
 
 	/** 充电桩ID */
 	@Excel(name = "充电桩ID")
-	private String chargingPileId;
+	private List<Long> chargingPileId;
 
 	/** 轮次 */
 	@Excel(name = "轮次")

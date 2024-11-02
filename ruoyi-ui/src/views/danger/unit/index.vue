@@ -79,6 +79,19 @@
           />
         </el-select>
       </el-form-item>
+
+      <el-form-item label="初检日期" prop="initialDate" >
+        <el-date-picker clearable @change="$forceUpdate()"
+            v-model="queryParams.initialDate"
+            type="daterange"
+            range-separator="-"
+            value-format="yyyy-MM-dd"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            size="small">
+          </el-date-picker>
+      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -316,6 +329,7 @@ export default {
         community: null,
         hamlet: null,
         highRiskType: null,
+        initialDate: [],
         startInitialDate: null,
         endInitialDate: null,
         startReviewDate: null,
@@ -415,6 +429,10 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
+      if(this.queryParams.initialDate != null){
+        this.queryParams.startInitialDate = this.queryParams.initialDate[0];
+        this.queryParams.endInitialDate = this.queryParams.initialDate[1];
+      }
       this.queryParams.pageNum = 1;
       this.getList();
     },

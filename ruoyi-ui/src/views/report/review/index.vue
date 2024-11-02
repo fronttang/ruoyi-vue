@@ -76,6 +76,34 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="el-icon-edit"
+          size="mini"
+          @click="handleBatchAudit"
+        >批量审核</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="el-icon-date"
+          size="mini"
+          @click="handleBatchSetReportDate"
+        >批量设置编制日期</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-dropdown size="mini" @command="handleBatchCommand">
+          <el-button size="mini" type="primary" plain icon="el-icon-download">批量下载<i class="el-icon-arrow-down el-icon--right"></i></el-button>
+          <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item :command="1">制式Word报告</el-dropdown-item>
+              <el-dropdown-item :command="2">归档Word报告</el-dropdown-item>
+              <el-dropdown-item :command="3">原始记录(电检)</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -113,6 +141,11 @@
       <el-table-column label="村" align="center" prop="hamlet" :show-overflow-tooltip="true" v-if="projectType === '1'">
         <template slot-scope="scope">
           <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="编制日期" align="center" prop="reportDate" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.reportDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status" width="150" :formatter="statusFormat" />
@@ -155,6 +188,14 @@
               icon="iconfont iconfont-reload"
               @click="handleResetStatus(scope.row)"
             ></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="编制日期" placement="top">
+            <el-button
+              size="medium"
+              type="text"
+              icon="el-icon-date"
+              @click="handleReportDate(scope.row)"
+            >  </el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -202,6 +243,62 @@
         </el-col>
       </el-row>
     </el-dialog>
+
+    <el-dialog title="编制日期" :visible.sync="openReportDate" width="600px" append-to-body>
+      <el-form ref="reportDateForm" :model="reportDateForm" :rules="reportDateRoles" label-width="100px" label-position="top">
+        <el-form-item label="编制日期" label-width="100px" prop="reportDate">
+          <el-date-picker clearable @change="$forceUpdate()"
+            v-model="reportDateForm.reportDate"
+            type="daterange"
+            range-separator="-"
+            value-format="yyyy-MM-dd"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            size="small">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" :loading="setReportDateLoading" @click="submitReportDate">确 定</el-button>
+        <el-button @click="openReportDate = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="批量审核" :visible.sync="batchAuditOpen" width="800px" append-to-body>
+        <el-form ref="batchAuditForm" :model="form" :rules="rules" label-width="80px">
+          <el-form-item label="驳回原因" label-width="100px" prop="remark">
+            <el-input v-model="form.remark" type="textarea" placeholder="请输入驳回原因" />
+          </el-form-item>
+          <el-form-item label="相关图片" label-width="100px" prop="operationPic">
+            <image-upload v-model="form.operationPic" />
+          </el-form-item>
+        </el-form>
+        <div style="padding-left: 100px;">
+          <el-button type="primary" :loading="handleBatchPassLoading" @click="handleBatchPass">通过</el-button>
+          <el-button v-if="form.status !== '0'" :loading="handleBatchNotPassLoading" @click="handleBatchNotPass">驳回</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="批量设置编制日期" :visible.sync="batchReportDateOpen" width="600px" append-to-body>
+      <el-form ref="batchReportDateForm" :model="reportDateForm" :rules="reportDateRoles" label-width="100px" label-position="top">
+        <el-form-item label="编制日期" label-width="100px" prop="reportDate">
+          <el-date-picker clearable @change="$forceUpdate()"
+            v-model="reportDateForm.reportDate"
+            type="daterange"
+            range-separator="-"
+            value-format="yyyy-MM-dd"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            size="small">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" :loading="submitBatchReportDateLoading" @click="submitBatchReportDate">确 定</el-button>
+        <el-button @click="batchReportDateOpen = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <style>
@@ -217,7 +314,7 @@ padding-bottom: 0px;
 }
 </style>
 <script>
-import { listReport, getReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus} from "@/api/report/report";
+import { listReport, getReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus, setReportDate, getOriginalRecords, batchPass, batchNotPass, batchSetReportDate, batchDownload} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
@@ -267,6 +364,13 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      batchAuditOpen: false,
+      openReportDate: false,
+      setReportDateLoading: false,
+      batchReportDateOpen: false,
+      handleBatchPassLoading: false,
+      handleBatchNotPassLoading: false,
+      submitBatchReportDateLoading: false,
       workerRoleId: this.$store.state.settings.workerRoleId,
       projectInfo: {
 
@@ -283,16 +387,27 @@ export default {
         district: null,
         street: null,
         community: null,
-        hamlet: null
+        hamlet: null,
+        unitIds: [],
+        startDate: null,
+        endDate: null,
+        remark: null,
+        operationPic: null
       },
       // 表单参数
       form: {},
+      reportDateForm: {
+        reportDate: [],
+        unitId: null,
+        type: '2'
+      },
       // 表单校验
       rules: {
         remark: [
           { required: true, message: "驳回原因不能为空", trigger: "blur" }
         ],
       },
+      reportDateRoles: {},
       projectType: null,
       reportLogs: [],
       loadingInstance: null
@@ -358,7 +473,7 @@ export default {
       });
     },
     handlePass(){
-      passReport(this.form.reportId).then(response => {
+      passReport(this.form.unitId, '2').then(response => {
         this.$modal.msgSuccess("操作成功");
         this.open = false;
         this.getList();
@@ -370,7 +485,9 @@ export default {
         reportId: null,
         remark: null,
         operationPic: null,
-        status: null
+        status: null,
+        unitId: null,
+        type: '2'
       };
       this.resetForm("form");
     },
@@ -412,33 +529,18 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
+      this.ids = selection.map(item => item.unitId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
     handleAudit(row){
       this.reset();
       this.form.status = row.status;
-      if(row.reportId != null){
-        this.form.reportId = row.reportId;
-        getReportLogs(row.reportId).then(response => {
-          this.reportLogs = response.data;
-          this.open = true;
-        });
-      } else {
-        this.queryReportForm = {
-          unitId: row.unitId,
-          type: '2'
-        }
-        getReport(this.queryReportForm).then(response => {
-          this.report = response.data;
-          this.form.reportId = this.report.id;
-          getReportLogs(this.report.id).then(response => {
-            this.reportLogs = response.data;
-            this.open = true;
-          });
-        });
-      }
+      this.form.unitId = row.unitId;
+      getReportLogs(row.unitId, '2').then(response => {
+        this.reportLogs = response.data;
+        this.open = true;
+      });
     },
     handleUpdate(row){
 
@@ -457,53 +559,22 @@ export default {
       this.$tab.openPage("隐患数据汇总", '/danger/list/index/' + unitId, params);
     },
     handleDownloadOriginalRecords(row){
-      if(row.reportId != null){
-        this.download('report/download/originalRecords/' + row.reportId, {}, `电检原始记录报告.docx`)
-      } else {
-        this.queryReportForm = {
-          unitId: row.unitId,
-          type: '1'
-        }
-        getReport(this.queryReportForm).then(response => {
-          this.download('report/download/originalRecords/' + this.report.id, {}, `电检原始记录报告.docx`)
-        });
-      }
+      var fileName = "Y" + row.name + ".docx";
+      getOriginalRecords(row.unitId, '2').then(response => {
+        this.$download.resource(response.data, fileName);
+      });
     },
     handleOpenInitialReport(row){
       this.loadingInstance = Loading.service({ text: "正在生成数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
-      // 打开初检报告
-      if(row.reportId != null){
+      getWordReport(row.unitId, '2').then(response => {
+        this.$tab.openPage("编辑Word报告", '/report/weboffice/weboffice/' + response.data.reportId + "/1");
+        //this.download('common/download/resource?resource=' + response.file, {})
 
-        getWordReport(row.reportId).then(response => {
-
-          this.$tab.openPage("编辑Word报告", '/report/weboffice/weboffice/' + row.reportId + "/1");
-          //this.download('common/download/resource?resource=' + response.file, {})
-
-          this.loadingInstance.close();
-        }).catch((r) => {
-          this.$modal.msgError('生成报告出现错误，请联系管理员！')
-          this.loadingInstance.close();
-        });
-        
-      } else {
-        this.queryReportForm = {
-          unitId: row.unitId,
-          type: '2'
-        }
-        getReport(this.queryReportForm).then(response => {
-          getWordReport(this.report.id).then(response => {
-            this.$tab.openPage("编辑Word报告", '/report/weboffice/weboffice/' + row.reportId + "/1");
-            this.loadingInstance.close();
-          }).catch((r) => {
-            this.$modal.msgError('生成报告出现错误，请联系管理员！')
-            this.loadingInstance.close();
-          });
-          this.loadingInstance.close();
-        }).catch((r) => {
-          this.$modal.msgError('生成报告出现错误，请联系管理员！')
-          this.loadingInstance.close();
-        });
-      }
+        this.loadingInstance.close();
+      }).catch((r) => {
+        this.$modal.msgError('生成报告出现错误，请联系管理员！')
+        this.loadingInstance.close();
+      });
     },
     handleOpenArchivedPdf(row){
       if(row.archivedPdf == null){
@@ -513,10 +584,11 @@ export default {
       }
     },
     handleDownloadArchivedPDFReport(row) {
+      var fileName = "C" + row.name + ".pdf";
       if(row.archivedPdf == null){
         this.$modal.msgError("请先归档Word报告为PDF");
       } else {
-        this.$download.resource(row.archivedPdf, "归档PDF报告.pdf");
+        this.$download.resource(row.archivedPdf, fileName);
         //this.$download.resource(row.archivedPdf);
       }
     },
@@ -530,11 +602,10 @@ export default {
     handleArchivedWordReportToPdf(row){
       this.loading = true;
       // word报告归档为pdf
-      archivedPdf(row.reportId).then(response => {
+      archivedPdf(row.unitId, '2').then(response => {
         this.$modal.msgSuccess('归档成功')
         this.loading = false;
       }).catch((r) => {
-        //this.$modal.msgError("无归档Word报告");
         this.loading = false;
       });
     },
@@ -546,10 +617,11 @@ export default {
       }
     },
     handleDownloadInitialReport(row){
+      var fileName = "Z" + row.name + ".docx";
       if(row.wordFile == null){
         this.$modal.msgError("无制式Word报告");
       } else {
-        this.$download.resource(row.wordFile, "制式Word报告.docx");
+        this.$download.resource(row.wordFile, fileName);
       }
     },
     // 更多操作触发
@@ -568,6 +640,116 @@ export default {
           break;
       }
     },
+    handleReportDate(row){
+      this.reportDateForm.unitId = row.unitId;
+      this.reportDateForm.type = '2'; 
+      if(row.startDate != null && row.endDate != null){
+        this.reportDateForm.reportDate = [row.startDate , row.endDate];
+      } else {
+        this.reportDateForm.reportDate = [];
+      }
+      this.openReportDate = true;
+    },
+    submitReportDate(){
+      var param = {};
+      if(this.reportDateForm.reportDate != null){
+        param.startDate = this.reportDateForm.reportDate[0];
+        param.endDate = this.reportDateForm.reportDate[1];
+      }
+
+      param.unitId = this.reportDateForm.unitId;
+      param.type = '2';
+
+      this.loading = true;
+      setReportDate(param).then(response => {
+        this.loading = false;
+        this.openReportDate = false;
+        this.$modal.msgSuccess('设置成功')
+        this.getList();
+      }).catch((r) => {
+        this.loading = false;
+        this.openReportDate = false;
+      });
+    },
+    handleBatchCommand(type){
+      this.loadingInstance = Loading.service({ text: "正在生成数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+      var filename = '报告.zip';
+      if(type == '1'){
+        filename = '制式报告.zip';
+      } else if(type == '2'){
+        filename = '归档报告.zip';
+      } else if(type == '3'){
+        filename = '原始记录.zip';
+      } 
+      // 批量下载
+      this.queryParams.unitIds = this.ids;
+      batchDownload(this.queryParams, type).then(response => {
+        this.$download.resource(response.data, filename);
+        this.loadingInstance.close();
+      }).catch((r) => {
+        this.$modal.msgError('生成报告出现错误，请联系管理员！')
+        this.loadingInstance.close();
+      });
+    },
+    handleBatchAudit(){
+      this.reset();
+      this.batchAuditOpen = true;
+    },
+    handleBatchPass(){
+      this.handleBatchPassLoading = true;
+      this.queryParams.unitIds = this.ids;
+      batchPass(this.queryParams).then(response => {
+        this.$modal.msgSuccess('操作成功')
+        this.batchAuditOpen = false;
+        this.handleBatchPassLoading = false;
+        this.getList();
+      }).catch((r) => {
+        this.handleBatchPassLoading = false;
+        this.batchAuditOpen = false;
+      });
+    },
+    handleBatchNotPass(){
+      this.handleBatchNotPassLoading = true;
+      this.$refs["batchAuditForm"].validate(valid => {
+        if (valid) {
+          this.queryParams.unitIds = this.ids;
+          this.queryParams.remark = this.form.remark;
+          this.queryParams.operationPic = this.form.operationPic;
+          batchNotPass(this.queryParams).then(response => {
+            this.$modal.msgSuccess('操作成功')
+            this.batchAuditOpen = false;
+            this.handleBatchNotPassLoading = false;
+            this.getList();
+          }).catch((r) => {
+            this.handleBatchNotPassLoading = false;
+            this.batchAuditOpen = false;
+          });
+        } else{
+          this.handleBatchNotPassLoading = false;
+        }
+      });
+    },
+    handleBatchSetReportDate(){
+      this.reportDateForm.reportDate = [];
+      this.batchReportDateOpen = true;
+    },
+    submitBatchReportDate() {
+      this.submitBatchReportDateLoading = true;
+      if(this.reportDateForm.reportDate != null){
+        this.queryParams.startDate = this.reportDateForm.reportDate[0];
+        this.queryParams.endDate = this.reportDateForm.reportDate[1];
+      }
+      this.queryParams.unitIds = this.ids;
+      batchSetReportDate(this.queryParams).then(response => {
+        this.$modal.msgSuccess('操作成功')
+        this.batchReportDateOpen = false;
+        this.submitBatchReportDateLoading = false;
+        this.getList();
+      }).catch((r) => {
+        this.submitBatchReportDateLoading = false;
+        this.batchReportDateOpen = false;
+      });
+    }
   }
 };
 </script>

@@ -107,4 +107,29 @@ public class OwnerUnitReport extends BaseEntity {
 	 */
 	private Integer archivedWordVersion;
 
+	/**
+	 * 编制开始日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date startDate;
+
+	/**
+	 * 编制结束日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date endDate;
+
+	/**
+	 * 编制日期
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date reportDate;
+
+	public Date getReportDate() {
+		if (reportDate == null) {
+			return new Date();
+		}
+		return reportDate;
+	}
+
 }

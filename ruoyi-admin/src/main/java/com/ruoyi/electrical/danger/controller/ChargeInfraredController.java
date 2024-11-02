@@ -44,7 +44,7 @@ public class ChargeInfraredController extends BaseController {
 	/**
 	 * 修改红外判定
 	 */
-	@PreAuthorize("@ss.hasPermi('project:infrared:edit')")
+	// @PreAuthorize("@ss.hasPermi('project:infrared:edit')")
 	@Log(title = "红外判定", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody ChargeInfrared chargeInfrared) {

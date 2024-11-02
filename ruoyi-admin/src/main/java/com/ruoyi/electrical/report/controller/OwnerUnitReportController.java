@@ -53,10 +53,15 @@ public class OwnerUnitReportController extends BaseController {
 		return AjaxResult.success(report);
 	}
 
-	@GetMapping("/log/{reportId}")
-	public AjaxResult reportLogList(@PathVariable Long reportId) {
+	@GetMapping("/log/{unitId}/{type}")
+	public AjaxResult reportLogList(@PathVariable Long unitId, @PathVariable String type) {
 
-		List<OwnerUnitReportLog> logs = ownerUnitReportLogService.selectOwnerUnitReportLogByReportId(reportId);
+		OwnerUnitReport report = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(unitId, type);
+		if (report == null) {
+			return AjaxResult.success();
+		}
+
+		List<OwnerUnitReportLog> logs = ownerUnitReportLogService.selectOwnerUnitReportLogByReportId(report.getId());
 
 		return AjaxResult.success(logs);
 	}
@@ -66,10 +71,15 @@ public class OwnerUnitReportController extends BaseController {
 	 * 
 	 * @return
 	 */
-	@GetMapping("/pass/{reportId}")
-	public AjaxResult pass(@PathVariable Long reportId) {
+	@GetMapping("/pass/{unitId}/{type}")
+	public AjaxResult pass(@PathVariable Long unitId, @PathVariable String type) {
 
-		ownerUnitReportService.pass(reportId);
+		OwnerUnitReport report = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(unitId, type);
+		if (report == null) {
+			return AjaxResult.error();
+		}
+
+		ownerUnitReportService.pass(report.getId());
 
 		return AjaxResult.success();
 	}
@@ -83,6 +93,14 @@ public class OwnerUnitReportController extends BaseController {
 	@PostMapping("/notpass")
 	public AjaxResult notPass(OwnerUnitReportPassDto data) {
 
+		OwnerUnitReport report = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(data.getUnitId(),
+				data.getType());
+		if (report == null) {
+			return AjaxResult.error();
+		}
+
+		data.setReportId(report.getId());
+
 		ownerUnitReportService.notPass(data);
 
 		return AjaxResult.success();
@@ -91,6 +109,22 @@ public class OwnerUnitReportController extends BaseController {
 	@GetMapping("/reset/status/{unitId}/{type}")
 	public AjaxResult resetStatus(@PathVariable("unitId") Long unitId, @PathVariable("type") String type) {
 		ownerUnitReportService.resetStatusOwnerUnitReportByUnitIdAndType(unitId, type);
+		return AjaxResult.success();
+	}
+
+	@PostMapping("/report/date")
+	public AjaxResult setReportDate(OwnerUnitReport dto) {
+
+		OwnerUnitReport report = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(dto.getUnitId(),
+				dto.getType());
+		if (report == null) {
+			return AjaxResult.error();
+		}
+
+		dto.setId(report.getId());
+
+		ownerUnitReportService.setReportDate(dto);
+
 		return AjaxResult.success();
 	}
 

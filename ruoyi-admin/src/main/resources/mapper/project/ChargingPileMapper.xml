@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="ChargingPile" id="ChargingPileResult">
         <result property="id"    column="id"    />
+        <result property="originalId"    column="original_id"    />
         <result property="unitId"    column="unit_id"    />
         <result property="name"    column="name"    />
         <result property="code"    column="code"    />
@@ -22,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectChargingPileVo">
-        select id, unit_id, name, code, rounds, type, brand, model, power, serial_number, create_by, create_time, update_by, update_time
+        select id, original_id, unit_id, name, code, rounds, type, brand, model, power, serial_number, create_by, create_time, update_by, update_time
         from charging_pile 
     </sql>
 
@@ -51,9 +52,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
        where d.form_data_id = #{formDataId} and #{pileId} member of(d.charging_pile_id)
     </select>
 
-    <insert id="insertChargingPile" parameterType="ChargingPile" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertChargingPile" parameterType="ChargingPile">
         insert into charging_pile
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="originalId != null">original_id,</if>
             <if test="unitId != null">unit_id,</if>
             <if test="name != null and name != ''">name,</if>
             <if test="code != null">code,</if>
@@ -69,6 +72,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="originalId != null">#{originalId},</if>
             <if test="unitId != null">#{unitId},</if>
             <if test="name != null and name != ''">#{name},</if>
             <if test="code != null">#{code},</if>
@@ -88,6 +93,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateChargingPile" parameterType="ChargingPile">
         update charging_pile
         <trim prefix="SET" suffixOverrides=",">
+            <if test="originalId != null">original_id = #{originalId},</if>
             <if test="unitId != null">unit_id = #{unitId},</if>
             <if test="name != null and name != ''">name = #{name},</if>
             <if test="code != null">code = #{code},</if>

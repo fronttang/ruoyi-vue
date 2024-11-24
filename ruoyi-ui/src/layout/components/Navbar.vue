@@ -30,12 +30,12 @@
       </template>
 
       <el-dropdown @command="handleChangeProject" class="avatar-container right-menu-item hover-effect" trigger="click">
-        <div class="avatar-wrapper" style="font-size: 14px;">
+        <div class="avatar-wrapper" style="font-size: 14px;max-width:400px;display: inline-block;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
           {{selectedProject}}
           <i class="el-icon-arrow-down el-icon--right"></i>
         </div>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-for="item in projectDict" :command="item" >{{item.name}}</el-dropdown-item>
+        <el-dropdown-menu slot="dropdown" style="max-width:400px">
+          <el-dropdown-item style="width:100%;display: inline-block;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;" v-for="item in projectDict" :command="item" >{{item.name}}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
 

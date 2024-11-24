@@ -26,6 +26,7 @@ import com.ruoyi.electrical.vo.OwnerUnitReportVo;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 初检报告Service业务层处理
@@ -33,6 +34,7 @@ import cn.hutool.core.util.StrUtil;
  * @author fronttang
  * @date 2024-07-15
  */
+@Slf4j
 @Service
 public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 
@@ -59,15 +61,18 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 	@Override
 	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndType(Long unitId, String type) {
 
-		LoginUser loginUser = SecurityUtils.getLoginUser();
-
 		OwnerUnitReport report = ownerUnitReportMapper.selectOwnerUnitReportByUnitIdAndType(unitId, type);
 		if (report == null) {
 			report = new OwnerUnitReport();
 			report.setId(IdUtil.getSnowflake().nextId());
 			report.setType(type);
-			report.setInspector(loginUser.getUser().getNickName());
-			report.setInspectorId(loginUser.getUserId());
+			try {
+				LoginUser loginUser = SecurityUtils.getLoginUser();
+				report.setInspector(loginUser.getUser().getNickName());
+				report.setInspectorId(loginUser.getUserId());
+			} catch (Exception e) {
+				log.error("", e);
+			}
 			report.setUnitId(unitId);
 			report.setDetectData(new Date());
 			report.setDetectStatus("0");

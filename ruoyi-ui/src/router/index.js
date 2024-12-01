@@ -312,6 +312,26 @@ export const dynamicRoutes = [
         meta: { title: '报告编辑', activeMenu: '/report/Initial' }
       }
     ]
+  },
+  {
+    path: '/electrical/project/view',
+    component: Layout,
+    hidden: true,
+    permissions: ['electrical:project:list'],
+    children: [
+      {
+        path: 'device/:projectId(\\d+)',
+        component: () => import('@/views/electrical/project/device'),
+        name: 'ProjectDevice',
+        meta: { title: '项目设备列表', activeMenu: '/electrical/project' }
+      },
+      {
+        path: 'image/:deviceId(\\d+)',
+        component: () => import('@/views/electrical/project/image'),
+        name: 'ProjectDeviceImage',
+        meta: { title: '设备照片集合', activeMenu: '/electrical/project' }
+      }
+    ]
   }
 ]
 

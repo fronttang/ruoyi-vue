@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.design.mapper.ElectricityProjectMapper">
+    
+    <resultMap type="ElectricityProject" id="ElectricityProjectResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    
+    <resultMap type="com.ruoyi.electrical.design.vo.ElectricityProjectVo" id="ElectricityProjectVoResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="images"    column="images"    />
+    </resultMap>
+
+    <sql id="selectElectricityProjectVo">
+        select id, name, create_by, create_time, update_by, update_time from electricity_project
+    </sql>
+
+    <select id="selectElectricityProjectList" parameterType="ElectricityProject" resultMap="ElectricityProjectResult">
+        <include refid="selectElectricityProjectVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectElectricityProjectById" parameterType="Long" resultMap="ElectricityProjectResult">
+        <include refid="selectElectricityProjectVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertElectricityProject" parameterType="ElectricityProject">
+        insert into electricity_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateElectricityProject" parameterType="ElectricityProject">
+        update electricity_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteElectricityProjectById" parameterType="Long">
+        delete from electricity_project where id = #{id}
+    </delete>
+
+    <delete id="deleteElectricityProjectByIds" parameterType="String">
+        delete from electricity_project where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.electrical.design.mapper.ElectricityProjectDeviceImageMapper">
+    
+    <resultMap type="ElectricityProjectDeviceImage" id="ElectricityProjectDeviceImageResult">
+        <result property="id"    column="id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="imageName"    column="image_name"    />
+        <result property="imageType"    column="image_type"    />
+        <result property="images"    column="images" typeHandler="com.ruoyi.electrical.design.type.DeviceImagesTypeHandler"   />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectElectricityProjectDeviceImageVo">
+        select id, project_id, device_id, image_name, image_type, images, create_by, create_time, update_by, update_time from electricity_project_device_image
+    </sql>
+
+    <select id="selectElectricityProjectDeviceImageList" parameterType="ElectricityProjectDeviceImage" resultMap="ElectricityProjectDeviceImageResult">
+        <include refid="selectElectricityProjectDeviceImageVo"/>
+        <where>  
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="imageName != null  and imageName != ''"> and image_name like concat('%', #{imageName}, '%')</if>
+            <if test="imageType != null  and imageType != ''"> and image_type = #{imageType}</if>
+            <if test="images != null  and images != ''"> and images = #{images}</if>
+        </where>
+    </select>
+    
+    <select id="selectElectricityProjectDeviceImageById" parameterType="Long" resultMap="ElectricityProjectDeviceImageResult">
+        <include refid="selectElectricityProjectDeviceImageVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertElectricityProjectDeviceImage" parameterType="ElectricityProjectDeviceImage">
+        insert into electricity_project_device_image
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="imageName != null and imageName != ''">image_name,</if>
+            <if test="imageType != null and imageType != ''">image_type,</if>
+            <if test="images != null">images,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="imageName != null and imageName != ''">#{imageName},</if>
+            <if test="imageType != null and imageType != ''">#{imageType},</if>
+            <if test="images != null">#{images},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateElectricityProjectDeviceImage" parameterType="ElectricityProjectDeviceImage">
+        update electricity_project_device_image
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="imageName != null and imageName != ''">image_name = #{imageName},</if>
+            <if test="imageType != null and imageType != ''">image_type = #{imageType},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteElectricityProjectDeviceImageById" parameterType="Long">
+        delete from electricity_project_device_image where id = #{id}
+    </delete>
+
+    <delete id="deleteElectricityProjectDeviceImageByIds" parameterType="String">
+        delete from electricity_project_device_image where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -58,6 +58,9 @@ public class BatchOperateController extends BaseController {
 
 	@Autowired
 	private OriginalRecordsReportController originalRecordsReport;
+	
+	@Autowired
+	private UnitReportController reportGenerateService;
 
 	/**
 	 * 批量通过
@@ -221,8 +224,25 @@ public class BatchOperateController extends BaseController {
 								String localPath = RuoYiConfig.getProfile();
 								filePath = localPath
 										+ StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
+							} else {
+								try {
+									// 沒有就直接生成
+									AjaxResult initialReport = reportGenerateService.initialReport(ownerUnit.getId(), report.getType());
+									if (initialReport != null && initialReport.isSuccess()) {
+	
+										String initialReportPath = String
+												.valueOf(initialReport.get(AjaxResult.DATA_TAG));
+	
+										if (StrUtil.isNotBlank(initialReportPath)) {
+											String localPath = RuoYiConfig.getProfile();
+											filePath = localPath + StringUtils.substringAfter(initialReportPath,
+													Constants.RESOURCE_PREFIX);
+										}
+									}
+								}catch (Exception e) {
+									log.error("", e);
+								}
 							}
-
 						} else if ("2".equalsIgnoreCase(type)) {
 							fileName = StrUtil.format("C{}.docx", ownerUnit.getName());
 
@@ -231,6 +251,24 @@ public class BatchOperateController extends BaseController {
 								String localPath = RuoYiConfig.getProfile();
 								filePath = localPath
 										+ StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
+							} else {
+								try {
+									// 沒有就直接生成
+									AjaxResult initialReport = reportGenerateService.initialReport(ownerUnit.getId(), report.getType());
+									if (initialReport != null && initialReport.isSuccess()) {
+	
+										String initialReportPath = String
+												.valueOf(initialReport.get(AjaxResult.DATA_TAG));
+	
+										if (StrUtil.isNotBlank(initialReportPath)) {
+											String localPath = RuoYiConfig.getProfile();
+											filePath = localPath + StringUtils.substringAfter(initialReportPath,
+													Constants.RESOURCE_PREFIX);
+										}
+									}
+								}catch (Exception e) {
+									log.error("", e);
+								}
 							}
 						} else if ("3".equalsIgnoreCase(type)) {
 							fileName = StrUtil.format("Y{}.docx", ownerUnit.getName());

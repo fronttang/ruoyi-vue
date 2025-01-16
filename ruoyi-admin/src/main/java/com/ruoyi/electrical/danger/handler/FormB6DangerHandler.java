@@ -110,7 +110,14 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 
 		// String location = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() :
 		// "";
-		return "漏电保护开关";
+
+		String location = null;
+		FormB6 formb = getFormb(vo);
+		if (formb != null) {
+			location = StrUtil.isNotBlank(formb.getLocation()) ? formb.getLocation() : "";
+		}
+		return location;
+	
 	}
 
 	@Override
@@ -191,22 +198,36 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 	@Override
 	public String getReportLocation(OwnerUnitDanger vo) {
 
-		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
-		// String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ?
-		// vo.getBuildingName() : "";
-		String buildingName = "";
+		String location = null;
+		FormB6 formb = getFormb(vo);
+		if (formb != null) {
 
-		return StrUtil.format("{}{}", buildingName, unitAreaName);
+			String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+			// String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ?
+			// vo.getBuildingName() : "";
+			String buildingName = "";
+			String loc = StrUtil.isNotBlank(formb.getLocation()) ? formb.getLocation() : "";
 
+			location = StrUtil.format("{}{}{}", buildingName, unitAreaName, loc);
+		}
+
+		return location;
 	}
 
 	@Override
 	public String getLocation(OwnerUnitDanger vo) {
 
-		String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
-		String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+		String location = null;
+		FormB6 formb = getFormb(vo);
+		if (formb != null) {
 
-		return StrUtil.format("{}{}", buildingName, unitAreaName);
+			String unitAreaName = StrUtil.isNotBlank(vo.getAreaName()) ? vo.getAreaName() : "";
+			String buildingName = StrUtil.isNotBlank(vo.getBuildingName()) ? vo.getBuildingName() : "";
+			String loc = StrUtil.isNotBlank(formb.getLocation()) ? formb.getLocation() : "";
 
+			location = StrUtil.format("{}{}{}", buildingName, unitAreaName, loc);
+		}
+
+		return location;
 	}
 }

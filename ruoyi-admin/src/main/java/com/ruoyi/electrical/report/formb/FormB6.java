@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.formb;
 
 import com.ruoyi.electrical.report.annotation.Formb;
 
+import cn.hutool.core.util.StrUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @Formb("B6")
 public class FormB6 extends BaseFormB {
-
+	
 	/**
 	 * 被测设备型号
 	 */
@@ -60,6 +61,10 @@ public class FormB6 extends BaseFormB {
 	 */
 	@ApiModelProperty("判定结果 合格/不合格")
 	private String result;
+	
+	public String getResult() {
+		return StrUtil.isNotBlank(this.result) ? this.result : "/";
+	}
 
 	/**
 	 * 整体外观图

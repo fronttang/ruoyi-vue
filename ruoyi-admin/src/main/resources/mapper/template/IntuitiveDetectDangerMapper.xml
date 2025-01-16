@@ -13,6 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="suggestions"    column="suggestions"    />
         <result property="accMethod"    column="acc_method"    />
         <result property="score"    column="score"    />
+        <result property="important"    column="important"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -20,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectIntuitiveDetectDangerVo">
-        select id, template_id, data_id, level, description, suggestions, acc_method, score, create_by, create_time, update_by, update_time from intuitive_detect_danger
+        select id, template_id, data_id, level, description, suggestions, acc_method, score, important, create_by, create_time, update_by, update_time from intuitive_detect_danger
     </sql>
 
     <select id="selectIntuitiveDetectDangerList" parameterType="IntuitiveDetectDanger" resultMap="IntuitiveDetectDangerResult">
@@ -63,6 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="suggestions != null">suggestions,</if>
             <if test="accMethod != null">acc_method,</if>
             <if test="score != null">score,</if>
+            <if test="important != null">important,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -76,6 +78,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="suggestions != null">#{suggestions},</if>
             <if test="accMethod != null">#{accMethod},</if>
             <if test="score != null">#{score},</if>
+            <if test="important != null">#{important},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -93,6 +96,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="suggestions != null">suggestions = #{suggestions},</if>
             <if test="accMethod != null">acc_method = #{accMethod},</if>
             <if test="score != null">score = #{score},</if>
+            <if test="important != null">score = #{important},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

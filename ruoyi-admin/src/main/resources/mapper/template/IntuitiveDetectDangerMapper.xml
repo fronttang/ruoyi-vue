@@ -96,7 +96,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="suggestions != null">suggestions = #{suggestions},</if>
             <if test="accMethod != null">acc_method = #{accMethod},</if>
             <if test="score != null">score = #{score},</if>
-            <if test="important != null">score = #{important},</if>
+            <if test="important != null">important = #{important},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

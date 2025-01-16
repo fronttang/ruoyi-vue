@@ -186,6 +186,15 @@
               </el-table-column>
               <el-table-column label="隐患描述" align="center" prop="description" :show-overflow-tooltip="true"/>
               <el-table-column label="整改建议" align="center" prop="suggestions" :show-overflow-tooltip="true"/>
+              <el-table-column label="重大隐患" align="center" width="80" prop="important">
+                <template slot-scope="scope">
+                  <el-switch
+                    v-model="scope.row.important"
+                    active-value="1"
+                    inactive-value="0"
+                  ></el-switch>
+                </template>
+              </el-table-column>
               <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <el-button
@@ -214,7 +223,10 @@
 
     <!-- 添加或修改检测内容隐患对话框 -->
     <el-dialog :title="titleDanger" :visible.sync="openDanger" width="500px" append-to-body>
-      <el-form ref="formDanger" :model="danger" :rules="dangerRules" label-width="80px">
+      <el-form ref="formDanger" :model="danger" :rules="dangerRules" label-width="100px">
+        <el-form-item label="是否重大隐患" prop="important">
+          <el-switch v-model="danger.important" active-value="1" inactive-value="0" />
+        </el-form-item>
         <el-form-item label="隐患等级" prop="level">
           <el-select v-model="danger.level" placeholder="请选择隐患等级">
             <el-option
@@ -348,7 +360,8 @@ export default {
         level: null,
         description: null,
         suggestions: null,
-        templateId: this.$route.params.templateId
+        templateId: this.$route.params.templateId,
+        important: "0"
       };
       //this.resetForm("formDanger");
     },

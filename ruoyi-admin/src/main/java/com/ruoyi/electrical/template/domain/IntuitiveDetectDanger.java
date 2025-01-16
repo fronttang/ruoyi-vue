@@ -52,5 +52,5 @@ public class IntuitiveDetectDanger extends BaseEntity
     /**
      * 是否重大隐患1是0否
      */
-    private Integer important;
+    private String important;
 }

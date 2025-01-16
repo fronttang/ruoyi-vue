@@ -51,4 +51,8 @@ public interface IFormbDangerHandler {
 	}
 
 	String getPicture(OwnerUnitDanger vo);
+	
+	default Boolean isImportant(OwnerUnitDanger vo) {
+		return false;
+	}
 }

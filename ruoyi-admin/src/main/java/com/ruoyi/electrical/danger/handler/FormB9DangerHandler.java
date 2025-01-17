@@ -43,6 +43,16 @@ public class FormB9DangerHandler implements IFormbDangerHandler {
 	}
 
 	@Override
+	public Boolean isImportant(OwnerUnitDanger vo) {
+		Boolean important = false;
+		String result = getResult(vo);
+		if (FAILURE.equalsIgnoreCase(result)) {
+			important = true;
+		}
+		return important;
+	}
+	
+	@Override
 	public String getInfoLocation(OwnerUnitDanger vo) {
 
 		String location = null;

@@ -128,5 +128,15 @@ public class FormB1DangerHandler implements IFormbDangerHandler {
 
 		return location;
 	}
+	
+	@Override
+	public Boolean isImportant(OwnerUnitDanger vo) {
+		Boolean important = false;
+		String result = getResult(vo);
+		if (FAILURE.equalsIgnoreCase(result)) {
+			important = true;
+		}
+		return important;
+	}
 
 }

@@ -160,7 +160,7 @@ public class ProjectAreaController extends BaseController {
 								communityVo.setId(area.getCommunity());
 								communityVo.setLabel(area.getCommunityName());
 								communityVo.setArea(area);
-								communityMap.put(area.getCommunity(), streetVo);
+								communityMap.put(area.getCommunity(), communityVo);
 								streetVo.getChildren().add(communityVo);
 							}
 							if (StringUtils.hasText(area.getHamlet())) {

@@ -16,7 +16,7 @@ router.beforeEach((to, from, next) => {
     to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
     /* has token*/
     if (to.path === '/login') {
-      next({ path: '/admin' })
+      next({ path: '/' })
       NProgress.done()
     } else if (whiteList.indexOf(to.path) !== -1) {
       next()
@@ -34,7 +34,7 @@ router.beforeEach((to, from, next) => {
         }).catch(err => {
             store.dispatch('LogOut').then(() => {
               Message.error(err)
-              next({ path: '/admin' })
+              next({ path: '/' })
             })
           })
       } else {

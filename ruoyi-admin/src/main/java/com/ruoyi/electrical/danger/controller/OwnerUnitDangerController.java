@@ -62,19 +62,6 @@ public class OwnerUnitDangerController extends BaseController {
 	public TableDataInfo unitList(OwnerUnitDangerGroupDetailDto data) {
 		startPage();
 		List<OwnerUnitDangerGroupDetailVo> list = ownerUnitDangerService.ownerUnitDangerGroupList(data);
-		
-		list.forEach(item -> {
-			
-			OwnerUnitDanger query = new OwnerUnitDanger();
-			query.setUnitId(item.getUnitId());
-			List<OwnerUnitDanger> ownerUnitDangerList = ownerUnitDangerService.ownerUnitDangerList(query);
-			item.setDangers(ownerUnitDangerList.stream().filter(danger -> !"9".equals(danger.getStatus())).count());
-			item.setFinishs(ownerUnitDangerList.stream().filter(danger -> "2".equals(danger.getStatus())).count());
-			item.setReexaminations(ownerUnitDangerList.stream().filter(danger -> "1".equals(danger.getStatus())).count());
-			item.setRectifications(ownerUnitDangerList.stream().filter(danger -> "0".equals(danger.getStatus())).count());
-			
-		});
-		
 		return getDataTable(list);
 	}
 
@@ -82,20 +69,6 @@ public class OwnerUnitDangerController extends BaseController {
 	public TableDataInfo unitBuildingList(OwnerUnitDangerGroupDetailDto data) {
 		startPage();
 		List<OwnerUnitDangerGroupDetailVo> list = ownerUnitDangerService.ownerUnitBuildingDangerGroupList(data);
-		
-		list.forEach(item -> {
-			
-			OwnerUnitDanger query = new OwnerUnitDanger();
-			query.setUnitId(item.getUnitId());
-			query.setBuildingId(item.getId());
-			List<OwnerUnitDanger> ownerUnitDangerList = ownerUnitDangerService.ownerUnitDangerList(query);
-			item.setDangers(ownerUnitDangerList.stream().filter(danger -> !"9".equals(danger.getStatus())).count());
-			item.setFinishs(ownerUnitDangerList.stream().filter(danger -> "2".equals(danger.getStatus())).count());
-			item.setReexaminations(ownerUnitDangerList.stream().filter(danger -> "1".equals(danger.getStatus())).count());
-			item.setRectifications(ownerUnitDangerList.stream().filter(danger -> "0".equals(danger.getStatus())).count());
-			
-		});
-
 		return getDataTable(list);
 	}
 

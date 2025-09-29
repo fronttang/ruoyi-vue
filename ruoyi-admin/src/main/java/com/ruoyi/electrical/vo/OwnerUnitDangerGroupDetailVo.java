@@ -70,21 +70,21 @@ public class OwnerUnitDangerGroupDetailVo {
 	/**
 	 * 总隐患数
 	 */
-	private Integer dangers;
+	private Long dangers;
 
 	/**
 	 * 待整改数
 	 */
-	private Integer rectifications;
+	private Long rectifications;
 
 	/**
 	 * 待复检数
 	 */
-	private Integer reexaminations;
+	private Long reexaminations;
 
 	/**
 	 * 完成数
 	 */
-	private Integer finishs;
+	private Long finishs;
 
 }

@@ -29,7 +29,16 @@
 
       </template>
 
-      <el-dropdown @command="handleChangeProject" class="avatar-container right-menu-item hover-effect" trigger="click">
+      <el-select v-model="projectId" placeholder="请选择项目" filterable class="avatar-container right-menu-item hover-effect" style="font-size: 14px;max-width:400px;" @change="handleChangeProject">
+          <el-option 
+            v-for="item in projectDict"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+      </el-select>
+
+      <el-dropdown v-if="false" @command="handleChangeProject" class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper" style="font-size: 14px;max-width:400px;display: inline-block;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
           {{selectedProject}}
           <i class="el-icon-arrow-down el-icon--right"></i>
@@ -81,13 +90,14 @@ import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
 import { getProjectWorkerRole, setProjectWorkerRole } from "@/api/project/ProjectWorker";
+import store from "@/store";
 
 export default {
   data() {
     return {
       selectedProject: "请选择项目",
       projectId: this.$store.state.settings.projectId,
-      projectDict: this.$store.state.user.projects,
+      //projectDict: this.$store.state.user.projects,
       nickName: this.$store.state.user.nickName,
       workerRoles: [],
       workerRoleName: ''
@@ -95,8 +105,13 @@ export default {
   },
   created(){
     if(this.projectDict != null && this.projectDict.length > 0){
-      this.projectId = this.projectDict[0].id;
-      this.handleChangeProject(this.projectDict[0]);
+      //console.log(this.projectId);
+      if(this.projectId == null || this.projectId == '') {
+        this.projectId = this.projectDict[0].id;
+      }
+      
+      this.handleChangeProject(this.projectId);
+      store.dispatch("GeneProAppRoutes", this.projectId);
     }
   },
   components: {
@@ -130,26 +145,75 @@ export default {
       get() {
         return this.$store.state.settings.topNav
       }
+    },
+    projectDict: {
+      get() {
+        return this.$store.state.user.projects
+      }
+    },
+    tagsView: {
+      get() {
+        return this.$store.state.settings.tagsView
+      }
+    },
+    fixedHeader: {
+      get() {
+        return this.$store.state.settings.fixedHeader
+      }
+    },
+    sidebarLogo: {
+      get() {
+        return this.$store.state.settings.sidebarLogo
+      }
+    },
+    dynamicTitle: {
+      get() {
+        return this.$store.state.settings.dynamicTitle
+      }
+    },
+    sideTheme: {
+      get() {
+        return this.$store.state.settings.sideTheme
+      }
+    },
+    theme: {
+      get() {
+        return this.$store.state.settings.theme
+      }
     }
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    handleChangeProject(project){
+    handleChangeProject(projectId){
       this.$store.dispatch('settings/changeSetting', {
         key: 'projectId',
-        value: project.id
+        value: projectId
       })
 
-      getProjectWorkerRole(project.id).then((res) => {
+      getProjectWorkerRole(projectId).then((res) => {
         this.workerRoles = res.data;
         if(this.workerRoles != null && this.workerRoles.length > 0){
           this.handleChangeWorkerRole(this.workerRoles[0]);
         }
       });
 
-      this.selectedProject = project.name;
+      this.$cache.local.set(
+        "layout-setting",
+        `{
+            "topNav": ${this.topNav},
+            "tagsView": ${this.tagsView},
+            "fixedHeader": ${this.fixedHeader},
+            "sidebarLogo": ${this.sidebarLogo},
+            "dynamicTitle": ${this.dynamicTitle},
+            "sideTheme": "${this.sideTheme}",
+            "theme": "${this.theme}",
+            "projectId": ${this.projectId}
+          }`
+      );
+
+      //this.selectedProject = project.name;
       this.$tab.closeAllPage();
       //this.$tab.closeOtherPage();
       this.$tab.openPage("首页", "/index");

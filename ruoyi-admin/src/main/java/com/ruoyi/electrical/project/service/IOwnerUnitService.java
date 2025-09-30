@@ -61,4 +61,6 @@ public interface IOwnerUnitService {
 	public boolean startRounds(Long unitId);
 
 	public int checkOwnerUnitName(OwnerUnit ownerUnit);
+
+	public void setGridman(Integer type, Long gridman, Long[] unitIds);
 }

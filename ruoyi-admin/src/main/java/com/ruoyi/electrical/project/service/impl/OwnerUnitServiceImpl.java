@@ -256,4 +256,16 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 		return ownerUnitMapper.checkOwnerUnitName(ownerUnit);
 	}
 
+	@Override
+	public void setGridman(Integer type, Long gridman, Long[] unitIds) {
+		// 分配
+		if(type == 0) {
+			ownerUnitMapper.setGridman(gridman, unitIds);
+		} else if(type  == 1) {
+			// 取消分配
+			ownerUnitMapper.unSetGridman(gridman, unitIds);
+		}
+
+	}
+
 }

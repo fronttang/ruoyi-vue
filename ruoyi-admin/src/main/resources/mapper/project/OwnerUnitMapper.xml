@@ -85,7 +85,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="area != null "> and area = #{area}</if>
             <if test="entrust != null  and entrust != ''"> and entrust = #{entrust}</if>
             <if test="manager != null "> and manager = #{manager}</if>
-            <if test="gridman != null "> and gridman = #{gridman}</if>
+            <if test="gridman != null ">
+            	<choose>
+            		<when test="gridman == 0">
+            			and (gridman is null or gridman = '')
+            		</when>
+            		<otherwise>
+            			and gridman = #{gridman}
+            		</otherwise>
+            	</choose>
+            </if>
             <if test="address != null  and address != ''"> and address = #{address}</if>
             <if test="contact != null  and contact != ''"> and contact = #{contact}</if>
             <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
@@ -343,4 +352,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+    
+    <update id="setGridman">
+        update owner_unit set gridman = #{gridman} where id in 
+        <foreach item="id" collection="unitIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    
+    <update id="unSetGridman">
+        update owner_unit set gridman = null where gridman = #{gridman} and id in 
+        <foreach item="id" collection="unitIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

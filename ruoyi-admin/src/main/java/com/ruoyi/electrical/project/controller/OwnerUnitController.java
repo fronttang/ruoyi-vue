@@ -202,4 +202,14 @@ public class OwnerUnitController extends BaseController {
 
 		return ownerUnitImportService.importOwnerUnit(projectId, type, file);
 	}
+	
+	@GetMapping("/gridman/{type}/{gridman}/{unitIds}")
+	public AjaxResult setGridman(@PathVariable Integer type, @PathVariable Long gridman, @PathVariable Long[] unitIds) {
+
+		AjaxResult ajax = AjaxResult.success();
+		if(type != null && gridman != null && unitIds != null && unitIds.length > 0) {
+			ownerUnitService.setGridman(type, gridman, unitIds);
+		}
+		return ajax;
+	}
 }

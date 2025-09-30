@@ -1,6 +1,9 @@
 package com.ruoyi.electrical.project.mapper;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.ruoyi.electrical.project.domain.OwnerUnit;
 
 /**
@@ -61,4 +64,8 @@ public interface OwnerUnitMapper {
 	public int deleteOwnerUnitByIds(Long[] ids);
 
 	public int checkOwnerUnitName(OwnerUnit ownerUnit);
+
+	public int setGridman(@Param("gridman") Long gridman, @Param("unitIds") Long[] unitIds);
+
+	public int unSetGridman(@Param("gridman") Long gridman, @Param("unitIds") Long[] unitIds);
 }

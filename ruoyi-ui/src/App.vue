@@ -29,7 +29,7 @@ export default {
     // 全局监听项目id
     projectId: {
       handler(newVal, oldVal) {
-        if (!newVal || newVal == oldVal) return;
+        //if (!newVal || newVal == oldVal) return;
         // 请求项目菜单路由
         store.dispatch("GeneProAppRoutes", newVal);
       },

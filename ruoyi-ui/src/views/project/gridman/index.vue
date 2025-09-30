@@ -85,27 +85,30 @@
       </el-table-column>
       <el-table-column label="操作" fixed="right" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" >
+            <el-button size="mini" type="text" icon="el-icon-edit">操作</el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="edit" icon="el-icon-edit" >修改</el-dropdown-item>
+              <el-dropdown-item command="delete" icon="el-icon-delete" >删除</el-dropdown-item>
+              <el-dropdown-item command="logout" icon="el-icon-user" >下线</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
+            @click="handleUnit(scope.row, 0)"
             v-hasPermi="['projectrole:detectUnitUser:edit']"
-          >修改</el-button>
+          >分配</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['projectrole:detectUnitUser:remove']"
-          >删除</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-user"
-            @click="handleLogout(scope.row)"
+            icon="el-icon-edit"
+            @click="handleUnit(scope.row, 1)"
             v-hasPermi="['projectrole:detectUnitUser:edit']"
-          >下线</el-button>
+          >已分配</el-button>
+
         </template>
       </el-table-column>
     </el-table>
@@ -139,17 +142,121 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+
+    <!-- 分配对话框 -->
+    <el-dialog :title="unitTitle" :visible.sync="userUnitVisible" width="1200px" append-to-body>
+      <el-form :model="queryUnitParams" ref="queryUnitForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+        <el-form-item label="名称" prop="name">
+          <el-input
+            v-model="queryUnitParams.name"
+            placeholder="请输入名称"
+            clearable
+            @keyup.enter.native="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item label="类型" prop="highRiskType"  v-if="projectType === '3'">
+          <el-select v-model="queryUnitParams.highRiskType" placeholder="请选择业主单元类型" filterable clearable>
+            <el-option
+              v-for="dict in dict.type.high_risk_type"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="区" prop="district">
+          <el-select v-model="queryUnitParams.district" placeholder="请选择区"  filterable clearable>
+            <el-option
+              v-for="dict in districtOptions"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="街道" prop="street">
+          <el-select v-model="queryUnitParams.street" placeholder="请选择街道"  filterable clearable>
+            <el-option
+              v-for="dict in streetOptions"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="社区" prop="community" v-if="projectType === '1' || projectType == '3'">
+          <el-select v-model="queryUnitParams.community" placeholder="请选择社区"  filterable clearable>
+            <el-option
+              v-for="dict in communityOptions"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="村" prop="hamlet"  v-if="projectType === '1'">
+          <el-select v-model="queryUnitParams.hamlet" placeholder="请选择村"  filterable clearable>
+            <el-option
+              v-for="dict in hamletOptions"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleUnitQuery">搜索</el-button>
+          <el-button icon="el-icon-refresh" size="mini" @click="resetUnitQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+
+      <el-row :gutter="10" class="mb8">
+        <el-col :span="1.5">
+          <el-button
+            type="success"
+            plain
+            icon="el-icon-edit"
+            size="mini"
+            :disabled="unitSelected"
+            @click="submitUnit"
+          >{{ buttonName }}</el-button>
+        </el-col>
+      </el-row>
+      <el-table v-loading="unitLoading" :data="OwnerUnitList" @selection-change="handleSelectionChangeUnit">
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column label="ID" align="center" width="60" prop="id" />
+        <el-table-column label="名称" align="center" prop="name" min-width="200" :show-overflow-tooltip="true" />
+        <el-table-column label="检测单位" align="center" prop="detectName" min-width="300" :formatter="detectFormat" :show-overflow-tooltip="true"/>
+        <el-table-column label="区域" align="center" prop="area" min-width="200" :formatter="areaFormat" :show-overflow-tooltip="true" />
+        <el-table-column label="管理员" align="center" prop="manager" width="100" :formatter="managerFormat" />
+        <el-table-column label="网格员" align="center" prop="gridman" width="100"  :formatter="gridmanFormat" />
+        <el-table-column label="检测地址" align="center" prop="address" min-width="200" :show-overflow-tooltip="true" />
+      </el-table>
+      <pagination
+        v-show="unitTotal>0"
+        :total="unitTotal"
+        :page.sync="queryUnitParams.pageNum"
+        :limit.sync="queryUnitParams.pageSize"
+        @pagination="getUnitList"
+      />
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { listDetectUnitUser, getDetectUnitUser, delDetectUnitUser, addDetectUnitUser, updateDetectUnitUser, userLogout } from "@/api/projectrole/detectUnitUser";
+import { listDetectUnitUser, getDetectUnitUser, delDetectUnitUser, addDetectUnitUser, updateDetectUnitUser, userLogout, getDetectUnitUserDictByTypeAndProjectId } from "@/api/projectrole/detectUnitUser";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { changeUserStatus } from "@/api/system/user";
+import DictMeta from '@/utils/dict/DictMeta'
+import { getProject } from "@/api/project/project";
+import { getProjectAreaDictByProjectId, getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
+import { listOwnerUnit,setGridmain} from "@/api/project/OwnerUnit";
 
 export default {
   name: "DetectUnitUser",
-  dicts: ['account_status'],
+  dicts: ['account_status', 'high_risk_type'],
   data() {
     const equalToPassword = (rule, value, callback) => {
       if (this.form.password !== value) {
@@ -208,6 +315,43 @@ export default {
       },
       // 检测单位字典选项
       detectUnitDict: [],
+
+      queryUnitParams: {
+        pageNum: 1,
+        pageSize: 10,
+        account: null,
+        highRiskType: null,
+        detectId: null,
+        name: null,
+        district: null,
+        street: null,
+        community: null,
+        hamlet: null,
+        gridman: 0,
+        projectId: this.$store.state.settings.projectId,
+      },
+
+      projectAreaDict: [],
+      ownerUnitUserDict: [],
+      gridmanDict: [],  
+      OwnerUnitList: [],
+      districtOptions: [],
+      streetOptions: [],
+      communityOptions: [],
+      hamletOptions: [],
+      projectType: null,
+      projectInfo: {
+
+      },
+      unitTitle: '分配管辖的业主单元',
+      userUnitVisible: false,
+      buttonName: '分配',
+      unitSelected: false,
+      unitLoading: false,
+      unitTotal: 0,
+      unitIds: [],
+      unitType: 0,
+      selectGridman: null,
     };
   },
   created() {
@@ -217,6 +361,48 @@ export default {
     /** 查询检测单位账号列表 */
     getList() {
       this.loading = true;
+
+      getProject(this.$store.state.settings.projectId).then(response => {
+        this.projectInfo = response.data;
+        this.form.projectName = this.projectInfo.name;
+        this.projectType = response.data.type;
+      });
+
+      detectUnitDict().then(response => {
+        this.detectUnitDict = response.data;
+      });
+
+      getProjectAreaDictByProjectId(this.$store.state.settings.projectId).then(response => {
+        this.projectAreaDict = response.data;
+      });
+
+      getDetectUnitUserDictByTypeAndProjectId('05', this.$store.state.settings.projectId).then(response => {
+        this.ownerUnitUserDict = response.data;
+      });
+      getDetectUnitUserDictByTypeAndProjectId('04', this.$store.state.settings.projectId).then(response => {
+        this.gridmanDict = response.data;
+      });
+
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+        const dictMeta = DictMeta.parse("districtOptions");
+        this.districtOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'street').then(response => {
+        const dictMeta = DictMeta.parse("streetOptions");
+        this.streetOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'community').then(response => {
+        const dictMeta = DictMeta.parse("communityOptions");
+        this.communityOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'hamlet').then(response => {
+        const dictMeta = DictMeta.parse("hamletOptions");
+        this.hamletOptions = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
       listDetectUnitUser(this.queryParams).then(response => {
         this.gridmanList = response.rows;
         this.total = response.total;
@@ -249,6 +435,53 @@ export default {
       };
       this.resetForm("form");
     },
+
+    resetUnitQuery() {
+      this.queryUnitParams.pageNum = 1;
+      this.resetForm("queryUnitForm");
+    },
+
+    handleUnitQuery() {
+      this.getUnitList();
+    },
+
+    getUnitList() {
+      this.unitLoading = true;
+      listOwnerUnit(this.queryUnitParams).then(response => {
+        this.OwnerUnitList = response.rows;
+        this.unitTotal = response.total;
+        this.unitLoading = false;
+      });
+    },
+
+    handleSelectionChangeUnit(selection) {
+      this.unitIds = selection.map(item => item.id)
+      this.unitSelected = !selection.length
+    },
+
+    submitUnit() {
+      //alert(this.unitIds);
+      setGridmain(this.unitType, this.selectGridman, this.unitIds ).then(response => {
+        this.$modal.msgSuccess("操作成功");
+        this.queryUnitParams.pageNum = 1;
+        this.getUnitList();
+      });
+    },
+
+    handleUnit(row, type) {
+      if(type == '0') {
+        this.queryUnitParams.gridman = 0;
+        this.buttonName = "分配";
+      } else {
+        this.queryUnitParams.gridman = row.id;
+        this.buttonName = "取消分配";
+      }
+      this.selectGridman = row.id,
+      this.unitType = type;
+      this.resetUnitQuery();
+      this.userUnitVisible = true;
+      this.getUnitList();
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -271,6 +504,24 @@ export default {
       this.open = true;
       this.title = "添加网格员";
     },
+
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "edit":
+          this.handleUpdate(row);
+          break;
+        case "delete":
+          this.handleDelete(row);
+          break;
+        case "logout":
+          this.handleLogout(row);
+          break;
+        default:
+          break;
+      }
+    },
+
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
@@ -337,7 +588,48 @@ export default {
       this.download('projectrole/detectUnitUser/export', {
         ...this.queryParams
       }, `detectUnitUser_${new Date().getTime()}.xlsx`)
-    }
+    },
+
+
+    detectFormat(row){
+      return this.selectDictVoLabel(this.detectUnitDict, row.detectId);
+    },
+    managerFormat(row){
+      return this.selectDictVoLabel(this.ownerUnitUserDict, row.manager);
+    },
+    gridmanFormat(row){
+      return this.selectDictVoLabel(this.gridmanDict, row.gridman);
+    },
+    areaFormat(row) {
+      var area = [];
+      var districtName = this.selectDictLabel(this.districtOptions, row.district);
+      var streetName = this.selectDictLabel(this.streetOptions, row.street);
+      var communityName = this.selectDictLabel(this.communityOptions, row.community);
+      var hamletName = this.selectDictLabel(this.hamletOptions, row.hamlet);
+
+      area.push(districtName);
+      area.push(streetName);
+      area.push(communityName);
+      area.push(hamletName);
+
+      return area.join('/');
+    },
+    selectDictVoLabel(datas, value) {
+      if (value === undefined) {
+        return "";
+      }
+      var actions = [];
+      Object.keys(datas).some((key) => {
+        if (datas[key].id == value) {
+          actions.push(datas[key].name);
+          return true;
+        }
+      })
+      if (actions.length === 0) {
+        actions.push(value);
+      }
+      return actions.join('');
+    },
   }
 };
 </script>

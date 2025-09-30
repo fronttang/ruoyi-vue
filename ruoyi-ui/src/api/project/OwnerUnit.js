@@ -58,3 +58,10 @@ export function roundsStep(id) {
     method: 'get'
   })
 }
+
+export function setGridmain(type, gridman, unitIds) {
+  return request({
+    url: '/project/OwnerUnit/gridman/' + type + '/' + gridman + '/' + unitIds,
+    method: 'get'
+  })
+}

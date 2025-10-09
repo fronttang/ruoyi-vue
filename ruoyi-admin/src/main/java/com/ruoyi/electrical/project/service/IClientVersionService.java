@@ -58,4 +58,6 @@ public interface IClientVersionService
      * @return 结果
      */
     public int deleteClientVersionById(Long id);
+    
+    public ClientVersion getLatestClientVersion(String client);
 }

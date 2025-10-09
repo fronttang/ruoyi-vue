@@ -87,4 +87,9 @@ public class ClientVersionServiceImpl implements IClientVersionService {
 	public int deleteClientVersionById(Long id) {
 		return clientVersionMapper.deleteClientVersionById(id);
 	}
+
+	@Override
+	public ClientVersion getLatestClientVersion(String client) {
+		return clientVersionMapper.getLatestClientVersion(client);
+	}
 }

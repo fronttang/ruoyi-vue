@@ -241,7 +241,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = '/admin/index';
+          location.href = '/index';
         })
       }).catch(() => {});
     }

@@ -1,6 +1,10 @@
 package com.ruoyi.electrical.project.mapper;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
 import com.ruoyi.electrical.project.domain.ClientVersion;
 
 /**
@@ -58,4 +62,7 @@ public interface ClientVersionMapper
      * @return 结果
      */
     public int deleteClientVersionByIds(Long[] ids);
+
+    @Select("SELECT *,download_url as downloadUrl FROM client_version WHERE client = #{client} ORDER BY id DESC LIMIT 1")
+	public ClientVersion getLatestClientVersion(@Param("client") String client);
 }

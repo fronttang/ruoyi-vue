@@ -8,6 +8,7 @@
 <script>
 import ThemePicker from "@/components/ThemePicker";
 import store from "./store";
+import { getToken } from '@/utils/auth'
 
 export default {
   name: "App",
@@ -30,8 +31,10 @@ export default {
     projectId: {
       handler(newVal, oldVal) {
         if (!newVal || newVal == oldVal) return;
-        // 请求项目菜单路由
-        store.dispatch("GeneProAppRoutes", newVal);
+        if (getToken()) { 
+          // 请求项目菜单路由
+          store.dispatch("GeneProAppRoutes", newVal);
+        }
       },
       immediate: true,
     },

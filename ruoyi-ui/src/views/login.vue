@@ -49,8 +49,8 @@
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
-        <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">立即注册</router-link>
+        <div style="float: right;">
+          <a class="document-link" target="_blank" :href="downloadApp" title="下载APP">下载APP</a>
         </div>
       </el-form-item>
     </el-form>
@@ -63,6 +63,7 @@
 
 <script>
 import { getCodeImg } from "@/api/login";
+import { latestVersion } from "@/api/project/version";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -71,6 +72,7 @@ export default {
   data() {
     return {
       codeUrl: "",
+      downloadApp: "",
       loginForm: {
         username: "",
         password: "",
@@ -106,6 +108,7 @@ export default {
   created() {
     this.getCode();
     this.getCookie();
+    this.getLatestVersion();
   },
   methods: {
     getCode() {
@@ -115,6 +118,11 @@ export default {
           this.codeUrl = "data:image/gif;base64," + res.img;
           this.loginForm.uuid = res.uuid;
         }
+      });
+    },
+    getLatestVersion() {
+      latestVersion("Android").then(res => {
+        this.downloadApp = res.data.downloadUrl;
       });
     },
     getCookie() {

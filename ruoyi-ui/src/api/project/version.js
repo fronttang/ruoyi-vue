@@ -42,3 +42,10 @@ export function delVersion(id) {
     method: 'delete'
   })
 }
+
+export function latestVersion(client) {
+  return request({
+    url: '/project/version/latest?client=' + client,
+    method: 'get'
+  })
+}

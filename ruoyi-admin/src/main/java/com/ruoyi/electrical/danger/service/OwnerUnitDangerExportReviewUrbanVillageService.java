@@ -144,7 +144,7 @@ public class OwnerUnitDangerExportReviewUrbanVillageService {
 			export.setUnFinishs(unFinishs);
 
 			// 隐患总数量
-			long danger = dangers.stream().count();
+			long danger = dangers.stream().filter(d -> StrUtil.isNotBlank(d.getStatus()) && !"9".equals(d.getStatus())).count();
 			export.setDanger(danger);
 
 			// 整改率

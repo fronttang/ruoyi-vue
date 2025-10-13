@@ -43,6 +43,7 @@ import com.deepoove.poi.xwpf.NiceXWPFDocument;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.electrical.danger.domain.OwnerUnitDanger;
@@ -78,6 +79,7 @@ import com.ruoyi.electrical.template.service.IIntuitiveDetectDataService;
 import com.ruoyi.electrical.vo.OwnerUnitReivewDateVo;
 import com.ruoyi.electrical.vo.ReportFileVo;
 import com.ruoyi.system.service.ISysDictDataService;
+import com.ruoyi.system.service.ISysUserService;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -119,6 +121,9 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 	@Autowired
 	private OwnerUnitReportMapper ownerUnitReportMapper;
+	
+	@Autowired
+	private ISysUserService sysUserService;
 
 	private static Set<Class<?>> allFormbBeans = new HashSet<Class<?>>();
 
@@ -441,7 +446,21 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		BeanUtils.copyProperties(detectUnit, detectUnitInfo);
 
 		OwnerUnitReportInfo reportInfo = new OwnerUnitReportInfo();
-		BeanUtils.copyProperties(report, reportInfo, "detectData");
+		BeanUtils.copyProperties(report, reportInfo, "detectData", "inspector");
+		
+		// ④基本情况中检测人员为当前工作人员账号的“姓名+记录员”中间用顿号“、”隔开
+		SysUser sysUser = sysUserService.selectUserById(report.getInspectorId());
+		if (sysUser != null) {
+			List<String> inspector = new ArrayList<String>();
+			if (StrUtil.isNotBlank(sysUser.getNickName())) {
+				inspector.add(sysUser.getNickName());
+			}
+			if (StrUtil.isNotBlank(sysUser.getRecorder())) {
+				inspector.add(sysUser.getRecorder());
+			}
+			reportInfo.setInspector(String.join(",", inspector));
+		}
+		
 		reportInfo.setDetectData(DateUtil.format(report.getReportDate(), DatePattern.CHINESE_DATE_FORMATTER));
 
 		OwnerUnitInfo unitInfo = new OwnerUnitInfo();

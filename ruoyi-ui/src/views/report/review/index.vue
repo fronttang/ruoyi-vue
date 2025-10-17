@@ -618,11 +618,22 @@ export default {
     },
     handleDownloadInitialReport(row){
       var fileName = "Z" + row.name + ".docx";
-      if(row.wordFile == null){
-        this.$modal.msgError("无制式Word报告");
-      } else {
-        this.$download.resource(row.wordFile, fileName);
-      }
+      //if(row.wordFile == null){
+      //  this.$modal.msgError("无制式Word报告");
+      //} else {
+      //  this.$download.resource(row.wordFile, fileName);
+      //}
+
+      this.loadingInstance = Loading.service({ text: "正在生成数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+      getWordReport(row.unitId, '2').then(response => {
+        this.$download.resource(response.data.path, fileName);
+
+        this.loadingInstance.close();
+      }).catch((r) => {
+        this.$modal.msgError('生成报告出现错误，请联系管理员！')
+        this.loadingInstance.close();
+      });
+
     },
     // 更多操作触发
     handleCommand(command, row) {

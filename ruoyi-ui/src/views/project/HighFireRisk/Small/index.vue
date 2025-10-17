@@ -271,7 +271,7 @@ import DictMeta from '@/utils/dict/DictMeta'
 import { getToken } from "@/utils/auth";
 
 export default {
-  name: "OwnerUnit",
+  name: "Small",
   dicts: ['detect_content', 'building_nature', 'small_unit_type'],
   data() {
     return {

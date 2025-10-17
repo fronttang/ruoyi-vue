@@ -86,5 +86,16 @@ public class OwnerUnitDangerGroupDetailVo {
 	 * 完成数
 	 */
 	private Long finishs;
+	
+	public String getReviewStatus() {
+		if(this.rectifications > 0) {
+			return "0";
+		} else if(this.reexaminations > 0) {
+			return "1";
+		} else if(this.dangers > 0 && this.dangers == this.finishs) {
+			return "2";
+		}
+		return "/";
+	}
 
 }

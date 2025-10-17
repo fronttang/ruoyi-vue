@@ -255,7 +255,7 @@ import { getProjectAreaDictByProjectId, getProjectAreaDictByProjectIdAndType } f
 import { listOwnerUnit,setGridmain} from "@/api/project/OwnerUnit";
 
 export default {
-  name: "DetectUnitUser",
+  name: "Gridman",
   dicts: ['account_status', 'high_risk_type'],
   data() {
     const equalToPassword = (rule, value, callback) => {

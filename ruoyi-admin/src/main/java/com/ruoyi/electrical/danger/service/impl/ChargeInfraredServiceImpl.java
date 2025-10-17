@@ -88,6 +88,9 @@ public class ChargeInfraredServiceImpl implements IChargeInfraredService {
 					if (IFormbDangerHandler.QUALIFIED.equals(chargeInfrared.getResult())) {
 						// 合格变成非隐患
 						update.setStatus("9");
+					} else if(IFormbDangerHandler.FAILURE.equals(chargeInfrared.getResult())) {
+						// 不合格变成待整改
+						update.setStatus("0");
 					}
 
 					return unitDangerService.updateOwnerUnitDanger(update);

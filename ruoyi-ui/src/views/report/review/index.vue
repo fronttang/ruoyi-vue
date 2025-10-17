@@ -322,7 +322,7 @@ import DictMeta from '@/utils/dict/DictMeta'
 import { Notification, MessageBox, Message, Loading } from 'element-ui'
 
 export default {
-  name: "OwnerUnit",
+  name: "Review",
   dicts: ['high_risk_type', 'owner_unit_report_status'],
   computed: {
     workerRole() {

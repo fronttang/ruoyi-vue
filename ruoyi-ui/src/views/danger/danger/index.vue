@@ -903,7 +903,7 @@ import { getProject } from "@/api/project/project";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 
 export default {
-  name: "OwnerUnit",
+  name: "Danger",
   dicts: ['high_risk_type', 'again_test_status', 'hazard_level', 'hazard_level_high', 'hazard_level_charging_station', 'danger_status'],
   data() {
     return {

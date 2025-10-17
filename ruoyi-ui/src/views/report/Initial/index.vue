@@ -322,7 +322,7 @@ import DictMeta from '@/utils/dict/DictMeta'
 import { Notification, MessageBox, Message, Loading } from 'element-ui'
 
 export default {
-  name: "OwnerUnit",
+  name: "Initial",
   dicts: ['high_risk_type', 'owner_unit_report_status'],
   computed: {
     workerRole() {
@@ -580,7 +580,17 @@ export default {
     handleDownloadInitialReport(row){
       var fileName = "Z" + row.name + ".docx";
       if(row.wordFile == null){
-        this.$modal.msgError("无制式Word报告");
+        this.loadingInstance = Loading.service({ text: "正在生成数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+        getWordReport(row.unitId, '1').then(response => {
+          //this.download('common/download/resource?resource=' + response.file, {})
+          this.$download.resource(response.data.path, fileName);
+          this.loadingInstance.close();
+        }).catch((r) => {
+          this.$modal.msgError('生成报告出现错误，请联系管理员！')
+          this.loadingInstance.close();
+        });
+
+        //this.$modal.msgError("无制式Word报告");
       } else {
         this.$download.resource(row.wordFile, fileName);
       }

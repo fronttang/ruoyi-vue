@@ -341,7 +341,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 										}
 									}
 
-									return formbBean;
+									return com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(formbBean);
 								}
 							} catch (Exception e) {
 								log.error("", e);

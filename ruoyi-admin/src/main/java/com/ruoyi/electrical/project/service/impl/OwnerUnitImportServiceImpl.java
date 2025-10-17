@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -168,6 +169,22 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 				propertyTypeMap.putAll(propertyType.stream().collect(
 						Collectors.toMap(SysDictData::getDictLabel, SysDictData::getDictValue, (v1, v2) -> v2)));
 			}
+			
+			List<SysDictData> nature = dictTypeService.selectDictDataByType("building_nature");
+			Map<String, String> natureMap = new HashMap<String, String>();
+
+			if (CollUtil.isNotEmpty(nature)) {
+				natureMap.putAll(nature.stream().collect(
+						Collectors.toMap(SysDictData::getDictLabel, SysDictData::getDictValue, (v1, v2) -> v2)));
+			}
+			
+			List<SysDictData> detectContent = dictTypeService.selectDictDataByType("detect_content");
+			Map<String, String> detectContentMap = new HashMap<String, String>();
+
+			if (CollUtil.isNotEmpty(detectContent)) {
+				detectContentMap.putAll(detectContent.stream().collect(
+						Collectors.toMap(SysDictData::getDictLabel, SysDictData::getDictValue, (v1, v2) -> v2)));
+			}
 
 			for (T data : importData) {
 				try {
@@ -208,6 +225,8 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 					ownerUnit.setCreateBy("admin");
 					ownerUnit.setCreateTime(DateUtils.getNowDate());
 					ownerUnit.setUpdateTime(DateUtils.getNowDate());
+					ownerUnit.setNature(natureMap.get(ownerUnit.getNature()));
+					ownerUnit.setTestContent(buildDetectContent(ownerUnit.getTestContent(), detectContentMap));
 
 					if ("4".equalsIgnoreCase(project.getType())) {
 						buildChargingStationData(ownerUnit, chargingStationTypeMap, propertyTypeMap);
@@ -236,6 +255,18 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 		}
 		return AjaxResult.error();
 	}
+	
+	private String buildDetectContent(String detectContent, Map<String, String> detectContentMap) {
+		if (StrUtil.isBlank(detectContent)) {
+			return null;
+		}
+		
+		return Stream.of(detectContent.split(","))
+	            .map(String::trim)
+	            .map(detectContentMap::get)
+	            .filter(StrUtil::isNotBlank)
+	            .collect(Collectors.joining(","));
+	} 
 
 	private void buildChargingStationData(OwnerUnit ownerUnit, Map<String, String> chargingStationTypeMap,
 			Map<String, String> propertyTypeMap) {

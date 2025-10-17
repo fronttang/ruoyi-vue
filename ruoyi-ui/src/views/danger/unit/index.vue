@@ -287,7 +287,7 @@ import DictMeta from '@/utils/dict/DictMeta'
 import { Loading } from 'element-ui'
 
 export default {
-  name: "OwnerUnitDanger",
+  name: "Group",
   dicts: ['initial_test_status', 'again_test_status', 'high_risk_type'],
   data() {
     return {

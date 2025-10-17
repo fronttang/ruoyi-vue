@@ -343,8 +343,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	select t.* from (select o.id, o.name, o.name as unit_name, o.district, o.street, o.community, o.hamlet, o.high_risk_type,
 		CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
-		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
-		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date,
+		r1.detect_data as initial_date,
+		r2.detect_data as review_date,
 		(select count(1) as dangers from owner_unit_danger ud1 where ud1.unit_id = o.id and ud1.status = '0' and ud1.rounds = o.rounds ) as rectifications,
 		(select count(1) as dangers from owner_unit_danger ud2 where ud2.unit_id = o.id and ud2.status = '1' and ud2.rounds = o.rounds ) as reexaminations,
 		(select count(1) as dangers from owner_unit_danger ud3 where ud3.unit_id = o.id and ud3.status = '2' and ud3.rounds = o.rounds ) as finishs,
@@ -361,7 +361,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="hamlet != null and hamlet !='' "> and t.hamlet = #{hamlet}</if>
             <if test="highRiskType != null and highRiskType !='' "> and t.high_risk_type = #{highRiskType}</if>
             <if test="initialStatus != null and initialStatus !='' "> and t.initial_status = #{initialStatus}</if>
-            <if test="reviewStatus != null and reviewStatus != '' ">and t.review_status = #{reviewStatus} </if>
+            <if test="reviewStatus != null and reviewStatus != '' ">
+				<choose>
+					<when test="reviewStatus == 0">
+						and t.rectifications > 0
+					</when>
+					<when test="reviewStatus == 1">
+						and t.reexaminations > 0
+					</when>
+					<when test="reviewStatus == 2">
+						and ( t.dangers > 0 and t.dangers = t.finishs)
+					</when>
+				</choose>
+			</if>
             <if test="startInitialDate != null "> and date(t.initial_date) &gt;= #{startInitialDate}</if>
             <if test="endInitialDate != null"> and date(t.initial_date) &lt;= #{endInitialDate}</if>
             <if test="startReviewDate != null  "> and date(t.review_date) &gt;= #{startReviewDate}</if>
@@ -377,14 +389,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(select count(1) as dangers from owner_unit_danger ud1 where ud1.building_id = o.id and ud1.status = '0' ) as rectifications,
 		(select count(1) as dangers from owner_unit_danger ud2 where ud2.building_id = o.id and ud2.status = '1' ) as reexaminations,
 		(select count(1) as dangers from owner_unit_danger ud3 where ud3.building_id = o.id and ud3.status = '2' ) as finishs,
-		(select count(1) from owner_unit_danger t where t.building_id = o.id and t.status != '9' ) as dangers
+		(select count(1) from owner_unit_danger t where t.building_id = o.id and t.status != '9'  and t.status != '' and t.status is not null ) as dangers
 		from owner_unit_building o 
 		left join owner_unit u on u.id = o.unit_id
 		where o.unit_id = #{unitId}) t
 		<where>  
             <if test="name != null and name !='' "> and t.name like concat('%', #{name}, '%')</if>
             <if test="initialStatus != null and initialStatus !='' "> and t.initial_status = #{initialStatus}</if>
-            <if test="reviewStatus != null and reviewStatus !='' "> and t.review_status = #{reviewStatus}</if>
+            <if test="reviewStatus != null and reviewStatus != '' ">
+				<choose>
+					<when test="reviewStatus == 0">
+						and t.rectifications > 0
+					</when>
+					<when test="reviewStatus == 1">
+						and t.reexaminations > 0
+					</when>
+					<when test="reviewStatus == 2">
+						and ( t.dangers > 0 and t.dangers = t.finishs)
+					</when>
+				</choose>
+			</if>
         </where>
     	
     </select>

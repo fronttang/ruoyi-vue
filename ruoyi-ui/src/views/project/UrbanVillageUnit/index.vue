@@ -333,7 +333,7 @@ import DictMeta from '@/utils/dict/DictMeta'
 import { getToken } from "@/utils/auth";
 
 export default {
-  name: "OwnerUnit",
+  name: "UrbanVillageUnit",
   dicts: ['detect_content', 'building_nature'],
   data() {
     return {

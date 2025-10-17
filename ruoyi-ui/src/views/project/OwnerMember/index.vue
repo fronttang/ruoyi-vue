@@ -148,7 +148,7 @@ import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { changeUserStatus } from "@/api/system/user";
 
 export default {
-  name: "DetectUnitUser",
+  name: "OwnerMember",
   dicts: ['account_status'],
   data() {
     const equalToPassword = (rule, value, callback) => {

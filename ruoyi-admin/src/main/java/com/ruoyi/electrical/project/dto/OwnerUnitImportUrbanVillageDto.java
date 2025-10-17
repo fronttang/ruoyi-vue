@@ -96,4 +96,10 @@ public class OwnerUnitImportUrbanVillageDto extends OwnerUnitImportResultDto {
 	 */
 	@Excel(name = "检测地址", orderNum = "13")
 	private String address;
+	
+	/**
+	 * 检测内容
+	 */
+	@Excel(name = "检测内容", orderNum = "14")
+	private String testContent;
 }

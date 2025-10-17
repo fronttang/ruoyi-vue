@@ -143,7 +143,7 @@ import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea"
 import DictMeta from '@/utils/dict/DictMeta'
 
 export default {
-  name: "OwnerUnitBuildingDanger",
+  name: "Building",
   dicts: ['initial_test_status', 'again_test_status'],
   data() {
     return {

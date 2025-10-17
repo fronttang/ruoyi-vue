@@ -579,7 +579,7 @@ export default {
     },
     handleDownloadInitialReport(row){
       var fileName = "Z" + row.name + ".docx";
-      if(row.wordFile == null){
+      //if(row.wordFile == null){
         this.loadingInstance = Loading.service({ text: "正在生成数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
         getWordReport(row.unitId, '1').then(response => {
           //this.download('common/download/resource?resource=' + response.file, {})
@@ -591,9 +591,9 @@ export default {
         });
 
         //this.$modal.msgError("无制式Word报告");
-      } else {
-        this.$download.resource(row.wordFile, fileName);
-      }
+      //} else {
+      //  this.$download.resource(row.wordFile, fileName);
+      //}
     },
     handleOpenArchivedPdf(row){
       if(row.archivedPdf == null){

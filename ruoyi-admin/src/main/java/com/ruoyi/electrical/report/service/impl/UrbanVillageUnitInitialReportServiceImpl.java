@@ -267,6 +267,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 	private Map<String, List<Object>> buildFormb(OwnerUnit ownerUnit, List<OwnerUnitDanger> unitDangerList) {
 
+		OwnerUnit tempOwnerUnit = com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(ownerUnit);
+		
 		Map<String, List<Object>> formb = new HashMap<String, List<Object>>();
 
 		SysDictData query = new SysDictData();
@@ -316,17 +318,17 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 									// BeanUtils.copyProperties(formbBean, newInstance);
 
 									if (!"B15".equalsIgnoreCase(dang.getFormCode())) {
-										BeanUtil.setFieldValue(formbBean, "temperature", ownerUnit.getTemperature());
+										BeanUtil.setFieldValue(formbBean, "temperature", tempOwnerUnit.getTemperature());
 									}
-									BeanUtil.setFieldValue(formbBean, "humidity", ownerUnit.getHumidity());
+									BeanUtil.setFieldValue(formbBean, "humidity", tempOwnerUnit.getHumidity());
 									String detectDate = DateUtil.format(dang.getInitialTime(),
 											DatePattern.CHINESE_DATE_FORMATTER);
 									BeanUtil.setFieldValue(formbBean, "detectDate", detectDate);
 
 									if ("B1".equalsIgnoreCase(dang.getFormCode())
 											|| "BB1".equalsIgnoreCase(dang.getFormCode())) {
-										BeanUtil.setFieldValue(formbBean, "weather", ownerUnit.getWeather());
-										BeanUtil.setFieldValue(formbBean, "windSpeed", ownerUnit.getWindSpeed());
+										BeanUtil.setFieldValue(formbBean, "weather", tempOwnerUnit.getWeather());
+										BeanUtil.setFieldValue(formbBean, "windSpeed", tempOwnerUnit.getWindSpeed());
 										BeanUtil.setFieldValue(formbBean, "deviceName", dang.getReportLocation1());
 									} else {
 										BeanUtil.setFieldValue(formbBean, "location", dang.getReportLocation1());
@@ -467,6 +469,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		BeanUtils.copyProperties(ownerUnit, unitInfo, "nature", "testStartDate", "testEndDate");
 		unitInfo.setTestStartDate(DateUtil.format(ownerUnit.getTestStartDate(), DatePattern.CHINESE_DATE_FORMATTER));
 		unitInfo.setTestEndDate(DateUtil.format(ownerUnit.getTestEndDate(), DatePattern.CHINESE_DATE_FORMATTER));
+		
+		unitInfo = com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(unitInfo);
 
 		buildOwnerUnitNatureInfo(ownerUnit, unitInfo);
 

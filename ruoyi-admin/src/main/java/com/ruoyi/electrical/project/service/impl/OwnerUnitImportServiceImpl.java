@@ -222,21 +222,23 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 					ownerUnit.setCommunity(projectArea.getCommunity());
 					ownerUnit.setHamlet(projectArea.getHamlet());
 					ownerUnit.setArea(projectArea.getId());
-					ownerUnit.setCreateBy("admin");
-					ownerUnit.setCreateTime(DateUtils.getNowDate());
-					ownerUnit.setUpdateTime(DateUtils.getNowDate());
 					ownerUnit.setNature(natureMap.get(ownerUnit.getNature()));
 					ownerUnit.setTestContent(buildDetectContent(ownerUnit.getTestContent(), detectContentMap));
-
+					
 					if ("4".equalsIgnoreCase(project.getType())) {
 						buildChargingStationData(ownerUnit, chargingStationTypeMap, propertyTypeMap);
 					}
+					
 					if (ownerUnitService.checkOwnerUnitName(ownerUnit) > 0) {
-						data.setResult("名称重复");
-						continue;
+						//data.setResult("名称重复");
+						//continue;
+						ownerUnitService.updateOwnerUnit(ownerUnit);
+					} else {
+						ownerUnit.setCreateBy("admin");
+						ownerUnit.setCreateTime(DateUtils.getNowDate());
+						ownerUnit.setUpdateTime(DateUtils.getNowDate());
+						ownerUnitService.insertOwnerUnit(ownerUnit);
 					}
-
-					ownerUnitService.insertOwnerUnit(ownerUnit);
 					data.setResult("导入成功");
 				} catch (Exception e) {
 					data.setResult(StrUtil.format("导入失败：{}", e.getMessage()));

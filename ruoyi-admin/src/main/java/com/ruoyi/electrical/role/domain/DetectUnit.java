@@ -47,15 +47,15 @@ public class DetectUnit extends BaseEntity
     private String contactPhone;
 
     /** logo */
-    @Excel(name = "logo")
+    //@Excel(name = "logo")
     private String logo;
 
     /** 营业执照 */
-    @Excel(name = "营业执照")
+    //@Excel(name = "营业执照")
     private String businessLicense;
 
     /** 资质 */
-    @Excel(name = "资质")
+    //@Excel(name = "资质")
     private String qualification;
 
     public void setId(Long id) 

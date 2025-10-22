@@ -82,7 +82,7 @@ public class IntuitiveDetectController extends BaseController {
 	/**
 	 * 查询直观检测标题列表
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:list')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:list')")
 	@GetMapping("/list")
 	public TableDataInfo list(IntuitiveDetectQuery intuitiveDetect) {
 		startPage();
@@ -93,7 +93,7 @@ public class IntuitiveDetectController extends BaseController {
 	/**
 	 * 导出直观检测标题列表
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:export')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:export')")
 	@Log(title = "直观检测标题", businessType = BusinessType.EXPORT)
 	@PostMapping("/export")
 	public void export(HttpServletResponse response, IntuitiveDetectQuery intuitiveDetect) {
@@ -105,7 +105,7 @@ public class IntuitiveDetectController extends BaseController {
 	/**
 	 * 获取直观检测标题详细信息
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:query')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:query')")
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
 		return success(intuitiveDetectService.selectIntuitiveDetectById(id));
@@ -114,7 +114,7 @@ public class IntuitiveDetectController extends BaseController {
 	/**
 	 * 新增直观检测标题
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:add')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:add')")
 	@Log(title = "直观检测标题", businessType = BusinessType.INSERT)
 	@PostMapping
 	public AjaxResult add(@RequestBody IntuitiveDetect intuitiveDetect) {
@@ -136,7 +136,7 @@ public class IntuitiveDetectController extends BaseController {
 	/**
 	 * 修改直观检测标题
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:edit')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:edit')")
 	@Log(title = "直观检测标题", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody IntuitiveDetect intuitiveDetect) {
@@ -146,7 +146,7 @@ public class IntuitiveDetectController extends BaseController {
 	/**
 	 * 删除直观检测标题
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:remove')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetect:remove')")
 	@Log(title = "直观检测标题", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
 	public AjaxResult remove(@PathVariable Long[] ids) {

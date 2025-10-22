@@ -63,7 +63,7 @@ public class OwnerUnitController extends BaseController {
 	/**
 	 * 查询业主单元列表
 	 */
-	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:list')")
+	//@PreAuthorize("@ss.hasPermi('project:OwnerUnit:list')")
 	@GetMapping("/list")
 	public TableDataInfo list(OwnerUnit ownerUnit) {
 		startPage();
@@ -74,7 +74,7 @@ public class OwnerUnitController extends BaseController {
 	/**
 	 * 导出业主单元列表
 	 */
-	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:export')")
+	//@PreAuthorize("@ss.hasPermi('project:OwnerUnit:export')")
 	@Log(title = "业主单元", businessType = BusinessType.EXPORT)
 	@PostMapping("/export")
 	public void export(HttpServletResponse response, OwnerUnit ownerUnit) {
@@ -86,7 +86,7 @@ public class OwnerUnitController extends BaseController {
 	/**
 	 * 获取业主单元详细信息
 	 */
-	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:query')")
+	//@PreAuthorize("@ss.hasPermi('project:OwnerUnit:query')")
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
 		return success(ownerUnitService.selectOwnerUnitById(id));
@@ -95,7 +95,7 @@ public class OwnerUnitController extends BaseController {
 	/**
 	 * 新增业主单元
 	 */
-	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:add')")
+	//@PreAuthorize("@ss.hasPermi('project:OwnerUnit:add')")
 	@Log(title = "业主单元", businessType = BusinessType.INSERT)
 	@PostMapping
 	public AjaxResult add(@RequestBody OwnerUnit ownerUnit) {
@@ -123,7 +123,7 @@ public class OwnerUnitController extends BaseController {
 	/**
 	 * 修改业主单元
 	 */
-	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:edit')")
+	//@PreAuthorize("@ss.hasPermi('project:OwnerUnit:edit')")
 	@Log(title = "业主单元", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody OwnerUnit ownerUnit) {
@@ -147,7 +147,7 @@ public class OwnerUnitController extends BaseController {
 	/**
 	 * 删除业主单元
 	 */
-	@PreAuthorize("@ss.hasPermi('project:OwnerUnit:remove')")
+	//@PreAuthorize("@ss.hasPermi('project:OwnerUnit:remove')")
 	@Log(title = "业主单元", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
 	public AjaxResult remove(@PathVariable Long[] ids) {

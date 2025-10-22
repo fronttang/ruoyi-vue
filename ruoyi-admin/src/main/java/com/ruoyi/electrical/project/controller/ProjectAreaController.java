@@ -68,7 +68,7 @@ public class ProjectAreaController extends BaseController {
 	/**
 	 * 获取项目区域详细信息
 	 */
-	@PreAuthorize("@ss.hasPermi('project:ProjectArea:query')")
+	//@PreAuthorize("@ss.hasPermi('project:ProjectArea:query')")
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
 		return success(projectAreaService.selectProjectAreaById(id));

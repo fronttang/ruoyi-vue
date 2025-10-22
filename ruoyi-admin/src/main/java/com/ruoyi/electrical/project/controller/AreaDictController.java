@@ -69,7 +69,7 @@ public class AreaDictController extends BaseController
     /**
      * 获取区域字典详细信息
      */
-    @PreAuthorize("@ss.hasPermi('project:AreaDict:query')")
+    //@PreAuthorize("@ss.hasPermi('project:AreaDict:query')")
     @GetMapping(value = "/{dictCode}")
     public AjaxResult getInfo(@PathVariable("dictCode") Long dictCode)
     {

@@ -37,7 +37,7 @@ public class IntuitiveDetectDangerController extends BaseController
     /**
      * 查询检测内容隐患列表
      */
-    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:list')")
+    //@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:list')")
     @GetMapping("/list")
     public TableDataInfo list(IntuitiveDetectDanger intuitiveDetectDanger)
     {
@@ -49,7 +49,7 @@ public class IntuitiveDetectDangerController extends BaseController
     /**
      * 导出检测内容隐患列表
      */
-    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:export')")
+    //@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:export')")
     @Log(title = "检测内容隐患", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, IntuitiveDetectDanger intuitiveDetectDanger)
@@ -62,7 +62,7 @@ public class IntuitiveDetectDangerController extends BaseController
     /**
      * 获取检测内容隐患详细信息
      */
-    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:query')")
+    //@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -72,7 +72,7 @@ public class IntuitiveDetectDangerController extends BaseController
     /**
      * 新增检测内容隐患
      */
-    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:add')")
+    //@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:add')")
     @Log(title = "检测内容隐患", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody IntuitiveDetectDanger intuitiveDetectDanger)
@@ -83,7 +83,7 @@ public class IntuitiveDetectDangerController extends BaseController
     /**
      * 修改检测内容隐患
      */
-    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:edit')")
+    //@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:edit')")
     @Log(title = "检测内容隐患", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody IntuitiveDetectDanger intuitiveDetectDanger)
@@ -94,7 +94,7 @@ public class IntuitiveDetectDangerController extends BaseController
     /**
      * 删除检测内容隐患
      */
-    @PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:remove')")
+    //@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectDanger:remove')")
     @Log(title = "检测内容隐患", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

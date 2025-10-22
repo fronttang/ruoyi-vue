@@ -56,7 +56,7 @@ public class IntuitiveDetectDataController extends BaseController {
 	/**
 	 * 查询直观检测表内容列表
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:list')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:list')")
 	@GetMapping("/list")
 	public TableDataInfo list(IntuitiveDetectData intuitiveDetectData) {
 		startPage();
@@ -64,7 +64,7 @@ public class IntuitiveDetectDataController extends BaseController {
 		return getDataTable(list);
 	}
 
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:list')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:list')")
 	@GetMapping("/list/view")
 	public TableDataInfo listViewData(IntuitiveDetectData intuitiveDetectData) {
 		startPage();
@@ -76,7 +76,7 @@ public class IntuitiveDetectDataController extends BaseController {
 	/**
 	 * 导出直观检测表内容列表
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:export')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:export')")
 	@Log(title = "直观检测表内容", businessType = BusinessType.EXPORT)
 	@PostMapping("/export")
 	public void export(HttpServletResponse response, IntuitiveDetectData intuitiveDetectData) {
@@ -88,7 +88,7 @@ public class IntuitiveDetectDataController extends BaseController {
 	/**
 	 * 获取直观检测表内容详细信息
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:query')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:query')")
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
 		IntuitiveDetectData intuitiveDetectData = intuitiveDetectDataService.selectIntuitiveDetectDataById(id);
@@ -113,7 +113,7 @@ public class IntuitiveDetectDataController extends BaseController {
 	/**
 	 * 新增直观检测表内容
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:add')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:add')")
 	@Log(title = "直观检测表内容", businessType = BusinessType.INSERT)
 	@PostMapping
 	public AjaxResult add(@RequestBody IntuitiveDetectData intuitiveDetectData) {
@@ -123,7 +123,7 @@ public class IntuitiveDetectDataController extends BaseController {
 	/**
 	 * 修改直观检测表内容
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:edit')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:edit')")
 	@Log(title = "直观检测表内容", businessType = BusinessType.UPDATE)
 	@PutMapping
 	public AjaxResult edit(@RequestBody IntuitiveDetectData intuitiveDetectData) {
@@ -133,7 +133,7 @@ public class IntuitiveDetectDataController extends BaseController {
 	/**
 	 * 删除直观检测表内容
 	 */
-	@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:remove')")
+	//@PreAuthorize("@ss.hasPermi('template:IntuitiveDetectData:remove')")
 	@Log(title = "直观检测表内容", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
 	public AjaxResult remove(@PathVariable Long[] ids) {

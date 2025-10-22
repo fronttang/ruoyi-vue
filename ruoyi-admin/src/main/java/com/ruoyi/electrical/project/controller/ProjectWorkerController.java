@@ -79,7 +79,7 @@ public class ProjectWorkerController extends BaseController {
 	/**
 	 * 获取项目工作人员详细信息
 	 */
-	@PreAuthorize("@ss.hasPermi('project:ProjectWorker:query')")
+	//@PreAuthorize("@ss.hasPermi('project:ProjectWorker:query')")
 	@GetMapping(value = "/{id}")
 	public AjaxResult getInfo(@PathVariable("id") Long id) {
 		return success(projectWorkerService.selectProjectWorkerById(id));

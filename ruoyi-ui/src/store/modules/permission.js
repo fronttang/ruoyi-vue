@@ -83,6 +83,8 @@ const permission = {
             newRoutes = chargingStationRouters;
           }
 
+          newRoutes = filterDynamicRoutes(newRoutes);
+
           let routers = permission.state.sidebarRouters;
 
           let settingRoutes = routers.filter(

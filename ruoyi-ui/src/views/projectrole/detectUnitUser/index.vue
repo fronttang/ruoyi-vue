@@ -58,16 +58,6 @@
           v-hasPermi="['projectrole:detectUnitUser:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['projectrole:detectUnitUser:export']"
-        >导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -84,6 +74,7 @@
           active-value="0"
           inactive-value="1"
           @change="handleStatusChange(scope.row)"
+          v-hasPermi="['projectrole:detectUnitUser:edit']"
         ></el-switch>
       </template>
       </el-table-column>
@@ -113,7 +104,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleLogout(scope.row)"
-            v-hasPermi="['projectrole:detectUnitUser:edit']"
+            v-hasPermi="['projectrole:detectUnitUser:logout']"
           >下线</el-button>
         </template>
       </el-table-column>

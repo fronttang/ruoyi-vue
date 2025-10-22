@@ -23,7 +23,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['projectrole:detectUnitUser:add']"
+          v-hasPermi="['project:OwnerMember:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -34,7 +34,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['projectrole:detectUnitUser:edit']"
+          v-hasPermi="['project:OwnerMember:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -45,18 +45,8 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['projectrole:detectUnitUser:remove']"
+          v-hasPermi="['project:OwnerMember:remove']"
         >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['projectrole:detectUnitUser:export']"
-        >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -90,21 +80,21 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['projectrole:detectUnitUser:edit']"
+            v-hasPermi="['project:OwnerMember:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['projectrole:detectUnitUser:remove']"
+            v-hasPermi="['project:OwnerMember:remove']"
           >删除</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-user"
             @click="handleLogout(scope.row)"
-            v-hasPermi="['projectrole:detectUnitUser:edit']"
+            v-hasPermi="['project:OwnerMember:logout']"
           >下线</el-button>
         </template>
       </el-table-column>

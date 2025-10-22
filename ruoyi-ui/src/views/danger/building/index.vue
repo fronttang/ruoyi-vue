@@ -65,12 +65,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleViewDangers(scope.row)"
+            v-hasPermi="['danger:export:view']"
           >查看</el-button>
           <el-button 
             size="mini"
             type="text"
             icon="el-icon-picture"
             @click="handlePictures(scope.row)"
+            v-hasPermi="['danger:export:images']"
           >图片</el-button>
         </template>
       </el-table-column>

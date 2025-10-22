@@ -55,7 +55,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['template:IntuitiveDetectData:add']"
+          v-hasPermi="['template:Template:edit']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -66,7 +66,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['template:IntuitiveDetectData:edit']"
+          v-hasPermi="['template:Template:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -76,7 +76,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['template:IntuitiveDetectData:export']"
+          v-hasPermi="['template:Template:edit']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -106,14 +106,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['template:IntuitiveDetectData:edit']"
+            v-hasPermi="['template:Template:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['template:IntuitiveDetectData:remove']"
+            v-hasPermi="['template:Template:edit']"
           >删除</el-button>
         </template>
       </el-table-column>

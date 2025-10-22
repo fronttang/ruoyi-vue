@@ -95,6 +95,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['project:infrared:edit']"
           >判定</el-button>
         </template>
       </el-table-column>

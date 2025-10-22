@@ -83,6 +83,7 @@
           icon="el-icon-edit"
           size="mini"
           @click="handleBatchAudit"
+          v-hasPermi="['report:review:audit']"
         >批量审核</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -92,10 +93,11 @@
           icon="el-icon-date"
           size="mini"
           @click="handleBatchSetReportDate"
+          v-hasPermi="['report:review:reportdate']"
         >批量设置编制日期</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-dropdown size="mini" @command="handleBatchCommand">
+        <el-dropdown size="mini" @command="handleBatchCommand" v-hasPermi="['report:review:download']">
           <el-button size="mini" type="primary" plain icon="el-icon-download">批量下载<i class="el-icon-arrow-down el-icon--right"></i></el-button>
           <el-dropdown-menu slot="dropdown">
               <el-dropdown-item :command="1">制式Word报告</el-dropdown-item>
@@ -156,6 +158,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleAudit(scope.row)"
+            v-hasPermi="['report:review:audit']"
           >审核</el-button>
           <el-tooltip class="item" effect="dark" content="打开制式Word报告" placement="top">
             <el-button 
@@ -163,6 +166,7 @@
               type="text"
               icon="iconfont iconfont-word"
               @click="handleOpenInitialReport(scope.row)"
+              v-hasPermi="['report:review:edit']"
             ></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="打开归档Word报告" placement="top">
@@ -171,9 +175,10 @@
               type="text"
               icon="iconfont iconfont-bg-word"
               @click="handleOpenArchivedWordReport(scope.row)"
+              v-hasPermi="['report:review:edit']"
             ></el-button>
           </el-tooltip>
-          <el-dropdown size="medium" @command="(command) => handleCommand(command, scope.row)" >
+          <el-dropdown size="medium" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['report:review:download']">
             <el-button size="medium" type="text" icon="iconfont iconfont-download"></el-button>
             <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="downloadInitialReport" icon="iconfont iconfont-download" >下载制式Word报告</el-dropdown-item>
@@ -187,6 +192,7 @@
               type="text"
               icon="iconfont iconfont-reload"
               @click="handleResetStatus(scope.row)"
+              v-hasPermi="['report:review:status']"
             ></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="编制日期" placement="top">
@@ -195,6 +201,7 @@
               type="text"
               icon="el-icon-date"
               @click="handleReportDate(scope.row)"
+              v-hasPermi="['report:review:reportdate']"
             >  </el-button>
           </el-tooltip>
         </template>

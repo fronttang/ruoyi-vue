@@ -91,8 +91,9 @@
             type="text"
             icon="el-icon-edit"
             @click="handleView(scope.row)"
+            v-hasPermi="['danger:list:view']"
           >查看</el-button>
-          <el-dropdown size="mini" @command="(command) => handleStatus(scope.row, command)" v-if="scope.row.status != null && scope.row.status != '' && scope.row.status != '9'" >
+          <el-dropdown size="mini" v-hasPermi="['danger:list:edit']" @command="(command) => handleStatus(scope.row, command)" v-if="scope.row.status != null && scope.row.status != '' && scope.row.status != '9'" >
             <el-button size="mini" type="text" icon="el-icon-refresh-left">重置</el-button>
             <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="0" icon="el-icon-edit" >重置待整改</el-dropdown-item>

@@ -105,6 +105,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportDangerType1"
+            v-hasPermi="['danger:export:init']"
           >导出初检隐患台账</el-button>
         </el-col>
         <el-col :span="1.5" v-if="this.projectType == '1'">
@@ -114,6 +115,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportReviewDanger"
+            v-hasPermi="['danger:export:review']"
           >导出复检隐患台账</el-button>
         </el-col>
         <el-col :span="1.5" v-if="this.projectType == '2'">
@@ -123,6 +125,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportDangerType2"
+            v-hasPermi="['danger:export:dangers']"
           >导出隐患台账</el-button>
         </el-col>
         <el-col :span="1.5" v-if="this.projectType == '3'">
@@ -132,6 +135,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportDanger"
+            v-hasPermi="['danger:export:dangers']"
           >导出隐患台账</el-button>
         </el-col>
         <el-col :span="1.5" v-if="this.projectType == '3'">
@@ -141,6 +145,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportMissDevice"
+            v-hasPermi="['danger:export:messdevice']"
           >导出缺失设备台账</el-button>
         </el-col>
         <el-col :span="1.5" v-if="this.projectType == '4'">
@@ -150,6 +155,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportStationDanger"
+            v-hasPermi="['danger:export:dangers']"
           >导出隐患台账</el-button>
         </el-col>
         <el-col :span="1.5" v-if="this.projectType == '4'">
@@ -159,6 +165,7 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExportRoundsStationDanger"
+            v-hasPermi="['danger:export:all']"
           >导出总隐患台账</el-button>
         </el-col>
         <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -207,12 +214,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleView(scope.row)"
+            v-hasPermi="['danger:export:view']"
           >查看</el-button>
           <el-button v-if="projectType !== '2'" 
             size="mini"
             type="text"
             icon="el-icon-picture"
             @click="handlePictures(scope.row)"
+            v-hasPermi="['danger:export:images']"
           >图片</el-button>
         </template>
       </el-table-column>

@@ -23,7 +23,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['projectrole:detectUnitUser:add']"
+          v-hasPermi="['project:gridman:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -34,7 +34,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['projectrole:detectUnitUser:edit']"
+          v-hasPermi="['project:gridman:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -45,18 +45,8 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['projectrole:detectUnitUser:remove']"
+          v-hasPermi="['project:gridman:remove']"
         >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['projectrole:detectUnitUser:export']"
-        >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -85,12 +75,12 @@
       </el-table-column>
       <el-table-column label="操作" fixed="right" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" >
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['project:gridman:edit','project:gridman:remove','project:gridman:logout']">
             <el-button size="mini" type="text" icon="el-icon-edit">操作</el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="edit" icon="el-icon-edit" >修改</el-dropdown-item>
-              <el-dropdown-item command="delete" icon="el-icon-delete" >删除</el-dropdown-item>
-              <el-dropdown-item command="logout" icon="el-icon-user" >下线</el-dropdown-item>
+              <el-dropdown-item command="edit" icon="el-icon-edit" v-hasPermi="['project:gridman:edit']">修改</el-dropdown-item>
+              <el-dropdown-item command="delete" icon="el-icon-delete" v-hasPermi="['project:gridman:remove']">删除</el-dropdown-item>
+              <el-dropdown-item command="logout" icon="el-icon-user" v-hasPermi="['project:gridman:logout']">下线</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -99,14 +89,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUnit(scope.row, 0)"
-            v-hasPermi="['projectrole:detectUnitUser:edit']"
+            v-hasPermi="['project:gridman:fp']"
           >分配</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUnit(scope.row, 1)"
-            v-hasPermi="['projectrole:detectUnitUser:edit']"
+            v-hasPermi="['project:gridman:yfp']"
           >已分配</el-button>
 
         </template>

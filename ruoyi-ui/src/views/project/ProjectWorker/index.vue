@@ -27,7 +27,7 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-dropdown size="mini" @command="handleCommand">
+        <el-dropdown size="mini" @command="handleCommand" v-hasPermi="['project:ProjectWorker:add']">
           <el-button size="mini" type="primary" plain icon="el-icon-plus">绑定人员<i class="el-icon-arrow-down el-icon--right"></i></el-button>
           <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="type in dict.type.project_worker_bind_type" :command="type.value" >{{type.label}}</el-dropdown-item>
@@ -42,6 +42,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleBatchBindArea"
+          v-hasPermi="['project:ProjectWorker:area']"
         >批量绑定区域</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -52,6 +53,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleBatchEditArea"
+          v-hasPermi="['project:ProjectWorker:role']"
         >批量编辑权限</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -101,18 +103,21 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['project:ProjectWorker:remove']"
           >删除</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleBindArea(scope.row, '1')"
+            v-hasPermi="['project:ProjectWorker:area']"
           >绑定区域</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleBindArea(scope.row, '2')"
+            v-hasPermi="['project:ProjectWorker:role']"
           >编辑权限</el-button>
         </template>
       </el-table-column>

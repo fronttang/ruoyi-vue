@@ -43,7 +43,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['project:OwnerUnit:add']"
+          v-hasPermi="['project:IndustrialAreaUnit:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -54,7 +54,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['project:OwnerUnit:edit']"
+          v-hasPermi="['project:IndustrialAreaUnit:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -65,7 +65,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['project:OwnerUnit:remove']"
+          v-hasPermi="['project:IndustrialAreaUnit:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -75,7 +75,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['project:OwnerUnit:export']"
+          v-hasPermi="['project:IndustrialAreaUnit:export']"
         >导出</el-button>
       </el-col>
       <el-col :span="1.5" >
@@ -85,6 +85,7 @@
           icon="el-icon-upload2"
           size="mini"
           @click="handleImport"
+          v-hasPermi="['project:IndustrialAreaUnit:import']"
         >导入</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -111,14 +112,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['project:OwnerUnit:edit']"
+            v-hasPermi="['project:IndustrialAreaUnit:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['project:OwnerUnit:remove']"
+            v-hasPermi="['project:IndustrialAreaUnit:remove']"
           >删除</el-button>
         </template>
       </el-table-column>

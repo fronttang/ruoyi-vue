@@ -13,6 +13,11 @@ public class OwnerUnitReportInfo {
 	 * 报告ID
 	 */
 	private Long id;
+	
+	/**
+	 * 报告编号
+	 */
+	private String code;
 
 	/**
 	 * 检测时间

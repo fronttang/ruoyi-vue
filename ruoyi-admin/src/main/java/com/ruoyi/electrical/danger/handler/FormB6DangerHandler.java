@@ -167,7 +167,11 @@ public class FormB6DangerHandler implements IFormbDangerHandler {
 	public String getResult(OwnerUnitDanger vo) {
 		FormB6 formb = getFormb(vo);
 		if (formb != null) {
-			return formb.getResult();
+			String result = formb.getResult();
+			if(result.equals("空")) {
+				result = "无法检测";
+			}
+			return result;
 		}
 		return null;
 	}

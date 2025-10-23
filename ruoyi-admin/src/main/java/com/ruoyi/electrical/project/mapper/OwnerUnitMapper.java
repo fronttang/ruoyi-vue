@@ -63,7 +63,7 @@ public interface OwnerUnitMapper {
 	 */
 	public int deleteOwnerUnitByIds(Long[] ids);
 
-	public int checkOwnerUnitName(OwnerUnit ownerUnit);
+	public OwnerUnit checkOwnerUnitName(OwnerUnit ownerUnit);
 
 	public int setGridman(@Param("gridman") Long gridman, @Param("unitIds") Long[] unitIds);
 

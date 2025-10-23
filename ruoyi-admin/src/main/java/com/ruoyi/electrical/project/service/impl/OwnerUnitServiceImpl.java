@@ -252,7 +252,7 @@ public class OwnerUnitServiceImpl implements IOwnerUnitService {
 	}
 
 	@Override
-	public int checkOwnerUnitName(OwnerUnit ownerUnit) {
+	public OwnerUnit checkOwnerUnitName(OwnerUnit ownerUnit) {
 		return ownerUnitMapper.checkOwnerUnitName(ownerUnit);
 	}
 

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -229,9 +230,12 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 						buildChargingStationData(ownerUnit, chargingStationTypeMap, propertyTypeMap);
 					}
 					
-					if (ownerUnitService.checkOwnerUnitName(ownerUnit) > 0) {
+					OwnerUnit exsit = ownerUnitService.checkOwnerUnitName(ownerUnit);
+					
+					if (Objects.nonNull(exsit)) {
 						//data.setResult("名称重复");
 						//continue;
+						ownerUnit.setId(exsit.getId());
 						ownerUnitService.updateOwnerUnit(ownerUnit);
 					} else {
 						ownerUnit.setCreateBy("admin");
@@ -263,7 +267,7 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 			return null;
 		}
 		
-		return Stream.of(detectContent.split(","))
+		return Stream.of(detectContent.split("、"))
 	            .map(String::trim)
 	            .map(detectContentMap::get)
 	            .filter(StrUtil::isNotBlank)

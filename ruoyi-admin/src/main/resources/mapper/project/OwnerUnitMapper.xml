@@ -139,13 +139,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
     
-    <select id="checkOwnerUnitName" parameterType="OwnerUnit" resultType="Integer">
-        select count(1) from owner_unit 
+    <select id="checkOwnerUnitName" parameterType="OwnerUnit" resultMap="OwnerUnitResult">
+        select id from owner_unit 
         where name = #{name}  and type = #{type} and district = #{district} and street = #{street}
          <if test="community != null and community != '' "> and community = #{community}</if>
          <if test="hamlet != null  and hamlet != ''"> and hamlet = #{hamlet}</if>
          <if test="highRiskType != null and highRiskType != ''"> and high_risk_type = #{highRiskType}</if>
          <if test="id != null "> and id != #{id}</if>
+         limit 1
     </select>
     
     

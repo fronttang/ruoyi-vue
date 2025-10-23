@@ -1,11 +1,11 @@
 package com.ruoyi.electrical.project.controller;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -113,7 +113,8 @@ public class OwnerUnitController extends BaseController {
 		}
 
 		// 同名检查
-		if (ownerUnitService.checkOwnerUnitName(ownerUnit) > 0) {
+		OwnerUnit exsit = ownerUnitService.checkOwnerUnitName(ownerUnit);
+		if (Objects.nonNull(exsit)) {
 			return AjaxResult.error(StrUtil.format("该项目区域下已存在名为[{}]的业主单元", ownerUnit.getName()));
 		}
 

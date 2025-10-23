@@ -63,6 +63,11 @@ public class FormB6 extends BaseFormB {
 	private String result;
 	
 	public String getResult() {
+		
+		if ("空".equals(this.result)){
+			this.result = "无法检测";
+		}
+		
 		return StrUtil.isNotBlank(this.result) ? this.result : "/";
 	}
 

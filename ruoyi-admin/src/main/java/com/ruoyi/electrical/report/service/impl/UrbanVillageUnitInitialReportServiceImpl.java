@@ -150,16 +150,17 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
 		ConfigureBuilder configureBuilder = Configure.builder().useSpringEL().bind("device", policy);
 		Configure config = configureBuilder.build();
+		
+		NiceXWPFDocument main = null;
+		InputStream mainInputStream = null;
+		XWPFTemplate mainTemplate = null;
 		try {
 
 			Map<String, Object> dataMap = BeanUtil.beanToMap(initialReport);
 
-			NiceXWPFDocument main;
-
 			// 模板
-			InputStream mainInputStream = ClassPathResource.class.getClassLoader()
-					.getResourceAsStream("report/review/review_report.docx");
-			XWPFTemplate mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
+			mainInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/review/review_report.docx");
+			mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
 			main = mainTemplate.getXWPFDocument();
 
 			String path = saveReportFile(reportId, initialReport, main);
@@ -169,44 +170,47 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			log.error("生成电气检测复检报告失败！", e);
 			return AjaxResult.error();
 		} finally {
-
+			PoitlIOUtils.closeQuietlyMulti(mainTemplate, mainInputStream, main);
 		}
 	}
 
 	private String saveReportFile(Long reportId, InitialReport initialReport, NiceXWPFDocument main)
 			throws IOException, FileNotFoundException {
-		LocalDateTime now = LocalDateTime.now();
-		String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
-		String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
-		String datePath = DateUtil.format(now, "yyyy/MM/dd");
-
-		String filePath = StrUtil.format("{}/{}", datePath, fileName);
-
-		String baseDir = RuoYiConfig.getUploadPath();
-		File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
-
-		main.write(new FileOutputStream(saveFile));
-
-		PoitlIOUtils.closeQuietlyMulti(main); // 最后不要忘记关闭这些流。
-
-		Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
-
-		if (wordFileVersion == null) {
-			wordFileVersion = 1;
-		} else {
-			wordFileVersion = wordFileVersion + 1;
+		FileOutputStream fileOutputStream = null;
+		try {
+			LocalDateTime now = LocalDateTime.now();
+			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+			String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
+			String datePath = DateUtil.format(now, "yyyy/MM/dd");
+	
+			String filePath = StrUtil.format("{}/{}", datePath, fileName);
+	
+			String baseDir = RuoYiConfig.getUploadPath();
+			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
+			fileOutputStream = new FileOutputStream(saveFile);
+			main.write(fileOutputStream);
+			fileOutputStream.flush();
+			PoitlIOUtils.closeQuietlyMulti(main, fileOutputStream); // 最后不要忘记关闭这些流。
+	
+			Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
+	
+			if (wordFileVersion == null) {
+				wordFileVersion = 1;
+			} else {
+				wordFileVersion = wordFileVersion + 1;
+			}
+	
+			String path = FileUploadUtils.getPathFileName(baseDir, filePath);
+	
+			OwnerUnitReport report = new OwnerUnitReport();
+			report.setId(reportId);
+			report.setWordFileVersion(wordFileVersion);
+			report.setWordFile(path);
+			unitReportService.updateOwnerUnitReport(report);
+			return path;
+		} finally {
+			PoitlIOUtils.closeQuietlyMulti(fileOutputStream);
 		}
-
-		String path = FileUploadUtils.getPathFileName(baseDir, filePath);
-
-		OwnerUnitReport report = new OwnerUnitReport();
-		report.setId(reportId);
-		report.setWordFileVersion(wordFileVersion);
-		report.setWordFile(path);
-
-		unitReportService.updateOwnerUnitReport(report);
-
-		return path;
 	}
 
 	@Override
@@ -228,40 +232,47 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 				.bind("formb.B11", policy).bind("formb.B12", policy).bind("formb.B13", policy).bind("formb.B14", policy)
 				.bind("formb.B14A", policy).bind("formb.B14B", policy).bind("formb.B15", policy);
 		Configure config = configureBuilder.build();
+		
+		NiceXWPFDocument main = null;
+		InputStream mainInputStream = null;
+		InputStream formbInputStream = null;
+		InputStream formInputStream = null;
+		XWPFTemplate mainTemplate = null;
+		XWPFTemplate formbTemplate = null;
+		XWPFTemplate formTemplate = null;
+		NiceXWPFDocument formbDocument = null;
+		NiceXWPFDocument formDocument = null;
 		try {
 
 			ZipSecureFile.setMinInflateRatio(0.001);
 
 			Map<String, Object> dataMap = BeanUtil.beanToMap(initialReport);
 
-			NiceXWPFDocument main;
-
 			// 标题
-			InputStream mainInputStream = ClassPathResource.class.getClassLoader()
-					.getResourceAsStream("report/initial/Initial_Report.docx");
-			XWPFTemplate mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
+			mainInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Report.docx");
+			mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
 			main = mainTemplate.getXWPFDocument();
 
 			// 检测B表
-			InputStream formbInputStream = ClassPathResource.class.getClassLoader()
-					.getResourceAsStream("report/initial/Initial_Formb.docx");
-			XWPFTemplate formbTemplate = XWPFTemplate.compile(formbInputStream, config).render(dataMap);
-			main = main.merge(formbTemplate.getXWPFDocument());
+			formbInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Formb.docx");
+			formbTemplate = XWPFTemplate.compile(formbInputStream, config).render(dataMap);
+			formbDocument = formbTemplate.getXWPFDocument();
+			main = main.merge(formbDocument);
 
 			// 检测表
-			InputStream formInputStream = ClassPathResource.class.getClassLoader()
-					.getResourceAsStream("report/initial/Initial_Form.docx");
-			XWPFTemplate formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
+			formInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Form.docx");
+			formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
+			formDocument = formTemplate.getXWPFDocument();
 			main = main.merge(formTemplate.getXWPFDocument());
 
 			String path = saveReportFile(reportId, initialReport, main);
-
+			
 			return AjaxResult.success(new ReportFileVo(reportId, path));
 		} catch (Exception e) {
 			log.error("生成电气检测初检报告失败！", e);
 			return AjaxResult.error();
 		} finally {
-
+			PoitlIOUtils.closeQuietlyMulti(mainTemplate, formbTemplate, formTemplate, mainInputStream, formbInputStream, formInputStream, main, formbDocument, formDocument);
 		}
 	}
 

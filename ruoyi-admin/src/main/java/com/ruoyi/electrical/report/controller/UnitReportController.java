@@ -17,13 +17,8 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
-import com.ruoyi.electrical.project.domain.OwnerUnit;
-import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.report.domain.OwnerUnitReport;
-import com.ruoyi.electrical.report.service.IChargingStationInitialReportService;
-import com.ruoyi.electrical.report.service.IHighFireRiskInitialReportService;
 import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
-import com.ruoyi.electrical.report.service.IUrbanVillageUnitInitialReportService;
 import com.ruoyi.electrical.vo.ReportFileVo;
 
 import cn.hutool.core.date.DatePattern;
@@ -42,69 +37,12 @@ public class UnitReportController extends BaseController {
 	@Autowired
 	private IOwnerUnitReportService unitReportService;
 
-	@Autowired
-	private IOwnerUnitService ownerUnitService;
-
-	@Autowired
-	private IUrbanVillageUnitInitialReportService urbanVillageUnitInitialReportService;
-
-	@Autowired
-	private IHighFireRiskInitialReportService fireRiskInitialReportService;
-
-	@Autowired
-	private IChargingStationInitialReportService chargingStationInitialReportService;
-
 	/**
 	 * @param reportId
 	 */
 	@RequestMapping("/{unitId}/{type}")
 	public AjaxResult initialReport(@PathVariable Long unitId, @PathVariable String type) {
-
-		OwnerUnitReport report = unitReportService.selectOwnerUnitReportByUnitIdAndType(unitId, type);
-		if (report == null) {
-			return AjaxResult.error();
-		}
-
-		OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(unitId);
-
-		if (ownerUnit == null) {
-			return AjaxResult.error();
-		}
-		if ("1".equalsIgnoreCase(report.getType())) {
-
-			// 城中村 / 工业园
-			if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
-				return urbanVillageUnitInitialReportService.initialReport(report.getId());
-			} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
-				// 高风险
-				return fireRiskInitialReportService.initialReport(report.getId());
-
-			} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
-				// 充电站
-				return chargingStationInitialReportService.initialReport(report.getId());
-
-			} else {
-				return AjaxResult.error();
-			}
-		} else if ("2".equalsIgnoreCase(report.getType())) {
-
-			// 城中村 / 工业园
-			if ("1".equalsIgnoreCase(ownerUnit.getType()) || "2".equalsIgnoreCase(ownerUnit.getType())) {
-				return urbanVillageUnitInitialReportService.reviewReport(report.getId());
-			} else if ("3".equalsIgnoreCase(ownerUnit.getType())) {
-				// 高风险
-				return fireRiskInitialReportService.reviewReport(report.getId());
-
-			} else if ("4".equalsIgnoreCase(ownerUnit.getType())) {
-				// 充电站
-				return chargingStationInitialReportService.reviewReport(report.getId());
-
-			} else {
-				return AjaxResult.error();
-			}
-		} else {
-			return AjaxResult.error();
-		}
+		return unitReportService.reportGenerate(unitId, type);
 	}
 
 	@GetMapping("/archived/pdf/{unitId}/{type}")

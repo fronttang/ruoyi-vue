@@ -2,6 +2,7 @@ package com.ruoyi.electrical.report.service;
 
 import java.util.List;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.electrical.dto.OwnerUnitReportDto;
 import com.ruoyi.electrical.dto.OwnerUnitReportPassDto;
 import com.ruoyi.electrical.report.domain.OwnerUnitReport;
@@ -44,5 +45,7 @@ public interface IOwnerUnitReportService {
 	public boolean setReportDate(OwnerUnitReport report);
 
 	public List<OwnerUnitReportVo> selectOwnerUnitReportListByUnitIds(Long[] unitIds, Long projectId, String type);
+	
+	public AjaxResult reportGenerate(Long unitId, String type);
 
 }

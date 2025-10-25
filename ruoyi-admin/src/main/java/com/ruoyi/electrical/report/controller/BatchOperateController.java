@@ -1,17 +1,22 @@
 package com.ruoyi.electrical.report.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,8 +42,6 @@ import com.ruoyi.electrical.vo.OwnerUnitReportVo;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,9 +62,6 @@ public class BatchOperateController extends BaseController {
 	@Autowired
 	private OriginalRecordsReportController originalRecordsReport;
 	
-	@Autowired
-	private UnitReportController reportGenerateService;
-
 	/**
 	 * 批量通过
 	 * 
@@ -172,7 +172,7 @@ public class BatchOperateController extends BaseController {
 	 * @return
 	 * @throws IOException
 	 */
-	@Transactional
+	//@Transactional
 	@PostMapping("/download/{type}")
 	public AjaxResult download(@RequestBody OwnerUnitReportDto dto, @PathVariable String type) {
 
@@ -186,10 +186,66 @@ public class BatchOperateController extends BaseController {
 		}
 
 		ZipOutputStream zip = null;
+		FileOutputStream outputStream = null;
 		try {
 
 			if (CollUtil.isNotEmpty(list)) {
+				
+				ThreadPoolTaskExecutor executor = createThreadPoolTaskExecutor();
 
+				CountDownLatch latch = new CountDownLatch(list.size());
+				
+				Map<String, String> filePathMap = new ConcurrentHashMap<>();
+
+				for (OwnerUnitReportVo report : list) {
+					executor.execute(() -> {
+						try {
+							
+							OwnerUnitReport rp = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(report.getUnitId(), dto.getType());
+							if(rp == null) {
+								return;
+							}
+							
+							OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(report.getUnitId());
+							if (ownerUnit == null) {
+								return;
+							}
+							
+							String fileName = null;
+							String filePath = null;
+
+							if ("1".equalsIgnoreCase(type)) {
+								fileName = StrUtil.format("Z{}.docx", ownerUnit.getName());
+								filePath = initialReport(rp, ownerUnit, filePath);
+							} else if ("2".equalsIgnoreCase(type)) {
+								fileName = StrUtil.format("C{}.docx", ownerUnit.getName());
+								filePath = reviewReport(rp, ownerUnit, filePath);
+							} else if ("3".equalsIgnoreCase(type)) {
+								fileName = StrUtil.format("Y{}.docx", ownerUnit.getName());
+								filePath = originalRecords(ownerUnit, filePath);
+							}
+							if (StrUtil.isNotBlank(fileName) && StrUtil.isNotBlank(filePath)) {
+								 //File file = new File(filePath);
+								 //if (file.exists()) {
+				                    filePathMap.put(fileName, filePath);
+								 //} else {
+								//	 log.error("文件未生成或路径错误: {}", filePath);
+								 //}						
+							}
+						} finally {
+							latch.countDown();
+						}
+					});
+				}
+				
+				latch.await();
+				executor.shutdown();
+				executor.destroy();
+				
+				if (CollUtil.isEmpty(filePathMap)) {
+					return AjaxResult.error("无可下载文件");
+				}
+				
 				LocalDateTime now = LocalDateTime.now();
 				String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
 				String zipFileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".zip";
@@ -200,109 +256,35 @@ public class BatchOperateController extends BaseController {
 				String baseDir = RuoYiConfig.getUploadPath();
 				File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, zipFilePath);
 
-				FileOutputStream outputStream = new FileOutputStream(saveFile);
+				outputStream = new FileOutputStream(saveFile);
 				zip = new ZipOutputStream(outputStream);
+				
+				for (Map.Entry<String, String> entry : filePathMap.entrySet()) {
+					String fileName = entry.getKey();
+					String filePath = entry.getValue();
+					if (StrUtil.isNotBlank(fileName) && StrUtil.isNotBlank(filePath)) {
+						try (FileInputStream fis = new FileInputStream(filePath)) {
+				            ZipEntry zipEntry = new ZipEntry(fileName);
+				            zip.putNextEntry(zipEntry);
 
-				for (OwnerUnitReportVo report : list) {
-					OwnerUnitReport rp = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(report.getUnitId(),
-							dto.getType());
-					if (rp != null) {
-
-						OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(report.getUnitId());
-						if (ownerUnit == null) {
-							continue;
-						}
-
-						String fileName = null;
-						String filePath = null;
-
-						if ("1".equalsIgnoreCase(type)) {
-							fileName = StrUtil.format("Z{}.docx", ownerUnit.getName());
-
-							String wordFilePath = rp.getWordFile();
-							if (StrUtil.isNotBlank(wordFilePath)) {
-								String localPath = RuoYiConfig.getProfile();
-								filePath = localPath
-										+ StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
-							} else {
-								try {
-									// 沒有就直接生成
-									AjaxResult initialReport = reportGenerateService.initialReport(ownerUnit.getId(), report.getType());
-									if (initialReport != null && initialReport.isSuccess()) {
-	
-										String initialReportPath = String
-												.valueOf(initialReport.get(AjaxResult.DATA_TAG));
-	
-										if (StrUtil.isNotBlank(initialReportPath)) {
-											String localPath = RuoYiConfig.getProfile();
-											filePath = localPath + StringUtils.substringAfter(initialReportPath,
-													Constants.RESOURCE_PREFIX);
-										}
-									}
-								}catch (Exception e) {
-									log.error("", e);
-								}
-							}
-						} else if ("2".equalsIgnoreCase(type)) {
-							fileName = StrUtil.format("C{}.docx", ownerUnit.getName());
-
-							String archivedWord = rp.getArchivedWord();
-							if (StrUtil.isNotBlank(archivedWord)) {
-								String localPath = RuoYiConfig.getProfile();
-								filePath = localPath
-										+ StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
-							} else {
-								try {
-									// 沒有就直接生成
-									AjaxResult initialReport = reportGenerateService.initialReport(ownerUnit.getId(), report.getType());
-									if (initialReport != null && initialReport.isSuccess()) {
-	
-										String initialReportPath = String
-												.valueOf(initialReport.get(AjaxResult.DATA_TAG));
-	
-										if (StrUtil.isNotBlank(initialReportPath)) {
-											String localPath = RuoYiConfig.getProfile();
-											filePath = localPath + StringUtils.substringAfter(initialReportPath,
-													Constants.RESOURCE_PREFIX);
-										}
-									}
-								}catch (Exception e) {
-									log.error("", e);
-								}
-							}
-						} else if ("3".equalsIgnoreCase(type)) {
-							fileName = StrUtil.format("Y{}.docx", ownerUnit.getName());
-							try {
-								AjaxResult originalRecords = originalRecordsReport.originalRecords(ownerUnit.getId(),
-										report.getType());
-								if (originalRecords != null && originalRecords.isSuccess()) {
-
-									String originalRecordPath = String
-											.valueOf(originalRecords.get(AjaxResult.DATA_TAG));
-
-									if (StrUtil.isNotBlank(originalRecordPath)) {
-										String localPath = RuoYiConfig.getProfile();
-										filePath = localPath + StringUtils.substringAfter(originalRecordPath,
-												Constants.RESOURCE_PREFIX);
-									}
-								}
-							} catch (Exception e) {
-								log.error("", e);
-							}
-						}
-						if (StrUtil.isNotBlank(fileName) || StrUtil.isNotBlank(filePath)) {
-							try {
-								zip.putNextEntry(new ZipEntry(fileName));
-								IoUtil.write(zip, false, FileUtil.readBytes(filePath));
-								zip.flush();
-								zip.closeEntry();
-							} catch (Exception e) {
-								log.error("", e);
-							}
+				            byte[] buffer = new byte[1024];
+				            int length;
+				            while ((length = fis.read(buffer)) >= 0) {
+				            	zip.write(buffer, 0, length);
+				            }
+							
+//							zip.putNextEntry(new ZipEntry(fileName));
+//							IoUtil.write(zip, false, FileUtil.readBytes(filePath));
+//							zip.flush();
+//							zip.closeEntry();
+						} catch (Exception e) {
+							log.error("", e);
 						}
 					}
 				}
+				
 				zip.finish();
+				
 				String path = FileUploadUtils.getPathFileName(baseDir, zipFilePath);
 				return AjaxResult.success().put("data", path);
 			} else {
@@ -313,11 +295,112 @@ public class BatchOperateController extends BaseController {
 			return AjaxResult.error();
 		} finally {
 			try {
-				zip.close();
+				if( zip != null ) {
+					zip.close();
+				}
+				if( outputStream != null ) {
+					outputStream.close();
+				}
 			} catch (IOException e) {
+				//log.error("", e);
+			}
+		}
+	}
+
+	private String originalRecords(OwnerUnit ownerUnit, String filePath) {
+		try {
+			AjaxResult originalRecords = originalRecordsReport.originalRecords(ownerUnit.getId(), "1");
+			log.info("没有报告, 重新生成：{}", originalRecords);
+			if (originalRecords != null && originalRecords.isSuccess()) {
+
+				String originalRecordPath = String.valueOf(originalRecords.get(AjaxResult.DATA_TAG));
+
+				if (StrUtil.isNotBlank(originalRecordPath)) {
+					String localPath = RuoYiConfig.getProfile();
+					filePath = localPath + StringUtils.substringAfter(originalRecordPath, Constants.RESOURCE_PREFIX);
+				}
+			}
+		} catch (Exception e) {
+			log.error("", e);
+		}
+		return filePath;
+	}
+
+	private String reviewReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath) {
+		String archivedWord = rp.getArchivedWord();
+		if (StrUtil.isNotBlank(archivedWord)) {
+			String localPath = RuoYiConfig.getProfile();
+			filePath = localPath + StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
+		} else {
+			try {
+				// 沒有就直接生成
+				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), "2");
+				log.info("没有报告,重新生成：{}", initialReport);
+				if (initialReport != null && initialReport.isSuccess()) {
+
+					String initialReportPath = String.valueOf(initialReport.get(AjaxResult.DATA_TAG));
+
+					if (StrUtil.isNotBlank(initialReportPath)) {
+						String localPath = RuoYiConfig.getProfile();
+						filePath = localPath + StringUtils.substringAfter(initialReportPath, Constants.RESOURCE_PREFIX);
+					}
+				}
+			}catch (Exception e) {
 				log.error("", e);
 			}
 		}
-
+		return filePath;
 	}
+
+	private String initialReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath) {
+		String wordFilePath = rp.getWordFile();
+		if (StrUtil.isNotBlank(wordFilePath)) {
+			String localPath = RuoYiConfig.getProfile();
+			filePath = localPath + StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
+		} else {
+			try {
+				// 沒有就直接生成
+				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), "1");
+				log.info("没有报告,重新生成：{}", initialReport);
+				if (initialReport != null && initialReport.isSuccess()) {
+
+					String initialReportPath = String.valueOf(initialReport.get(AjaxResult.DATA_TAG));
+
+					if (StrUtil.isNotBlank(initialReportPath)) {
+						String localPath = RuoYiConfig.getProfile();
+						filePath = localPath + StringUtils.substringAfter(initialReportPath, Constants.RESOURCE_PREFIX);
+					}
+				}
+			} catch (Exception e) {
+				log.error("", e);
+			}
+		}
+		return filePath;
+	}
+	
+	/**
+     * 创建线程池执行器
+     */
+    private ThreadPoolTaskExecutor createThreadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        
+        // 基本配置
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(25);
+        executor.setKeepAliveSeconds(300);
+        executor.setThreadNamePrefix("report_ganerate_pool_");
+        
+        // 拒绝策略：由调用者线程执行
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        
+        // 优雅关闭配置
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        
+        // 初始化
+        executor.initialize();
+        
+        return executor;
+    }
 }

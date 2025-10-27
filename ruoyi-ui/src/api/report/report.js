@@ -101,7 +101,15 @@ export function batchSetReportDate(data) {
 
 export function batchDownload(data, type) {
   return request({
-    url: '/report/batch/download/' + type,
+    url: '/report/batch/download/zip/' + type,
+    method: 'post',
+    data: data
+  })
+}
+
+export function batchGenerateReport(data, type) {
+  return request({
+    url: '/report/batch/generate/' + type,
     method: 'post',
     data: data
   })

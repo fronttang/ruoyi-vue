@@ -321,12 +321,12 @@ padding-bottom: 0px;
 }
 </style>
 <script>
-import { listReport, getReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus, setReportDate, getOriginalRecords, batchPass, batchNotPass, batchSetReportDate, batchDownload} from "@/api/report/report";
+import { listReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus, setReportDate, getOriginalRecords, batchPass, batchNotPass, batchSetReportDate, batchDownload, batchGenerateReport} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
 import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
-import { Notification, MessageBox, Message, Loading } from 'element-ui'
+import {Loading } from 'element-ui'
 
 export default {
   name: "Initial",
@@ -703,11 +703,17 @@ export default {
       } 
       // 批量下载
       this.queryParams.unitIds = this.ids;
-      batchDownload(this.queryParams, type).then(response => {
-        this.$download.resource(response.data, filename);
-        this.loadingInstance.close();
+
+      batchGenerateReport(this.queryParams, type).then(res => {
+        batchDownload(this.queryParams, type).then(response => {
+          this.$download.resource(response.data, filename);
+          this.loadingInstance.close();
+        }).catch((r) => {
+          this.$modal.msgError('生成报告出现错误，请稍后重试！')
+          this.loadingInstance.close();
+        });
       }).catch((r) => {
-        this.$modal.msgError('生成报告出现错误，请联系管理员！')
+        this.$modal.msgError('生成报告出现错误，请稍后重试！')
         this.loadingInstance.close();
       });
     },

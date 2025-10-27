@@ -176,41 +176,40 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 	private String saveReportFile(Long reportId, InitialReport initialReport, NiceXWPFDocument main)
 			throws IOException, FileNotFoundException {
-		FileOutputStream fileOutputStream = null;
-		try {
-			LocalDateTime now = LocalDateTime.now();
-			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
-			String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
-			String datePath = DateUtil.format(now, "yyyy/MM/dd");
-	
-			String filePath = StrUtil.format("{}/{}", datePath, fileName);
-	
-			String baseDir = RuoYiConfig.getUploadPath();
-			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
-			fileOutputStream = new FileOutputStream(saveFile);
+		
+		LocalDateTime now = LocalDateTime.now();
+		String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+		String fileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".docx";
+		String datePath = DateUtil.format(now, "yyyy/MM/dd");
+
+		String filePath = StrUtil.format("{}/{}", datePath, fileName);
+
+		String baseDir = RuoYiConfig.getUploadPath();
+		File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, filePath);
+		
+		try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)){
+			
 			main.write(fileOutputStream);
 			fileOutputStream.flush();
-			PoitlIOUtils.closeQuietlyMulti(main, fileOutputStream); // 最后不要忘记关闭这些流。
-	
-			Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
-	
-			if (wordFileVersion == null) {
-				wordFileVersion = 1;
-			} else {
-				wordFileVersion = wordFileVersion + 1;
-			}
-	
-			String path = FileUploadUtils.getPathFileName(baseDir, filePath);
-	
-			OwnerUnitReport report = new OwnerUnitReport();
-			report.setId(reportId);
-			report.setWordFileVersion(wordFileVersion);
-			report.setWordFile(path);
-			unitReportService.updateOwnerUnitReport(report);
-			return path;
-		} finally {
-			PoitlIOUtils.closeQuietlyMulti(fileOutputStream);
+			fileOutputStream.getFD().sync();
+		} 
+		
+		Integer wordFileVersion = initialReport.getReport().getWordFileVersion();
+		
+		if (wordFileVersion == null) {
+			wordFileVersion = 1;
+		} else {
+			wordFileVersion = wordFileVersion + 1;
 		}
+
+		String path = FileUploadUtils.getPathFileName(baseDir, filePath);
+
+		OwnerUnitReport report = new OwnerUnitReport();
+		report.setId(reportId);
+		report.setWordFileVersion(wordFileVersion);
+		report.setWordFile(path);
+		unitReportService.updateOwnerUnitReport(report);
+		return path;
 	}
 
 	@Override

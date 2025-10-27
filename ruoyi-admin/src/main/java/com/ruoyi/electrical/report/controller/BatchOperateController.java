@@ -173,123 +173,131 @@ public class BatchOperateController extends BaseController {
 	 * @throws IOException
 	 */
 	//@Transactional
-	@PostMapping("/download/{type}")
-	public AjaxResult download(@RequestBody OwnerUnitReportDto dto, @PathVariable String type) {
-
-		List<OwnerUnitReportVo> list = new ArrayList<OwnerUnitReportVo>();
-
-		if (dto.getUnitIds() != null && dto.getUnitIds().length > 0) {
-			list = ownerUnitReportService.selectOwnerUnitReportListByUnitIds(dto.getUnitIds(), dto.getProjectId(),
-					dto.getType());
-		} else {
-			list = ownerUnitReportService.selectOwnerUnitReportList(dto);
+	@PostMapping("/generate/{type}")
+	public AjaxResult generate(@RequestBody OwnerUnitReportDto dto, @PathVariable String type) {
+		
+		Map<String, String> filePathMap = generateReport(dto, type);
+		if (CollUtil.isEmpty(filePathMap)) {
+			return AjaxResult.error("生成报告出错，请重试");
 		}
+		
+		return AjaxResult.success();
+	}
 
+	private Map<String, String> generateReport(OwnerUnitReportDto dto, String type) {
+		
+		List<OwnerUnitReportVo> reportList = (dto.getUnitIds() != null && dto.getUnitIds().length > 0)
+	            ? ownerUnitReportService.selectOwnerUnitReportListByUnitIds(dto.getUnitIds(), dto.getProjectId(), dto.getType())
+	            : ownerUnitReportService.selectOwnerUnitReportList(dto);
+
+		Map<String, String> filePathMap = new ConcurrentHashMap<>();
+		
+		try {
+			ThreadPoolTaskExecutor executor = createThreadPoolTaskExecutor();
+			CountDownLatch latch = new CountDownLatch(reportList.size());
+			for (OwnerUnitReportVo report : reportList) {
+				executor.execute(() -> {
+					try {
+						
+						OwnerUnitReport rp = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(report.getUnitId(), dto.getType());
+						if(rp == null) {
+							return;
+						}
+						
+						OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(report.getUnitId());
+						if (ownerUnit == null) {
+							return;
+						}
+						
+						String fileName = null;
+						String filePath = null;
+
+						if ("1".equalsIgnoreCase(type)) {
+							fileName = StrUtil.format("Z{}.docx", ownerUnit.getName());
+							filePath = wordFileReport(rp, ownerUnit, filePath, dto.getType());
+						} else if ("2".equalsIgnoreCase(type)) {
+							fileName = StrUtil.format("C{}.docx", ownerUnit.getName());
+							filePath = archivedWordReport(rp, ownerUnit, filePath, dto.getType());
+						} else if ("3".equalsIgnoreCase(type)) {
+							fileName = StrUtil.format("Y{}.docx", ownerUnit.getName());
+							filePath = originalRecords(ownerUnit, filePath);
+						}
+						if (StrUtil.isNotBlank(fileName) && StrUtil.isNotBlank(filePath)) {
+		                    filePathMap.put(fileName, filePath);
+						}
+					} finally {
+						latch.countDown();
+					}
+				});
+			}
+			
+			latch.await();
+			executor.shutdown();
+			executor.destroy();
+		} catch (Exception e) {
+			log.error("", e);
+		}
+		return filePathMap;
+	}
+	
+	@PostMapping("/download/zip/{type}")
+	public AjaxResult downloadzip(@RequestBody OwnerUnitReportDto dto, @PathVariable String type) {
+
+		
+		Map<String, String> filePathMap = generateReport(dto, type);
+		if (CollUtil.isEmpty(filePathMap)) {
+			return AjaxResult.error("生成报告出错，请重试");
+		}
+		
 		ZipOutputStream zip = null;
 		FileOutputStream outputStream = null;
 		try {
+			
+			if (CollUtil.isEmpty(filePathMap)) {
+				return AjaxResult.error("生成报告出错，请重试");
+			}
+			
+			LocalDateTime now = LocalDateTime.now();
+			String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
+			String zipFileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".zip";
+			String datePath = DateUtil.format(now, "yyyy/MM/dd");
 
-			if (CollUtil.isNotEmpty(list)) {
-				
-				ThreadPoolTaskExecutor executor = createThreadPoolTaskExecutor();
+			String zipFilePath = StrUtil.format("{}/{}", datePath, zipFileName);
 
-				CountDownLatch latch = new CountDownLatch(list.size());
-				
-				Map<String, String> filePathMap = new ConcurrentHashMap<>();
+			String baseDir = RuoYiConfig.getUploadPath();
+			File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, zipFilePath);
 
-				for (OwnerUnitReportVo report : list) {
-					executor.execute(() -> {
-						try {
-							
-							OwnerUnitReport rp = ownerUnitReportService.selectOwnerUnitReportByUnitIdAndType(report.getUnitId(), dto.getType());
-							if(rp == null) {
-								return;
-							}
-							
-							OwnerUnit ownerUnit = ownerUnitService.selectOwnerUnitById(report.getUnitId());
-							if (ownerUnit == null) {
-								return;
-							}
-							
-							String fileName = null;
-							String filePath = null;
+			outputStream = new FileOutputStream(saveFile);
+			zip = new ZipOutputStream(outputStream);
+			
+			for (Map.Entry<String, String> entry : filePathMap.entrySet()) {
+				String fileName = entry.getKey();
+				String filePath = entry.getValue();
+				if (StrUtil.isNotBlank(fileName) && StrUtil.isNotBlank(filePath)) {
+					try (FileInputStream fis = new FileInputStream(filePath)) {
+			            ZipEntry zipEntry = new ZipEntry(fileName);
+			            zip.putNextEntry(zipEntry);
 
-							if ("1".equalsIgnoreCase(type)) {
-								fileName = StrUtil.format("Z{}.docx", ownerUnit.getName());
-								filePath = initialReport(rp, ownerUnit, filePath);
-							} else if ("2".equalsIgnoreCase(type)) {
-								fileName = StrUtil.format("C{}.docx", ownerUnit.getName());
-								filePath = reviewReport(rp, ownerUnit, filePath);
-							} else if ("3".equalsIgnoreCase(type)) {
-								fileName = StrUtil.format("Y{}.docx", ownerUnit.getName());
-								filePath = originalRecords(ownerUnit, filePath);
-							}
-							if (StrUtil.isNotBlank(fileName) && StrUtil.isNotBlank(filePath)) {
-								 //File file = new File(filePath);
-								 //if (file.exists()) {
-				                    filePathMap.put(fileName, filePath);
-								 //} else {
-								//	 log.error("文件未生成或路径错误: {}", filePath);
-								 //}						
-							}
-						} finally {
-							latch.countDown();
-						}
-					});
-				}
-				
-				latch.await();
-				executor.shutdown();
-				executor.destroy();
-				
-				if (CollUtil.isEmpty(filePathMap)) {
-					return AjaxResult.error("无可下载文件");
-				}
-				
-				LocalDateTime now = LocalDateTime.now();
-				String timestamp = DateUtil.format(now, DatePattern.PURE_DATETIME_MS_PATTERN);
-				String zipFileName = timestamp + IdUtils.fastSimpleUUID().toUpperCase() + ".zip";
-				String datePath = DateUtil.format(now, "yyyy/MM/dd");
-
-				String zipFilePath = StrUtil.format("{}/{}", datePath, zipFileName);
-
-				String baseDir = RuoYiConfig.getUploadPath();
-				File saveFile = FileUploadUtils.getAbsoluteFile(baseDir, zipFilePath);
-
-				outputStream = new FileOutputStream(saveFile);
-				zip = new ZipOutputStream(outputStream);
-				
-				for (Map.Entry<String, String> entry : filePathMap.entrySet()) {
-					String fileName = entry.getKey();
-					String filePath = entry.getValue();
-					if (StrUtil.isNotBlank(fileName) && StrUtil.isNotBlank(filePath)) {
-						try (FileInputStream fis = new FileInputStream(filePath)) {
-				            ZipEntry zipEntry = new ZipEntry(fileName);
-				            zip.putNextEntry(zipEntry);
-
-				            byte[] buffer = new byte[1024];
-				            int length;
-				            while ((length = fis.read(buffer)) >= 0) {
-				            	zip.write(buffer, 0, length);
-				            }
-							
+			            byte[] buffer = new byte[1024];
+			            int length;
+			            while ((length = fis.read(buffer)) >= 0) {
+			            	zip.write(buffer, 0, length);
+			            }
+						
 //							zip.putNextEntry(new ZipEntry(fileName));
 //							IoUtil.write(zip, false, FileUtil.readBytes(filePath));
 //							zip.flush();
 //							zip.closeEntry();
-						} catch (Exception e) {
-							log.error("", e);
-						}
+					} catch (Exception e) {
+						//log.error("", e);
 					}
 				}
-				
-				zip.finish();
-				
-				String path = FileUploadUtils.getPathFileName(baseDir, zipFilePath);
-				return AjaxResult.success().put("data", path);
-			} else {
-				return AjaxResult.error();
 			}
+			
+			zip.finish();
+			
+			String path = FileUploadUtils.getPathFileName(baseDir, zipFilePath);
+			return AjaxResult.success().put("data", path);
 		} catch (Exception e) {
 			log.error("", e);
 			return AjaxResult.error();
@@ -326,7 +334,7 @@ public class BatchOperateController extends BaseController {
 		return filePath;
 	}
 
-	private String reviewReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath) {
+	private String archivedWordReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType) {
 		String archivedWord = rp.getArchivedWord();
 		if (StrUtil.isNotBlank(archivedWord)) {
 			String localPath = RuoYiConfig.getProfile();
@@ -334,7 +342,7 @@ public class BatchOperateController extends BaseController {
 		} else {
 			try {
 				// 沒有就直接生成
-				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), "2");
+				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), reportType);
 				log.info("没有报告,重新生成：{}", initialReport);
 				if (initialReport != null && initialReport.isSuccess()) {
 
@@ -352,7 +360,7 @@ public class BatchOperateController extends BaseController {
 		return filePath;
 	}
 
-	private String initialReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath) {
+	private String wordFileReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType) {
 		String wordFilePath = rp.getWordFile();
 		if (StrUtil.isNotBlank(wordFilePath)) {
 			String localPath = RuoYiConfig.getProfile();
@@ -360,7 +368,7 @@ public class BatchOperateController extends BaseController {
 		} else {
 			try {
 				// 沒有就直接生成
-				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), "1");
+				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), reportType);
 				log.info("没有报告,重新生成：{}", initialReport);
 				if (initialReport != null && initialReport.isSuccess()) {
 

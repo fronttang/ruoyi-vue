@@ -233,14 +233,15 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 		Configure config = configureBuilder.build();
 		
 		NiceXWPFDocument main = null;
-		InputStream mainInputStream = null;
-		InputStream formbInputStream = null;
-		InputStream formInputStream = null;
 		XWPFTemplate mainTemplate = null;
-		XWPFTemplate formbTemplate = null;
-		XWPFTemplate formTemplate = null;
-		NiceXWPFDocument formbDocument = null;
-		NiceXWPFDocument formDocument = null;
+		InputStream mainInputStream = null;
+		
+//		InputStream formbInputStream = null;
+//		InputStream formInputStream = null;
+//		XWPFTemplate formbTemplate = null;
+//		XWPFTemplate formTemplate = null;
+//		NiceXWPFDocument formbDocument = null;
+//		NiceXWPFDocument formDocument = null;
 		try {
 
 			ZipSecureFile.setMinInflateRatio(0.001);
@@ -252,17 +253,17 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			mainTemplate = XWPFTemplate.compile(mainInputStream, config).render(dataMap);
 			main = mainTemplate.getXWPFDocument();
 
-			// 检测B表
-			formbInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Formb.docx");
-			formbTemplate = XWPFTemplate.compile(formbInputStream, config).render(dataMap);
-			formbDocument = formbTemplate.getXWPFDocument();
-			main = main.merge(formbDocument);
-
-			// 检测表
-			formInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Form.docx");
-			formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
-			formDocument = formTemplate.getXWPFDocument();
-			main = main.merge(formTemplate.getXWPFDocument());
+//			// 检测B表
+//			formbInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Formb.docx");
+//			formbTemplate = XWPFTemplate.compile(formbInputStream, config).render(dataMap);
+//			formbDocument = formbTemplate.getXWPFDocument();
+//			main = main.merge(formbDocument);
+//
+//			// 检测表
+//			formInputStream = ClassPathResource.class.getClassLoader().getResourceAsStream("report/initial/Initial_Form.docx");
+//			formTemplate = XWPFTemplate.compile(formInputStream, config).render(dataMap);
+//			formDocument = formTemplate.getXWPFDocument();
+//			main = main.merge(formTemplate.getXWPFDocument());
 
 			String path = saveReportFile(reportId, initialReport, main);
 			
@@ -271,7 +272,8 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 			log.error("生成电气检测初检报告失败！", e);
 			return AjaxResult.error();
 		} finally {
-			PoitlIOUtils.closeQuietlyMulti(mainTemplate, formbTemplate, formTemplate, mainInputStream, formbInputStream, formInputStream, main, formbDocument, formDocument);
+			//PoitlIOUtils.closeQuietlyMulti(mainTemplate, formbTemplate, formTemplate, mainInputStream, formbInputStream, formInputStream, main, formbDocument, formDocument);
+			PoitlIOUtils.closeQuietlyMulti(mainTemplate, mainInputStream, main);
 		}
 	}
 

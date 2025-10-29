@@ -51,7 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from owner_unit o 
 		left join owner_unit_config uc on uc.unit_id = o.id
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
-		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r2.type = '2'
 		left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
 		left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)
@@ -88,7 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from owner_unit o 
 		left join owner_unit_config uc on uc.unit_id = o.id
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
-		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r2.type = '2'
 		left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
 		left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)
@@ -198,10 +198,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="inspectionPic"    column="inspection_pic"    />
         <result property="reviewDate"    column="review_date"    />
         <result property="reivewCode"    column="reivew_code"    />
+        <result property="initialCode"    column="initial_code"    />
     </resultMap>
     
     
     <select id="exportUrbanVillageByQuery" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="DangerExportUrbanVillageQueryDto">
+    	WITH
+	    area_dangers AS (
+	        SELECT ua.unit_id, COUNT(DISTINCT ua.id) AS households
+	        FROM owner_unit_area ua
+	        JOIN owner_unit_danger d ON d.unit_area_id = ua.id
+	        GROUP BY ua.unit_id
+	    )
     	select t.* from (select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
 		r1.is_danger_notice, su.nick_name as gridman, su.user_name as gridman_phone,
@@ -211,10 +219,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
 		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date,
-		(select count(1) from owner_unit_area ua where ua.unit_id = o.id and ua.type = '2') as areas
+		COALESCE(ah.households, 0) AS areas
 		from owner_unit o 
+		LEFT JOIN area_dangers ah ON ah.unit_id = o.id
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
-		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r2.type = '2'
 		left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
 		left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)
@@ -239,6 +248,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     
     <select id="exportUrbanVillageByUnitId" parameterType="Long" resultMap="DangerExportUrbanVillageQueryDto">
+        WITH
+	    area_dangers AS (
+	        SELECT ua.unit_id, COUNT(DISTINCT ua.id) AS households
+	        FROM owner_unit_area ua
+	        JOIN owner_unit_danger d ON d.unit_area_id = ua.id
+	        GROUP BY ua.unit_id
+	    )
     	select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
 		r1.is_danger_notice, su.nick_name as gridman, su.user_name as gridman_phone,
@@ -248,10 +264,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		CASE WHEN r2.detect_status is null THEN 0 ELSE r2.detect_status END as review_status,
 		CASE WHEN r1.detect_data is null THEN now() ELSE r1.detect_data END as initial_date,
 		CASE WHEN r2.detect_data is null THEN now() ELSE r2.detect_data END as review_date,
-		(select count(1) from owner_unit_area ua where ua.unit_id = o.id and ua.type = '2') as areas
+		COALESCE(ah.households, 0) AS areas
 		from owner_unit o 
+		LEFT JOIN area_dangers ah ON ah.unit_id = o.id
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
-		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r2.type = '2'
 		left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
 		left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)
@@ -299,7 +316,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(select count(1) from owner_unit_area ua where ua.unit_id = o.id and ua.type = '2') as areas
 		from owner_unit o 
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
-		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r2.type = '2'
 		left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
 		left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)
@@ -336,7 +353,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(select count(1) from owner_unit_area ua where ua.unit_id = o.id and ua.type = '2') as areas
 		from owner_unit o 
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
-		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
+		left join owner_unit_report r2 on r2.unit_id = o.id and r2.type = '2'
 		left join sys_dict_data a on (o.district = a.dict_value and a.dict_type='district' and a.project_id = o.project_id)
 		left join sys_dict_data b on (o.street = b.dict_value and b.dict_type='street' and b.project_id = o.project_id)
 		left join sys_dict_data c on (o.community = c.dict_value and c.dict_type='community' and c.project_id = o.project_id)

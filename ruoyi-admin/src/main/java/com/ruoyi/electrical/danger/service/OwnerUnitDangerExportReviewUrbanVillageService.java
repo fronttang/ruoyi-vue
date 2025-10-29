@@ -125,10 +125,8 @@ public class OwnerUnitDangerExportReviewUrbanVillageService {
 			// 入户检测房间数量
 			export.setDetectDoorNumber(detectDoorNumber);
 			// 入户率
-			if (Objects.nonNull(detectDoorNumber) && detectDoorNumber > 0 && Objects.nonNull(data.getDoorNumber())
-					&& data.getDoorNumber() > 0) {
-				BigDecimal rate = new BigDecimal(detectDoorNumber).divide(new BigDecimal(data.getDoorNumber()), 8,
-						BigDecimal.ROUND_HALF_UP);
+			if (Objects.nonNull(detectDoorNumber) && Objects.nonNull(data.getDoorNumber()) && data.getDoorNumber() > 0) {
+				BigDecimal rate = new BigDecimal(detectDoorNumber).divide(new BigDecimal(data.getDoorNumber()), 8, BigDecimal.ROUND_HALF_UP);
 				rate = new BigDecimal(100).multiply(rate);
 				rate = rate.setScale(2, RoundingMode.HALF_UP);
 				export.setHouseholdRate(StrUtil.format("{}%", rate.toPlainString()));

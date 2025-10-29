@@ -112,6 +112,7 @@ public class OwnerUnitDangerExportUrbanVillageService {
 			DangerExportUrbanVillageDto export = new DangerExportUrbanVillageDto();
 			BeanUtils.copyProperties(data, export);
 			export.setId(index++);
+			export.setNo(data.getInitialCode());
 
 			List<OwnerUnitDanger> dangers = data.getDangers();
 
@@ -129,13 +130,13 @@ public class OwnerUnitDangerExportUrbanVillageService {
 			// 入户检测房间数量
 			export.setDetectDoorNumber(detectDoorNumber);
 			// 检测率
-			if (Objects.nonNull(detectDoorNumber) && detectDoorNumber > 0 && Objects.nonNull(data.getDoorNumber())
-					&& data.getDoorNumber() > 0) {
-				BigDecimal rate = new BigDecimal(detectDoorNumber).divide(new BigDecimal(data.getDoorNumber()), 8,
-						BigDecimal.ROUND_HALF_UP);
+			if (Objects.nonNull(detectDoorNumber) && Objects.nonNull(data.getDoorNumber()) && data.getDoorNumber() > 0) {
+				BigDecimal rate = new BigDecimal(detectDoorNumber).divide(new BigDecimal(data.getDoorNumber()), 8, BigDecimal.ROUND_HALF_UP);
 				rate = new BigDecimal(100).multiply(rate);
 				rate = rate.setScale(2, RoundingMode.HALF_UP);
 				export.setHouseholdRate(rate.toPlainString() + "%");
+			} else {
+				export.setHouseholdRate("0%");
 			}
 
 			// 隐患总数量

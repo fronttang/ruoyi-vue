@@ -143,6 +143,11 @@ public class DangerExportUrbanVillageQueryDto {
 	 * 复检编号
 	 */
 	private String reivewCode;
+	
+	/**
+	 * 初检编号
+	 */
+	private String initialCode;
 
 	/**
 	 * 隐患列表

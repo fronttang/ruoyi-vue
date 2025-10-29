@@ -1,6 +1,7 @@
 package com.ruoyi.electrical.danger.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.ruoyi.electrical.dto.DangerExportUrbanVillageQueryDto;
 import com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 
 @Service
 public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportService {
@@ -58,7 +60,9 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 			exportData.forEach((d) -> {
 				OwnerUnitDanger query = new OwnerUnitDanger();
 				query.setUnitId(d.getId());
-				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerList(query));
+				List<OwnerUnitDanger> dangers = ownerUnitDangerMapper.ownerUnitDangerList(query);
+				dangers = dangers.stream().filter((da) -> StrUtil.isNotBlank(da.getStatus()) && !"9".equals(da.getStatus())).collect(Collectors.toList());
+				d.setDangers(dangers);
 			});
 		}
 		return exportData;
@@ -72,7 +76,9 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 			exportData.forEach((d) -> {
 				OwnerUnitDanger query = new OwnerUnitDanger();
 				query.setUnitId(d.getId());
-				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerList(query));
+				List<OwnerUnitDanger> dangers = ownerUnitDangerMapper.ownerUnitDangerList(query);
+				dangers = dangers.stream().filter((da) -> StrUtil.isNotBlank(da.getStatus()) && !"9".equals(da.getStatus())).collect(Collectors.toList());
+				d.setDangers(dangers);
 			});
 		}
 		return exportData;
@@ -90,7 +96,9 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 				if (!allRounds) {
 					query.setRounds(d.getRounds());
 				}
-				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerListAllRounds(query));
+				List<OwnerUnitDanger> dangers = ownerUnitDangerMapper.ownerUnitDangerListAllRounds(query);
+				dangers = dangers.stream().filter((da) -> StrUtil.isNotBlank(da.getStatus()) && !"9".equals(da.getStatus())).collect(Collectors.toList());
+				d.setDangers(dangers);
 			});
 		}
 		return exportData;
@@ -107,7 +115,9 @@ public class OwnerUnitDangerExportServiceImpl implements IOwnerUnitDangerExportS
 				if (!allRounds) {
 					query.setRounds(d.getRounds());
 				}
-				d.setDangers(ownerUnitDangerMapper.ownerUnitDangerListAllRounds(query));
+				List<OwnerUnitDanger> dangers = ownerUnitDangerMapper.ownerUnitDangerListAllRounds(query);
+				dangers = dangers.stream().filter((da) -> StrUtil.isNotBlank(da.getStatus()) && !"9".equals(da.getStatus())).collect(Collectors.toList());
+				d.setDangers(dangers);
 			});
 		}
 		return exportData;

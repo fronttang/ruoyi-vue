@@ -176,7 +176,7 @@ public class BatchOperateController extends BaseController {
 	@PostMapping("/generate/{type}")
 	public AjaxResult generate(@RequestBody OwnerUnitReportDto dto, @PathVariable String type) {
 		
-		Map<String, String> filePathMap = generateReport(dto, type);
+		Map<String, String> filePathMap = generateReport(dto, type, true);
 		if (CollUtil.isEmpty(filePathMap)) {
 			return AjaxResult.error("生成报告出错，请重试");
 		}
@@ -184,7 +184,7 @@ public class BatchOperateController extends BaseController {
 		return AjaxResult.success();
 	}
 
-	private Map<String, String> generateReport(OwnerUnitReportDto dto, String type) {
+	private Map<String, String> generateReport(OwnerUnitReportDto dto, String type, boolean generate) {
 		
 		List<OwnerUnitReportVo> reportList = (dto.getUnitIds() != null && dto.getUnitIds().length > 0)
 	            ? ownerUnitReportService.selectOwnerUnitReportListByUnitIds(dto.getUnitIds(), dto.getProjectId(), dto.getType())
@@ -214,10 +214,10 @@ public class BatchOperateController extends BaseController {
 
 						if ("1".equalsIgnoreCase(type)) {
 							fileName = StrUtil.format("Z{}.docx", ownerUnit.getName());
-							filePath = wordFileReport(rp, ownerUnit, filePath, dto.getType());
+							filePath = wordFileReport(rp, ownerUnit, filePath, dto.getType(), generate);
 						} else if ("2".equalsIgnoreCase(type)) {
 							fileName = StrUtil.format("C{}.docx", ownerUnit.getName());
-							filePath = archivedWordReport(rp, ownerUnit, filePath, dto.getType());
+							filePath = archivedWordReport(rp, ownerUnit, filePath, dto.getType(), generate);
 						} else if ("3".equalsIgnoreCase(type)) {
 							fileName = StrUtil.format("Y{}.docx", ownerUnit.getName());
 							filePath = originalRecords(ownerUnit, filePath);
@@ -244,7 +244,7 @@ public class BatchOperateController extends BaseController {
 	public AjaxResult downloadzip(@RequestBody OwnerUnitReportDto dto, @PathVariable String type) {
 
 		
-		Map<String, String> filePathMap = generateReport(dto, type);
+		Map<String, String> filePathMap = generateReport(dto, type, false);
 		if (CollUtil.isEmpty(filePathMap)) {
 			return AjaxResult.error("生成报告出错，请重试");
 		}
@@ -289,7 +289,7 @@ public class BatchOperateController extends BaseController {
 //							zip.flush();
 //							zip.closeEntry();
 					} catch (Exception e) {
-						//log.error("", e);
+						log.error("", e);
 					}
 				}
 			}
@@ -334,12 +334,12 @@ public class BatchOperateController extends BaseController {
 		return filePath;
 	}
 
-	private String archivedWordReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType) {
-//		String archivedWord = rp.getArchivedWord();
-//		if (StrUtil.isNotBlank(archivedWord)) {
-//			String localPath = RuoYiConfig.getProfile();
-//			filePath = localPath + StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
-//		} else {
+	private String archivedWordReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType, boolean generate) {
+		String archivedWord = rp.getArchivedWord();
+		if (StrUtil.isNotBlank(archivedWord) && !generate) {
+			String localPath = RuoYiConfig.getProfile();
+			filePath = localPath + StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
+		} else {
 			try {
 				// 沒有就直接生成
 				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), reportType);
@@ -356,16 +356,16 @@ public class BatchOperateController extends BaseController {
 			}catch (Exception e) {
 				log.error("", e);
 			}
-//		}
+		}
 		return filePath;
 	}
 
-	private String wordFileReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType) {
-//		String wordFilePath = rp.getWordFile();
-//		if (StrUtil.isNotBlank(wordFilePath)) {
-//			String localPath = RuoYiConfig.getProfile();
-//			filePath = localPath + StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
-//		} else {
+	private String wordFileReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType, boolean generate) {
+		String wordFilePath = rp.getWordFile();
+		if (StrUtil.isNotBlank(wordFilePath) && !generate) {
+			String localPath = RuoYiConfig.getProfile();
+			filePath = localPath + StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
+		} else {
 			try {
 				// 沒有就直接生成
 				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), reportType);
@@ -382,7 +382,7 @@ public class BatchOperateController extends BaseController {
 			} catch (Exception e) {
 				log.error("", e);
 			}
-//		}
+		}
 		return filePath;
 	}
 	

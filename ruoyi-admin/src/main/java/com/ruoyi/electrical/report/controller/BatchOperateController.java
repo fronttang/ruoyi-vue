@@ -318,7 +318,7 @@ public class BatchOperateController extends BaseController {
 	private String originalRecords(OwnerUnit ownerUnit, String filePath) {
 		try {
 			AjaxResult originalRecords = originalRecordsReport.originalRecords(ownerUnit.getId(), "1");
-			log.info("没有报告, 重新生成：{}", originalRecords);
+			//log.info("没有报告, 重新生成：{}", originalRecords);
 			if (originalRecords != null && originalRecords.isSuccess()) {
 
 				String originalRecordPath = String.valueOf(originalRecords.get(AjaxResult.DATA_TAG));
@@ -335,15 +335,15 @@ public class BatchOperateController extends BaseController {
 	}
 
 	private String archivedWordReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType) {
-		String archivedWord = rp.getArchivedWord();
-		if (StrUtil.isNotBlank(archivedWord)) {
-			String localPath = RuoYiConfig.getProfile();
-			filePath = localPath + StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
-		} else {
+//		String archivedWord = rp.getArchivedWord();
+//		if (StrUtil.isNotBlank(archivedWord)) {
+//			String localPath = RuoYiConfig.getProfile();
+//			filePath = localPath + StringUtils.substringAfter(archivedWord, Constants.RESOURCE_PREFIX);
+//		} else {
 			try {
 				// 沒有就直接生成
 				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), reportType);
-				log.info("没有报告,重新生成：{}", initialReport);
+				//log.info("没有报告,重新生成：{}", initialReport);
 				if (initialReport != null && initialReport.isSuccess()) {
 
 					String initialReportPath = String.valueOf(initialReport.get(AjaxResult.DATA_TAG));
@@ -356,20 +356,20 @@ public class BatchOperateController extends BaseController {
 			}catch (Exception e) {
 				log.error("", e);
 			}
-		}
+//		}
 		return filePath;
 	}
 
 	private String wordFileReport(OwnerUnitReport rp, OwnerUnit ownerUnit, String filePath, String reportType) {
-		String wordFilePath = rp.getWordFile();
-		if (StrUtil.isNotBlank(wordFilePath)) {
-			String localPath = RuoYiConfig.getProfile();
-			filePath = localPath + StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
-		} else {
+//		String wordFilePath = rp.getWordFile();
+//		if (StrUtil.isNotBlank(wordFilePath)) {
+//			String localPath = RuoYiConfig.getProfile();
+//			filePath = localPath + StringUtils.substringAfter(wordFilePath, Constants.RESOURCE_PREFIX);
+//		} else {
 			try {
 				// 沒有就直接生成
 				AjaxResult initialReport = ownerUnitReportService.reportGenerate(ownerUnit.getId(), reportType);
-				log.info("没有报告,重新生成：{}", initialReport);
+				//log.info("没有报告,重新生成：{}", initialReport);
 				if (initialReport != null && initialReport.isSuccess()) {
 
 					String initialReportPath = String.valueOf(initialReport.get(AjaxResult.DATA_TAG));
@@ -382,7 +382,7 @@ public class BatchOperateController extends BaseController {
 			} catch (Exception e) {
 				log.error("", e);
 			}
-		}
+//		}
 		return filePath;
 	}
 	

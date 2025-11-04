@@ -36,6 +36,11 @@ public class OwnerUnitDangerGroupDetailVo {
 	 * 初检时间
 	 */
 	private Date initialDate;
+	
+	/**
+	 * 复检时间
+	 */
+	private Date reviewDate;
 
 	/**
 	 * 复检状态

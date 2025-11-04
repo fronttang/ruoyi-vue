@@ -40,7 +40,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="区" prop="district">
-        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable>
+        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable @change="handleChangeDistrict">
           <el-option
             v-for="dict in districtOptions"
             :key="dict.value"
@@ -50,7 +50,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="街道" prop="street">
-        <el-select v-model="queryParams.street" placeholder="请选择街道"  filterable clearable>
+        <el-select v-model="queryParams.street" placeholder="请选择街道"  filterable clearable @change="handleChangeStreet">
           <el-option
             v-for="dict in streetOptions"
             :key="dict.value"
@@ -60,7 +60,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="社区" prop="community" v-if="projectType === '1' || projectType == '3'">
-        <el-select v-model="queryParams.community" placeholder="请选择社区"  filterable clearable>
+        <el-select v-model="queryParams.community" placeholder="请选择社区"  filterable clearable @change="handleChangeCommunity">
           <el-option
             v-for="dict in communityOptions"
             :key="dict.value"
@@ -83,6 +83,19 @@
       <el-form-item label="初检日期" prop="initialDate" >
         <el-date-picker clearable @change="$forceUpdate()"
             v-model="queryParams.initialDate"
+            type="daterange"
+            range-separator="-"
+            value-format="yyyy-MM-dd"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            size="small">
+          </el-date-picker>
+      </el-form-item>
+
+
+      <el-form-item label="复检日期" prop="reviewDate" >
+        <el-date-picker clearable @change="$forceUpdate()"
+            v-model="queryParams.reviewDate"
             type="daterange"
             range-separator="-"
             value-format="yyyy-MM-dd"
@@ -291,7 +304,7 @@
 <script>
 import { listUnitDanger, unitPictures, dangerExport, dangerReivewExport, stationRoundsDangerExport} from "@/api/danger/danger";
 import { getProject } from "@/api/project/project";
-import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
+import { getProjectAreaDictByProjectIdAndType, getProjectAreaDictTree } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
 import { Loading } from 'element-ui'
 
@@ -318,6 +331,17 @@ export default {
       streetOptions: [],
       communityOptions: [],
       hamletOptions: [],
+
+      districtData: [],
+      streetData: [],
+      communityData: [],
+      hamletData: [],
+
+      districtList: [],
+      streetList: [],
+      communityList: [],
+      hamletList: [],
+
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -339,6 +363,7 @@ export default {
         hamlet: null,
         highRiskType: null,
         initialDate: [],
+        reviewDate: [],
         startInitialDate: null,
         endInitialDate: null,
         startReviewDate: null,
@@ -371,24 +396,30 @@ export default {
         this.projectType = response.data.type;
       });
 
-      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+      getProjectAreaDictTree(this.$store.state.settings.projectId).then(response => {
+        this.districtData = response.data;
         const dictMeta = DictMeta.parse("districtOptions");
         this.districtOptions = dictMeta.responseConverter(response.data, dictMeta);
       });
 
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+        const dictMeta = DictMeta.parse("districtList");
+        this.districtList = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'street').then(response => {
-        const dictMeta = DictMeta.parse("streetOptions");
-        this.streetOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("streetList");
+        this.streetList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'community').then(response => {
-        const dictMeta = DictMeta.parse("communityOptions");
-        this.communityOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("communityList");
+        this.communityList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'hamlet').then(response => {
-        const dictMeta = DictMeta.parse("hamletOptions");
-        this.hamletOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("hamletList");
+        this.hamletList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       listUnitDanger(this.queryParams).then(response => {
@@ -416,12 +447,66 @@ export default {
     buildImgList(url){
       return [process.env.VUE_APP_BASE_API + url]
     },
+    handleChangeDistrict(district) {
+      this.queryParams.street = null;
+      this.queryParams.community = null;
+      this.queryParams.hamlet = null;
+      if( district != null) {
+        var selectDistrict  = this.districtData.filter(item => item.dictValue == district);
+        console.log(selectDistrict);
+        if(selectDistrict != null && selectDistrict.length > 0) {
+          this.streetData = selectDistrict[0].sub;
+          console.log(this.streetData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.streetOptions = dictMeta.responseConverter(this.streetData, dictMeta);
+        } else {
+          this.streetOptions = [];
+        }
+      } else {
+        this.streetOptions = [];
+      }
+    },
+    handleChangeStreet(street) {
+      this.queryParams.community = null;
+      this.queryParams.hamlet = null;
+      if( street != null) {
+        var selectStreet  = this.streetData.filter(item => item.dictValue == street);
+        console.log(selectStreet);
+        if(selectStreet != null && selectStreet.length > 0) {
+          this.communityData = selectStreet[0].sub;
+          console.log(this.communityData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.communityOptions = dictMeta.responseConverter(this.communityData, dictMeta);
+        } else {
+          this.communityOptions = [];
+        }
+      } else {
+        this.communityOptions = [];
+      }
+    },
+    handleChangeCommunity(community) {
+      this.queryParams.hamlet = null;
+      if( community != null) {
+        var selected  = this.communityData.filter(item => item.dictValue == community);
+        console.log(selected);
+        if(selected != null && selected.length > 0) {
+          this.hamletData = selected[0].sub;
+          console.log(this.hamletData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.hamletOptions = dictMeta.responseConverter(this.hamletData, dictMeta);
+        } else {
+          this.hamletOptions = [];
+        }
+      } else {
+        this.hamletOptions = [];
+      }
+    },
     areaFormat(row) {
       var area = [];
-      var districtName = this.selectDictLabel(this.districtOptions, row.district);
-      var streetName = this.selectDictLabel(this.streetOptions, row.street);
-      var communityName = this.selectDictLabel(this.communityOptions, row.community);
-      var hamletName = this.selectDictLabel(this.hamletOptions, row.hamlet);
+      var districtName = this.selectDictLabel(this.districtList, row.district);
+      var streetName = this.selectDictLabel(this.streetList, row.street);
+      var communityName = this.selectDictLabel(this.communityList, row.community);
+      var hamletName = this.selectDictLabel(this.hamletList, row.hamlet);
 
       area.push(districtName);
       if(streetName && streetName != null && streetName != ''){
@@ -441,6 +526,10 @@ export default {
       if(this.queryParams.initialDate != null){
         this.queryParams.startInitialDate = this.queryParams.initialDate[0];
         this.queryParams.endInitialDate = this.queryParams.initialDate[1];
+      }
+      if(this.queryParams.reviewDate != null){
+        this.queryParams.startReviewDate = this.queryParams.reviewDate[0];
+        this.queryParams.endReivewDate = this.queryParams.reviewDate[1];
       }
       this.queryParams.pageNum = 1;
       this.getList();

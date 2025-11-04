@@ -59,6 +59,11 @@ public class OwnerUnitReportDto {
 	private String remark;
 
 	private String operationPic;
+	
+	/**
+	 * 报告状态
+	 */
+	private String detectStatus;
 
 	/**
 	 * 编制开始日期

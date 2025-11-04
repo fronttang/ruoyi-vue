@@ -334,6 +334,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	<result property="initialStatus"    column="initial_status"    />
     	<result property="initialDate"    column="initial_date"    />
     	<result property="reviewStatus"    column="review_status"    />
+    	<result property="reviewDate"    column="review_date"    />
     	<result property="highRiskType"    column="high_risk_type"    />
     	<result property="unitId"    column="unit_id"    />
     	<result property="unitName"    column="unit_name"    />
@@ -377,7 +378,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="startInitialDate != null "> and date(t.initial_date) &gt;= #{startInitialDate}</if>
             <if test="endInitialDate != null"> and date(t.initial_date) &lt;= #{endInitialDate}</if>
             <if test="startReviewDate != null  "> and date(t.review_date) &gt;= #{startReviewDate}</if>
-            <if test="endReivewDate != null "> and date(t.review_date) &lt;= #{endReivewDate}</if>
+            <if test="endReviewDate != null "> and date(t.review_date) &lt;= #{endReviewDate}</if>
         </where>
     	
     </select>

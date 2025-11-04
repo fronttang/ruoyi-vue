@@ -25,6 +25,8 @@ public interface IOwnerUnitReportService {
 	public List<OwnerUnitReportVo> selectOwnerUnitReportList(OwnerUnitReportDto ownerUnitReport);
 
 	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndType(Long unitId, String type);
+	
+	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndTypeAndCode(Long unitId, String type, String code);
 
 	public OwnerUnitReport selectOwnerUnitReportById(Long id);
 

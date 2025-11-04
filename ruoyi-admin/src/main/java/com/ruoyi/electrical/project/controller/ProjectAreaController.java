@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +28,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.electrical.project.domain.AreaDict;
 import com.ruoyi.electrical.project.domain.ProjectArea;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.vo.ProjectAreaTree;
@@ -181,6 +184,81 @@ public class ProjectAreaController extends BaseController {
 			});
 		}
 		List<ProjectAreaTree> result = new ArrayList<ProjectAreaTree>(districtMap.values());
+		return success(result);
+	}
+	
+	@GetMapping("/dictTree/{projectId}")
+	public AjaxResult dictAreaTree(@PathVariable("projectId") Long projectId) {
+
+		List<ProjectArea> projectAreas = projectAreaService.queryProjectAreaByProjectId(projectId);
+		
+		List<AreaDict> district = projectAreaService.queryProjectAreaDictByProjectIdAndType(projectId, "district");
+		List<AreaDict> street = projectAreaService.queryProjectAreaDictByProjectIdAndType(projectId, "street");
+		List<AreaDict> community = projectAreaService.queryProjectAreaDictByProjectIdAndType(projectId, "community");
+		List<AreaDict> hamlet = projectAreaService.queryProjectAreaDictByProjectIdAndType(projectId, "hamlet");
+		
+		Map<String, AreaDict> districtAreaDictMap = district.stream().collect(Collectors.toMap(AreaDict::getDictValue, Function.identity()));
+		Map<String, AreaDict> streetAreaDictMap = street.stream().collect(Collectors.toMap(AreaDict::getDictValue, Function.identity()));
+		Map<String, AreaDict> communityAreaDictMap = community.stream().collect(Collectors.toMap(AreaDict::getDictValue, Function.identity()));
+		Map<String, AreaDict> hamletAreaDictMap = hamlet.stream().collect(Collectors.toMap(AreaDict::getDictValue, Function.identity()));
+		
+
+		Map<String, AreaDict> districtMap = new HashMap<String, AreaDict>();
+		Map<String, AreaDict> streetMap = new HashMap<String, AreaDict>();
+		Map<String, AreaDict> communityMap = new HashMap<String, AreaDict>();
+		Map<String, AreaDict> hamletMap = new HashMap<String, AreaDict>();
+		if (!CollectionUtils.isEmpty(projectAreas)) {
+			projectAreas.forEach((area) -> {
+
+				if (StringUtils.hasText(area.getDistrict())) {
+					AreaDict districtVo = districtMap.get(area.getDistrict());
+					if (districtVo == null) {
+						districtVo = districtAreaDictMap.get(area.getDistrict());
+						if (districtVo == null) {
+							return;
+						}
+						districtMap.put(area.getDistrict(), districtVo);
+					}
+
+					if (StringUtils.hasText(area.getStreet())) {
+						AreaDict streetVo = streetMap.get(area.getStreet());
+						if (streetVo == null) {
+							streetVo = streetAreaDictMap.get(area.getStreet());
+							if (streetVo == null) {
+								return;
+							}
+							streetMap.put(area.getStreet(), streetVo);
+							districtVo.getSub().add(streetVo);
+						}
+						if (StringUtils.hasText(area.getCommunity())) {
+							AreaDict communityVo = communityMap.get(area.getCommunity());
+							if (communityVo == null) {
+								
+								communityVo = communityAreaDictMap.get(area.getCommunity());
+								if(communityVo == null) {
+									return;
+								}
+								communityMap.put(area.getCommunity(), communityVo);
+								streetVo.getSub().add(communityVo);
+							}
+							if (StringUtils.hasText(area.getHamlet())) {
+								AreaDict hamletVo = hamletMap.get(area.getHamlet());
+								if (hamletVo == null) {
+									hamletVo = hamletAreaDictMap.get(area.getHamlet());
+									if (hamletVo == null) {
+										return;
+									}
+									hamletMap.put(area.getHamlet(), hamletVo);
+									communityVo.getSub().add(hamletVo);
+								}
+							}
+						}
+					}
+				}
+
+			});
+		}
+		List<AreaDict> result = new ArrayList<AreaDict>(districtMap.values());
 		return success(result);
 	}
 

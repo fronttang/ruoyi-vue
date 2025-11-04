@@ -48,58 +48,70 @@ public class OwnerUnitImportUrbanVillageDto extends OwnerUnitImportResultDto {
 	 */
 	@Excel(name = "房屋编码", orderNum = "5")
 	private String code;
+	
+	/**
+	 * 初检报告编号
+	 */
+	@Excel(name = "初检报告编号", orderNum = "6")
+	private String initCode;
+	
+	/**
+	 * 复检报告编号
+	 */
+	@Excel(name = "复检报告编号", orderNum = "7")
+	private String reviewCode;
 
 	/**
 	 * 委托单位
 	 */
-	@Excel(name = "委托单位", orderNum = "6")
+	@Excel(name = "委托单位", orderNum = "8")
 	private String entrust;
 
 	/**
 	 * 建筑使用性质
 	 */
-	@Excel(name = "建筑使用性质", orderNum = "7")
+	@Excel(name = "建筑使用性质", orderNum = "9")
 	private String nature;
 
 	/**
 	 * 建筑面积
 	 */
-	@Excel(name = "建筑面积", orderNum = "8")
+	@Excel(name = "建筑面积", orderNum = "10")
 	private String acreage;
 
 	/**
 	 * 建筑层数
 	 */
-	@Excel(name = "建筑层数", orderNum = "9")
+	@Excel(name = "建筑层数", orderNum = "11")
 	private Long layers;
 
 	/**
 	 * 联系人
 	 */
-	@Excel(name = "联系人", orderNum = "10")
+	@Excel(name = "联系人", orderNum = "12")
 	private String contact;
 
 	/**
 	 * 联系电话
 	 */
-	@Excel(name = "联系电话", orderNum = "11")
+	@Excel(name = "联系电话", orderNum = "13")
 	private String phone;
 
 	/**
 	 * 户数
 	 */
-	@Excel(name = "户数", orderNum = "12")
+	@Excel(name = "户数", orderNum = "14")
 	private Long doorNumber;
 
 	/**
 	 * 检测地址
 	 */
-	@Excel(name = "检测地址", orderNum = "13")
+	@Excel(name = "检测地址", orderNum = "15")
 	private String address;
 	
 	/**
 	 * 检测内容
 	 */
-	@Excel(name = "检测内容", orderNum = "14")
+	@Excel(name = "检测内容", orderNum = "16")
 	private String testContent;
 }

@@ -41,6 +41,7 @@ import com.ruoyi.electrical.project.service.IOwnerUnitImportService;
 import com.ruoyi.electrical.project.service.IOwnerUnitService;
 import com.ruoyi.electrical.project.service.IProjectAreaService;
 import com.ruoyi.electrical.project.service.IProjectService;
+import com.ruoyi.electrical.report.service.IOwnerUnitReportService;
 import com.ruoyi.system.service.ISysDictTypeService;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
@@ -72,6 +73,9 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 
 	@Autowired
 	private ISysDictTypeService dictTypeService;
+	
+	@Autowired
+	private IOwnerUnitReportService ownerUnitReportService;
 
 	@Override
 	public AjaxResult importOwnerUnit(Long projectId, String highRiskType, MultipartFile file) throws Exception {
@@ -243,6 +247,10 @@ public class OwnerUnitImportServiceImpl implements IOwnerUnitImportService {
 						ownerUnit.setUpdateTime(DateUtils.getNowDate());
 						ownerUnitService.insertOwnerUnit(ownerUnit);
 					}
+					
+					ownerUnitReportService.selectOwnerUnitReportByUnitIdAndTypeAndCode(ownerUnit.getId(), "1", ownerUnit.getInitCode());
+					ownerUnitReportService.selectOwnerUnitReportByUnitIdAndTypeAndCode(ownerUnit.getId(), "2", ownerUnit.getReviewCode());
+					
 					data.setResult("导入成功");
 				} catch (Exception e) {
 					data.setResult(StrUtil.format("导入失败：{}", e.getMessage()));

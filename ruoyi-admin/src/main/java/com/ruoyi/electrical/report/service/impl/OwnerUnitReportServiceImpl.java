@@ -92,7 +92,9 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 				log.error("", e);
 			}
 			report.setUnitId(unitId);
-			report.setDetectData(new Date());
+			if("1".equals(type)) {
+				report.setDetectData(new Date());
+			}
 			report.setDetectStatus("0");
 			report.setStatus("0");
 			report.setCreateTime(DateUtils.getNowDate());
@@ -100,6 +102,40 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 
 			ownerUnitReportMapper.insertOwnerUnitReport(report);
 		}
+		return report;
+	}
+	
+	@Override
+	public OwnerUnitReport selectOwnerUnitReportByUnitIdAndTypeAndCode(Long unitId, String type, String code) {
+
+		OwnerUnitReport report = ownerUnitReportMapper.selectOwnerUnitReportByUnitIdAndType(unitId, type);
+		if (report == null) {
+			report = new OwnerUnitReport();
+			report.setId(IdUtil.getSnowflake().nextId());
+			report.setType(type);
+			try {
+				LoginUser loginUser = SecurityUtils.getLoginUser();
+				report.setInspector(loginUser.getUser().getNickName());
+				report.setInspectorId(loginUser.getUserId());
+			} catch (Exception e) {
+				log.error("", e);
+			}
+			report.setCode(code);
+			report.setUnitId(unitId);
+			if ("1".equals(type)) {
+				report.setDetectData(new Date());
+			}
+			report.setDetectStatus("0");
+			report.setStatus("0");
+			report.setCreateTime(DateUtils.getNowDate());
+			report.setUpdateTime(DateUtils.getNowDate());
+
+			ownerUnitReportMapper.insertOwnerUnitReport(report);
+		} else {
+			report.setCode(code);
+			ownerUnitReportMapper.updateOwnerUnitReport(report);
+		}
+		
 		return report;
 	}
 

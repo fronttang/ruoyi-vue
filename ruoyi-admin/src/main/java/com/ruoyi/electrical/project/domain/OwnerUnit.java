@@ -257,4 +257,14 @@ public class OwnerUnit extends BaseEntity {
 	 * 风速（m/s）
 	 */
 	private String windSpeed;
+	
+	/**
+	 * 初检报告编号
+	 */
+	private String initCode;
+	
+	/**
+	 * 复检报告编号
+	 */
+	private String reviewCode;
 }

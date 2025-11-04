@@ -30,7 +30,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="区" prop="district">
-        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable>
+        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable @change="handleChangeDistrict">
           <el-option
             v-for="dict in districtOptions"
             :key="dict.value"
@@ -40,7 +40,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="街道" prop="street">
-        <el-select v-model="queryParams.street" placeholder="请选择街道"  filterable clearable>
+        <el-select v-model="queryParams.street" placeholder="请选择街道"  filterable clearable  @change="handleChangeStreet">
           <el-option
             v-for="dict in streetOptions"
             :key="dict.value"
@@ -50,7 +50,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="社区" prop="community" v-if="projectType === '1' || projectType == '3'">
-        <el-select v-model="queryParams.community" placeholder="请选择社区"  filterable clearable >
+        <el-select v-model="queryParams.community" placeholder="请选择社区"  filterable clearable  @change="handleChangeCommunity">
           <el-option
             v-for="dict in communityOptions"
             :key="dict.value"
@@ -68,6 +68,27 @@
             :value="dict.value"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item label="复检状态" prop="detectStatus" >
+        <el-select v-model="queryParams.detectStatus" placeholder="请选择初检状态" filterable clearable>
+          <el-option
+            v-for="dict in dict.type.again_test_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="复检日期" prop="initialDate" >
+        <el-date-picker clearable @change="$forceUpdate()"
+            v-model="queryParams.initialDate"
+            type="daterange"
+            range-separator="-"
+            value-format="yyyy-MM-dd"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            size="small">
+          </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -127,22 +148,22 @@
       </el-table-column>
       <el-table-column label="区" align="center" prop="district" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
-          <dict-tag :options="districtOptions" :value="scope.row.district"/>
+          <dict-tag :options="districtList" :value="scope.row.district"/>
         </template>
       </el-table-column>
       <el-table-column label="街道" align="center" prop="street" :show-overflow-tooltip="true" >
         <template slot-scope="scope">
-          <dict-tag :options="streetOptions" :value="scope.row.street"/>
+          <dict-tag :options="streetList" :value="scope.row.street"/>
         </template>
       </el-table-column>
       <el-table-column label="社区" align="center" prop="community" :show-overflow-tooltip="true" v-if="projectType === '1' || projectType == '3'">
         <template slot-scope="scope">
-          <dict-tag :options="communityOptions" :value="scope.row.community"/>
+          <dict-tag :options="communityList" :value="scope.row.community"/>
         </template>
       </el-table-column>
       <el-table-column label="村" align="center" prop="hamlet" :show-overflow-tooltip="true" v-if="projectType === '1'">
         <template slot-scope="scope">
-          <dict-tag :options="hamletOptions" :value="scope.row.hamlet"/>
+          <dict-tag :options="hamletList" :value="scope.row.hamlet"/>
         </template>
       </el-table-column>
       <el-table-column label="编制日期" align="center" prop="reportDate" width="160">
@@ -224,7 +245,7 @@
               <el-collapse accordion>
                 <el-collapse-item :title="item.content" :name="index">
                   <div>
-                    <p v-if="item.remark != null && item.remark != ''">驳回原因：{{item.remark}}</p>
+                    <p v-if="item.remark != null && item.remark != ''">备注：{{item.remark}}</p>
                     <p v-if="item.operationPic != null && item.operationPic != ''">
                       相关图片：<image-preview :src="item.operationPic" :width="50" :height="50"/>
                     </p>
@@ -236,15 +257,15 @@
         </el-col>
         <el-col :span="12" v-if="form.status !== '3'">
           <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-            <el-form-item label="驳回原因" label-width="100px" prop="remark">
-              <el-input v-model="form.remark" type="textarea" placeholder="请输入驳回原因" />
+            <el-form-item label="备注" label-width="100px" prop="remark">
+              <el-input v-model="form.remark" type="textarea" placeholder="请输入备注" />
             </el-form-item>
             <el-form-item label="相关图片" label-width="100px" prop="operationPic">
               <image-upload v-model="form.operationPic" />
             </el-form-item>
           </el-form>
           <div style="padding-left: 100px;">
-            <el-button type="primary" @click="handlePass">通过</el-button>
+            <el-button type="primary" @click="handlePass">提交审核</el-button>
             <el-button v-if="form.status !== '0'" @click="handleNotPass">驳回</el-button>
           </div>
         </el-col>
@@ -273,15 +294,15 @@
 
     <el-dialog title="批量审核" :visible.sync="batchAuditOpen" width="800px" append-to-body>
         <el-form ref="batchAuditForm" :model="form" :rules="rules" label-width="80px">
-          <el-form-item label="驳回原因" label-width="100px" prop="remark">
-            <el-input v-model="form.remark" type="textarea" placeholder="请输入驳回原因" />
+          <el-form-item label="备注" label-width="100px" prop="remark">
+            <el-input v-model="form.remark" type="textarea" placeholder="请输入备注" />
           </el-form-item>
           <el-form-item label="相关图片" label-width="100px" prop="operationPic">
             <image-upload v-model="form.operationPic" />
           </el-form-item>
         </el-form>
         <div style="padding-left: 100px;">
-          <el-button type="primary" :loading="handleBatchPassLoading" @click="handleBatchPass">通过</el-button>
+          <el-button type="primary" :loading="handleBatchPassLoading" @click="handleBatchPass">提交审核</el-button>
           <el-button v-if="form.status !== '0'" :loading="handleBatchNotPassLoading" @click="handleBatchNotPass">驳回</el-button>
         </div>
     </el-dialog>
@@ -324,13 +345,13 @@ padding-bottom: 0px;
 import { listReport, getWordReport, archivedPdf, getReportLogs, passReport, notPassReport, resetReportStatus, setReportDate, getOriginalRecords, batchPass, batchNotPass, batchSetReportDate, batchDownload, batchGenerateReport} from "@/api/report/report";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
-import { getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
+import { getProjectAreaDictByProjectIdAndType, getProjectAreaDictTree } from "@/api/project/ProjectArea";
 import DictMeta from '@/utils/dict/DictMeta'
 import { Loading } from 'element-ui'
 
 export default {
   name: "Review",
-  dicts: ['high_risk_type', 'owner_unit_report_status'],
+  dicts: ['high_risk_type', 'owner_unit_report_status', 'again_test_status'],
   computed: {
     workerRole() {
       return this.$store.state.settings.workerRoleId;
@@ -366,6 +387,16 @@ export default {
       streetOptions: [],
       communityOptions: [],
       hamletOptions: [],
+
+      districtData: [],
+      streetData: [],
+      communityData: [],
+      hamletData: [],
+
+      districtList: [],
+      streetList: [],
+      communityList: [],
+      hamletList: [],
       
       // 弹出层标题
       title: "",
@@ -399,7 +430,11 @@ export default {
         startDate: null,
         endDate: null,
         remark: null,
-        operationPic: null
+        operationPic: null,
+        detectStatus: null,
+        initialDate: [],
+        startDate: null,
+        endDate: null
       },
       // 表单参数
       form: {},
@@ -410,9 +445,6 @@ export default {
       },
       // 表单校验
       rules: {
-        remark: [
-          { required: true, message: "驳回原因不能为空", trigger: "blur" }
-        ],
       },
       reportDateRoles: {},
       projectType: null,
@@ -437,24 +469,30 @@ export default {
         this.projectType = response.data.type;
       });
 
-      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+      getProjectAreaDictTree(this.$store.state.settings.projectId).then(response => {
+        this.districtData = response.data;
         const dictMeta = DictMeta.parse("districtOptions");
         this.districtOptions = dictMeta.responseConverter(response.data, dictMeta);
       });
 
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+        const dictMeta = DictMeta.parse("districtList");
+        this.districtList = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'street').then(response => {
-        const dictMeta = DictMeta.parse("streetOptions");
-        this.streetOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("streetList");
+        this.streetList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'community').then(response => {
-        const dictMeta = DictMeta.parse("communityOptions");
-        this.communityOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("communityList");
+        this.communityList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'hamlet').then(response => {
-        const dictMeta = DictMeta.parse("hamletOptions");
-        this.hamletOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("hamletList");
+        this.hamletList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       listReport(this.queryParams).then(response => {
@@ -498,6 +536,60 @@ export default {
       };
       this.resetForm("form");
     },
+    handleChangeDistrict(district) {
+      this.queryParams.street = null;
+      this.queryParams.community = null;
+      this.queryParams.hamlet = null;
+      if( district != null) {
+        var selectDistrict  = this.districtData.filter(item => item.dictValue == district);
+        console.log(selectDistrict);
+        if(selectDistrict != null && selectDistrict.length > 0) {
+          this.streetData = selectDistrict[0].sub;
+          console.log(this.streetData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.streetOptions = dictMeta.responseConverter(this.streetData, dictMeta);
+        } else {
+          this.streetOptions = [];
+        }
+      } else {
+        this.streetOptions = [];
+      }
+    },
+    handleChangeStreet(street) {
+      this.queryParams.community = null;
+      this.queryParams.hamlet = null;
+      if( street != null) {
+        var selectStreet  = this.streetData.filter(item => item.dictValue == street);
+        console.log(selectStreet);
+        if(selectStreet != null && selectStreet.length > 0) {
+          this.communityData = selectStreet[0].sub;
+          console.log(this.communityData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.communityOptions = dictMeta.responseConverter(this.communityData, dictMeta);
+        } else {
+          this.communityOptions = [];
+        }
+      } else {
+        this.communityOptions = [];
+      }
+    },
+    handleChangeCommunity(community) {
+      this.queryParams.hamlet = null;
+      if( community != null) {
+        var selected  = this.communityData.filter(item => item.dictValue == community);
+        console.log(selected);
+        if(selected != null && selected.length > 0) {
+          this.hamletData = selected[0].sub;
+          console.log(this.hamletData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.hamletOptions = dictMeta.responseConverter(this.hamletData, dictMeta);
+        } else {
+          this.hamletOptions = [];
+        }
+      } else {
+        this.hamletOptions = [];
+      }
+    },
     statusFormat(row){
       var statusName =  this.selectDictLabel(this.dict.type.owner_unit_report_status, row.status);
       if(row.reject === '1'){
@@ -526,6 +618,10 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
+      if(this.queryParams.initialDate != null){
+        this.queryParams.startDate = this.queryParams.initialDate[0];
+        this.queryParams.endDate = this.queryParams.initialDate[1];
+      }
       this.queryParams.pageNum = 1;
       this.getList();
     },

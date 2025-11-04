@@ -74,3 +74,10 @@ export function getProjectAreaTree(projectId) {
     method: 'get'
   })
 }
+
+export function getProjectAreaDictTree(projectId) {
+  return request({
+    url: '/project/ProjectArea/dictTree/' + projectId,
+    method: 'get'
+  })
+}

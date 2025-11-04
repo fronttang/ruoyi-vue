@@ -86,6 +86,6 @@ public class OwnerUnitDangerGroupDetailDto {
 	 * 结束 复检时间
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date endReivewDate;
+	private Date endReviewDate;
 
 }

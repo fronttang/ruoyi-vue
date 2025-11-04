@@ -61,10 +61,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectOwnerUnitReportList" parameterType="com.ruoyi.electrical.dto.OwnerUnitReportDto" resultMap="OwnerUnitReportVo">
-    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type,  
+    	select * from (select u.id as unit_id, r.id as report_id, u.detect_id, r.type, u.name, u.high_risk_type, r.detect_status,
     	r.archived_pdf, r.archived_word, r.word_file, r.word_file_version, r.archived_word_version,
     	r.start_date, r.end_date, 
-    	CASE WHEN r.report_date is null THEN now() ELSE r.report_date END as report_date,
+    	report_date,
     	u.district, u.street, u.community, u.hamlet,
     	CASE WHEN r.status is null THEN 0 ELSE r.status END as status, 
     	CASE WHEN r.reject is null THEN 0 ELSE r.reject END as reject
@@ -72,6 +72,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where u.project_id = #{projectId} ) t where 1=1
         <if test="name != null and name != '' "> and t.name like concat('%', #{name}, '%')</if>
          <if test="status != null  and status != ''"> and t.status = #{status}</if>
+         <if test="detectStatus != null  and detectStatus != ''"> and t.detect_status = #{detectStatus}</if>
+         <if test="startDate != null "> and t.report_date is not null and date(t.report_date) &gt;= #{startDate}</if>
+         <if test="endDate != null"> and t.report_date is not null and date(t.report_date) &lt;= #{endDate}</if>
          <if test="highRiskType != null  and highRiskType != ''"> and t.high_risk_type = #{highRiskType}</if>
          <if test="district != null  and district != ''"> and t.district = #{district}</if>
          <if test="street != null  and street != ''"> and t.street = #{street}</if>

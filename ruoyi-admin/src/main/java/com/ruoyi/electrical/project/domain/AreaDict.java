@@ -1,7 +1,13 @@
 package com.ruoyi.electrical.project.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 区域字典对象 sys_dict_data
@@ -9,6 +15,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @author fronttang
  * @date 2024-06-20
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class AreaDict extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -45,91 +53,5 @@ public class AreaDict extends BaseEntity
     
     private Long projectId;
 
-	public Long getDictCode() {
-		return dictCode;
-	}
-
-	public void setDictCode(Long dictCode) {
-		this.dictCode = dictCode;
-	}
-
-	public Long getDictSort() {
-		return dictSort;
-	}
-
-	public void setDictSort(Long dictSort) {
-		this.dictSort = dictSort;
-	}
-
-	public String getDictLabel() {
-		return dictLabel;
-	}
-
-	public void setDictLabel(String dictLabel) {
-		this.dictLabel = dictLabel;
-	}
-
-	public String getDictValue() {
-		return dictValue;
-	}
-
-	public void setDictValue(String dictValue) {
-		this.dictValue = dictValue;
-	}
-
-	public String getDictType() {
-		return dictType;
-	}
-
-	public void setDictType(String dictType) {
-		this.dictType = dictType;
-	}
-
-	public String getCssClass() {
-		return cssClass;
-	}
-
-	public void setCssClass(String cssClass) {
-		this.cssClass = cssClass;
-	}
-
-	public String getListClass() {
-		return listClass;
-	}
-
-	public void setListClass(String listClass) {
-		this.listClass = listClass;
-	}
-
-	public String getIsDefault() {
-		return isDefault;
-	}
-
-	public void setIsDefault(String isDefault) {
-		this.isDefault = isDefault;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public Long getProjectId() {
-		return projectId;
-	}
-
-	public void setProjectId(Long projectId) {
-		this.projectId = projectId;
-	}
-
-	@Override
-	public String toString() {
-		return "AreaDict [dictCode=" + dictCode + ", dictSort=" + dictSort + ", dictLabel=" + dictLabel + ", dictValue="
-				+ dictValue + ", dictType=" + dictType + ", cssClass=" + cssClass + ", listClass=" + listClass
-				+ ", isDefault=" + isDefault + ", status=" + status + ", projectId=" + projectId + "]";
-	}
-    
+    private List<AreaDict> sub = new ArrayList<>();
 }

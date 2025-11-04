@@ -10,7 +10,7 @@
         />
       </el-form-item>
       <el-form-item label="区" prop="district">
-        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable>
+        <el-select v-model="queryParams.district" placeholder="请选择区"  filterable clearable @change="handleChangeDistrict">
           <el-option
             v-for="dict in districtOptions"
             :key="dict.value"
@@ -317,7 +317,7 @@
 import { listOwnerUnit, getOwnerUnit, delOwnerUnit, addOwnerUnit, updateOwnerUnit, startRounds, roundsStep} from "@/api/project/OwnerUnit";
 import { detectUnitDict } from "@/api/projectrole/DetectUnit";
 import { getProject } from "@/api/project/project";
-import { getProjectAreaDict, getProjectAreaDictByProjectId, getProjectAreaDictByProjectIdAndType } from "@/api/project/ProjectArea";
+import { getProjectAreaDict, getProjectAreaDictByProjectId, getProjectAreaDictByProjectIdAndType,getProjectAreaDictTree } from "@/api/project/ProjectArea";
 import { getDetectUnitUserDictByTypeAndProjectId, getDetectUnitUserDict } from "@/api/projectrole/detectUnitUser";
 import DictMeta from '@/utils/dict/DictMeta'
 import { getToken } from "@/utils/auth";
@@ -346,6 +346,17 @@ export default {
       streetOptions: [],
       communityOptions: [],
       hamletOptions: [],
+
+      districtData: [],
+      streetData: [],
+      communityData: [],
+      hamletData: [],
+
+      districtList: [],
+      streetList: [],
+      communityList: [],
+      hamletList: [],
+
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -471,25 +482,30 @@ export default {
         this.projectAreaDict = response.data;
       });
 
-      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
-        this.districtList = response.data;
+      getProjectAreaDictTree(this.$store.state.settings.projectId).then(response => {
+        this.districtData = response.data;
         const dictMeta = DictMeta.parse("districtOptions");
         this.districtOptions = dictMeta.responseConverter(response.data, dictMeta);
       });
 
+      getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'district').then(response => {
+        const dictMeta = DictMeta.parse("districtList");
+        this.districtList = dictMeta.responseConverter(response.data, dictMeta);
+      });
+
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'street').then(response => {
-        const dictMeta = DictMeta.parse("streetOptions");
-        this.streetOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("streetList");
+        this.streetList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'community').then(response => {
-        const dictMeta = DictMeta.parse("communityOptions");
-        this.communityOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("communityList");
+        this.communityList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       getProjectAreaDictByProjectIdAndType(this.$store.state.settings.projectId, 'hamlet').then(response => {
-        const dictMeta = DictMeta.parse("hamletOptions");
-        this.hamletOptions = dictMeta.responseConverter(response.data, dictMeta);
+        const dictMeta = DictMeta.parse("hamletList");
+        this.hamletList = dictMeta.responseConverter(response.data, dictMeta);
       });
 
       listOwnerUnit(this.queryParams).then(response => {
@@ -556,10 +572,29 @@ export default {
     detectFormat(row){
       return this.selectDictVoLabel(this.detectUnitDict, row.detectId);
     },
+    handleChangeDistrict(district) {
+      this.queryParams.street = null;
+      this.queryParams.community = null;
+      this.queryParams.hamlet = null;
+      if( district != null) {
+        var selectDistrict  = this.districtData.filter(item => item.dictValue == district);
+        console.log(selectDistrict);
+        if(selectDistrict != null && selectDistrict.length > 0) {
+          this.streetData = selectDistrict[0].sub;
+          console.log(this.streetData);
+          const dictMeta = DictMeta.parse("streetOptions");
+          this.streetOptions = dictMeta.responseConverter(this.streetData, dictMeta);
+        } else {
+          this.streetOptions = [];
+        }
+      } else {
+        this.streetOptions = [];
+      }
+    },
     areaFormat(row) {
       var area = [];
-      var districtName = this.selectDictLabel(this.districtOptions, row.district);
-      var streetName = this.selectDictLabel(this.streetOptions, row.street);
+      var districtName = this.selectDictLabel(this.districtList, row.district);
+      var streetName = this.selectDictLabel(this.streetList, row.street);
       //var communityName = this.selectDictLabel(this.communityOptions, row.community);
       //var hamletName = this.selectDictLabel(this.hamletOptions, row.hamlet);
 

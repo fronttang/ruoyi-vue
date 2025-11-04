@@ -33,6 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="communityName"    column="community_name"    />
         <result property="hamlet"    column="hamlet"    />
         <result property="hamletName"    column="hamlet_name"    />
+        <result property="initialStatus"    column="initial_status"    />
     </resultMap>
 
     <sql id="selectChargeInfraredVo">
@@ -48,7 +49,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         JSON_UNQUOTE(d.formb->'$.data.result') as result,  
         JSON_UNQUOTE(d.formb->'$.data.type') as type,  
         JSON_UNQUOTE(d.formb->'$.data.infraredPic') as infrared_pic,  
-        JSON_UNQUOTE(d.formb->'$.data.inspectionPic') as inspection_pic
+        JSON_UNQUOTE(d.formb->'$.data.inspectionPic') as inspection_pic,
+        CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,r1.detect_data as initial_date
          
         from owner_unit_danger d 
         left join owner_unit u on u.id = d.unit_id
@@ -59,6 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join detect_unit du on du.id = u.detect_id
         left join owner_unit_area a on a.id = d.unit_area_id
         left join owner_unit_building b on b.id = d.building_id 
+        left join owner_unit_report r1 on r1.unit_id = u.id and r1.type = '1'
         where u.project_id = #{projectId}) t 
     </sql>
 
@@ -76,12 +79,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <if test="type != null  and type != ''"> and t.type = #{type}</if>
             <if test="result != null  and result != ''"> and t.result = #{result}</if>
-            <if test="startDate != null  and startDate != ''"> and date(t.initial_time) &gt;= #{startDate}</if>
-            <if test="endDate != null  and endDate != ''"> and date(t.initial_time) &lt;= #{endDate}</if>
+            <if test="startDate != null"> and date(t.initial_time) &gt;= #{startDate}</if>
+            <if test="endDate != null"> and date(t.initial_time) &lt;= #{endDate}</if>
             <if test="district != null  and district != ''"> and t.district = #{district}</if>
             <if test="street != null  and street != ''"> and t.street = #{street}</if>
             <if test="community != null  and community != ''"> and t.community = #{community}</if>
             <if test="hamlet != null  and hamlet != ''"> and t.hamlet = #{hamlet}</if>
+            <if test="initialStatus != null  and initialStatus != ''"> and t.initial_status = #{initialStatus}</if>
+            <if test="startInitialDate != null "> and t.initial_date is not null and date(t.initial_date) &gt;= #{startInitialDate}</if>
+            <if test="endInitialDate != null"> and t.initial_date is not null and date(t.initial_date) &lt;= #{endInitialDate}</if>
+            <choose>
+            	<when test="resultFlag != null and resultFlag == 0"> and ( t.result is null or t.result = '' )</when>
+            	<when test="resultFlag != null and resultFlag == 1"> and t.result is not null and t.result != '' </when>
+            </choose>
     </select>
     
     <select id="selectChargeInfraredById" parameterType="Long" resultMap="ChargeInfraredResult">

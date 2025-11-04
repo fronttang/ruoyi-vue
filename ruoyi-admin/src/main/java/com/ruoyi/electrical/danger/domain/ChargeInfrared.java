@@ -2,6 +2,7 @@ package com.ruoyi.electrical.danger.domain;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 import lombok.Data;
@@ -105,17 +106,38 @@ public class ChargeInfrared extends BaseEntity {
 	 * 搜索关键字
 	 */
 	private String keyword;
+	
+	/**
+	 * 初检状态
+	 */
+	private String initialStatus;
+	
+	/**
+	 * 开始时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date startInitialDate;
+
+	/**
+	 * 结束时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date endInitialDate;
 
 	/**
 	 * 开始时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startDate;
 
 	/**
 	 * 结束时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date endDate;
 
 	private Long projectId;
+	
+	private String resultFlag;
 
 }

@@ -67,6 +67,8 @@ import com.ruoyi.electrical.report.dto.OwnerUnitInfo;
 import com.ruoyi.electrical.report.dto.OwnerUnitReportInfo;
 import com.ruoyi.electrical.report.dto.UrbanVillageDanger;
 import com.ruoyi.electrical.report.formb.FormB1;
+import com.ruoyi.electrical.report.formb.FormB1.SinglePhase;
+import com.ruoyi.electrical.report.formb.FormB1.ThreePhase;
 import com.ruoyi.electrical.report.formb.FormB14;
 import com.ruoyi.electrical.report.formb.FormB6;
 import com.ruoyi.electrical.report.mapper.OwnerUnitReportMapper;
@@ -370,6 +372,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 					if ("B14".equalsIgnoreCase(key)) {
 						List<Object> residualCurrents = value.stream().filter((d) -> {
 							FormB14 b14 = (FormB14) d;
+							b14.setResidualCurrent(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(b14.getResidualCurrent()));
 							return FormB14.TYPE_RESIDUALCURRENT.equalsIgnoreCase(b14.getType());
 						}).collect(Collectors.toList());
 
@@ -377,6 +380,7 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 
 						List<Object> alarmTimes = value.stream().filter((d) -> {
 							FormB14 b14 = (FormB14) d;
+							b14.setAlarmTime(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(b14.getAlarmTime()));
 							return FormB14.TYPE_ALARMTIME.equalsIgnoreCase(b14.getType());
 						}).collect(Collectors.toList());
 
@@ -385,6 +389,12 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 						// 单相
 						List<Object> singlePhase = value.stream().filter((d) -> {
 							FormB1 b1 = (FormB1) d;
+							
+							SinglePhase sp = b1.getSinglePhase();
+							sp.setL(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(sp.getL()));
+							sp.setN(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(sp.getN()));
+							b1.setSinglePhase(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(sp));
+							
 							return FormB1.SINGLE_PHASE.equalsIgnoreCase(b1.getType());
 						}).collect(Collectors.toList());
 
@@ -393,6 +403,16 @@ public class UrbanVillageUnitInitialReportServiceImpl implements IUrbanVillageUn
 						// 三相
 						List<Object> threePhase = value.stream().filter((d) -> {
 							FormB1 b1 = (FormB1) d;
+							
+							ThreePhase tp = b1.getThreePhase();
+							tp.setA(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp.getA()));
+							tp.setB(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp.getB()));
+							tp.setN(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp.getN()));
+							tp.setC(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp.getC()));
+							tp.setC(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp.getC()));
+							tp.setVoltage(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp.getVoltage()));
+							b1.setThreePhase(com.ruoyi.electrical.util.BeanUtils.replaceNullWithSlash(tp));
+							
 							return !FormB1.SINGLE_PHASE.equalsIgnoreCase(b1.getType());
 						}).collect(Collectors.toList());
 

@@ -283,7 +283,9 @@ public class BatchOperateController extends BaseController {
 			            while ((length = fis.read(buffer)) >= 0) {
 			            	zip.write(buffer, 0, length);
 			            }
-						
+			            zip.flush();
+			            zip.closeEntry();
+			            
 //							zip.putNextEntry(new ZipEntry(fileName));
 //							IoUtil.write(zip, false, FileUtil.readBytes(filePath));
 //							zip.flush();

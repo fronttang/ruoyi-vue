@@ -349,7 +349,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(select count(1) as dangers from owner_unit_danger ud1 where ud1.unit_id = o.id and ud1.status = '0' and ud1.rounds = o.rounds ) as rectifications,
 		(select count(1) as dangers from owner_unit_danger ud2 where ud2.unit_id = o.id and ud2.status = '1' and ud2.rounds = o.rounds ) as reexaminations,
 		(select count(1) as dangers from owner_unit_danger ud3 where ud3.unit_id = o.id and ud3.status = '2' and ud3.rounds = o.rounds ) as finishs,
-		(select count(1) from owner_unit_danger t where t.unit_id = o.id and t.rounds = o.rounds and t.status != '9' and t.status != '' and t.status is not null ) as dangers
+		(select count(1) from owner_unit_danger t where t.unit_id = o.id and t.rounds = o.rounds and t.status &lt;&gt; '9' and t.status &lt;&gt; '' and t.status is not null ) as dangers
 		from owner_unit o 
 		left join owner_unit_report r1 on r1.unit_id = o.id and r1.type = '1'
 		left join owner_unit_report r2 on r2.unit_id = o.id and r1.type = '2'
@@ -390,7 +390,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(select count(1) as dangers from owner_unit_danger ud1 where ud1.building_id = o.id and ud1.status = '0' ) as rectifications,
 		(select count(1) as dangers from owner_unit_danger ud2 where ud2.building_id = o.id and ud2.status = '1' ) as reexaminations,
 		(select count(1) as dangers from owner_unit_danger ud3 where ud3.building_id = o.id and ud3.status = '2' ) as finishs,
-		(select count(1) from owner_unit_danger t where t.building_id = o.id and t.status != '9'  and t.status != '' and t.status is not null ) as dangers
+		(select count(1) from owner_unit_danger t where t.building_id = o.id and t.status &lt;&gt; '9'  and t.status &lt;&gt; '' and t.status is not null ) as dangers
 		from owner_unit_building o 
 		left join owner_unit u on u.id = o.unit_id
 		where o.unit_id = #{unitId}) t

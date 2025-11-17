@@ -46,9 +46,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         JSON_UNQUOTE(d.formb->'$.data.deviceCode') as device_code,
         JSON_UNQUOTE(d.formb->'$.data.imageCode') as image_code,
         JSON_UNQUOTE(d.formb->'$.data.overallPic') as overall_pic,  
-        JSON_UNQUOTE(d.formb->'$.data.result') as result,  
+        CASE WHEN JSON_UNQUOTE(d.formb->'$.data.result') IN ('null', '') THEN NULL ELSE JSON_UNQUOTE(d.formb->'$.data.result') END AS result,  
         JSON_UNQUOTE(d.formb->'$.data.type') as type,  
-        JSON_UNQUOTE(d.formb->'$.data.infraredPic') as infrared_pic,  
+        CASE WHEN JSON_UNQUOTE(d.formb->'$.data.infraredPic') IN ('null', '') THEN NULL ELSE JSON_UNQUOTE(d.formb->'$.data.infraredPic') END AS infrared_pic, 
         JSON_UNQUOTE(d.formb->'$.data.inspectionPic') as inspection_pic,
         CASE WHEN r1.detect_status is null THEN 0 ELSE r1.detect_status END as initial_status,r1.detect_data as initial_date
          

@@ -85,9 +85,9 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 			report.setId(IdUtil.getSnowflake().nextId());
 			report.setType(type);
 			try {
-				LoginUser loginUser = SecurityUtils.getLoginUser();
-				report.setInspector(loginUser.getUser().getNickName());
-				report.setInspectorId(loginUser.getUserId());
+				//LoginUser loginUser = SecurityUtils.getLoginUser();
+				//report.setInspector(loginUser.getUser().getNickName());
+				//report.setInspectorId(loginUser.getUserId());
 			} catch (Exception e) {
 				log.error("", e);
 			}
@@ -114,9 +114,9 @@ public class OwnerUnitReportServiceImpl implements IOwnerUnitReportService {
 			report.setId(IdUtil.getSnowflake().nextId());
 			report.setType(type);
 			try {
-				LoginUser loginUser = SecurityUtils.getLoginUser();
-				report.setInspector(loginUser.getUser().getNickName());
-				report.setInspectorId(loginUser.getUserId());
+				//LoginUser loginUser = SecurityUtils.getLoginUser();
+				//report.setInspector(loginUser.getUser().getNickName());
+				//report.setInspectorId(loginUser.getUserId());
 			} catch (Exception e) {
 				log.error("", e);
 			}

@@ -205,10 +205,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="exportUrbanVillageByQuery" parameterType="com.ruoyi.electrical.dto.OwnerUnitDangerGroupDetailDto" resultMap="DangerExportUrbanVillageQueryDto">
     	WITH
 	    area_dangers AS (
-	        SELECT ua.unit_id, COUNT(DISTINCT ua.id) AS households
-	        FROM owner_unit_area ua
-	        JOIN owner_unit_danger d ON d.unit_area_id = ua.id
-	        GROUP BY ua.unit_id
+	        SELECT a.unit_id, COUNT(DISTINCT d.unit_area_id) AS households
+			FROM owner_unit_danger d
+			JOIN owner_unit_area a ON d.unit_area_id = a.id and a.type = '2'
+			GROUP BY a.unit_id
 	    )
     	select t.* from (select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
@@ -250,10 +250,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="exportUrbanVillageByUnitId" parameterType="Long" resultMap="DangerExportUrbanVillageQueryDto">
         WITH
 	    area_dangers AS (
-	        SELECT ua.unit_id, COUNT(DISTINCT ua.id) AS households
-	        FROM owner_unit_area ua
-	        JOIN owner_unit_danger d ON d.unit_area_id = ua.id
-	        GROUP BY ua.unit_id
+	        SELECT a.unit_id, COUNT(DISTINCT d.unit_area_id) AS households
+			FROM owner_unit_danger d
+			JOIN owner_unit_area a ON d.unit_area_id = a.id and a.type = '2'
+			GROUP BY a.unit_id
 	    )
     	select o.id, o.code, o.name, o.address, o.layers, o.acreage, o.door_number, o.contact, o.phone,
     	o.district, o.street, o.community, o.hamlet, a.dict_label as district_name, b.dict_label as street_name, c.dict_label as community_name, d.dict_label as hamlet_name,
